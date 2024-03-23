@@ -1,0 +1,48 @@
+@import url('https://fonts.googleapis.com/css2?family=Lexend:wght@100..900&display=swap');
+
+// initial
+$color-text-normal: #000;
+$color-background: #fff;
+$font-family-default: 'Lexend', sans-serif;
+$color-primary: #10a9a0;
+
+// primary button
+$color-btn-primary-bg: $color-primary;
+$color-btn-primary-bg-hover: #57c3bc;
+$color-btn-primary-text: #fff;
+
+// default button
+$color-btn-default-bg: $color-primary;
+$color-btn-default-text: #fff;
+$color-btn-default-border: $color-primary;
+$color-btn-default-bg-hover: #57c3bc;
+
+// transparent button
+$color-btn-transparent-bg: transparent;
+$color-btn-transparent-bg-hover: $color-primary;
+$color-btn-transparent-text: $color-primary;
+$color-btn-transparent-text-hover: #fff;
+$color-btn-transparent-border: $color-primary;
+$color-btn-transparent-border-hover: $color-primary;
+
+// black button
+$color-btn-black-bg: #000;
+$color-btn-black-bg-hover: #3b3b3b;
+$color-btn-black-text: #fff;
+
+// white button
+$color-btn-white-text: #616161;
+$color-btn-white-bg: #fff;
+$color-btn-white-border: #9d9d9d;
+$color-btn-white-text-hover: $color-primary;
+$color-btn-white-border-hover: $color-primary;
+
+// red button
+$color-btn-red-bg: #ed1b35;
+$color-btn-red-border: #ed1b35;
+$color-btn-red-border-hover: #f55367;
+$color-btn-red-bg-hover: #f55367;
+
+// link button
+$color-btn-link-text: $color-primary;
+$color-btn-link-text-hover: #57c3bc;
