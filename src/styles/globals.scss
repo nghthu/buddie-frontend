@@ -1,0 +1,203 @@
+@use 'variables' as *;
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  font-size: 62.5%;
+  height: 100%;
+}
+
+body {
+  height: 100%;
+  font-family: $font-family-default;
+  font-size: 1.6rem;
+  font-weight: 400;
+  color: $color-text-normal;
+  line-height: 1.5;
+  background-color: $color-background;
+}
+
+body:has(.overflow-hidden) {
+  overflow: hidden;
+}
+
+a {
+  text-decoration: none;
+  line-height: 1.5;
+}
+
+button {
+  line-height: 1.5;
+}
+
+span {
+  font-family: $font-family-default;
+}
+
+.ant-btn {
+  font-family: $font-family-default;
+  border-radius: 5px;
+  font-weight: 400;
+  height: auto;
+}
+
+.ant-btn-primary {
+  color: $color-btn-primary-text;
+  background-color: $color-btn-primary-bg;
+
+  &:not(:disabled):not(.ant-btn-disabled):hover {
+    background-color: $color-btn-primary-bg-hover;
+  }
+}
+
+.ant-btn-black {
+  color: $color-btn-black-text;
+  background-color: $color-btn-black-bg;
+
+  &:not(:disabled):not(.ant-btn-disabled):hover {
+    background-color: $color-btn-black-bg-hover;
+  }
+}
+
+.ant-btn-default {
+  color: $color-btn-default-text;
+  background-color: $color-btn-default-bg;
+  border-color: $color-btn-default-border;
+
+  &:not(:disabled):not(.ant-btn-disabled):hover {
+    background-color: $color-btn-default-bg-hover;
+    color: $color-btn-default-text;
+    border-color: $color-btn-default-border;
+  }
+}
+
+.ant-btn-transparent {
+  background-color: $color-btn-transparent-bg;
+  color: $color-btn-transparent-text;
+  border-color: $color-btn-transparent-border;
+
+  &:not(:disabled):not(.ant-btn-disabled):hover {
+    background-color: $color-btn-transparent-bg-hover;
+    color: $color-btn-transparent-text-hover;
+    border-color: $color-btn-transparent-border-hover;
+  }
+}
+
+.ant-btn-white {
+  color: $color-btn-white-text;
+  background-color: $color-btn-white-bg;
+  border-color: $color-btn-white-border;
+
+  &:not(:disabled):not(.ant-btn-disabled):hover {
+    border-color: $color-btn-white-border-hover;
+    color: $color-btn-white-text-hover;
+  }
+}
+
+.ant-btn-link {
+  color: $color-btn-link-text;
+  border: 0;
+
+  &:not(:disabled):not(.ant-btn-disabled):hover {
+    color: $color-btn-link-text-hover;
+    border: 0;
+  }
+}
+
+.ant-form-item-explain-error {
+  font-weight: 400;
+  margin-top: 5px;
+  margin-bottom: 15px;
+}
+
+.ant-input-affix-wrapper {
+  &:hover {
+    border-color: $color-primary;
+  }
+
+  &:focus {
+    border-color: $color-primary;
+  }
+
+  &:focus-within {
+    border-color: $color-primary;
+  }
+}
+
+.ant-input-affix-wrapper .ant-input-prefix {
+  margin-inline-end: 8px;
+}
+
+.ant-result > .ant-result-image {
+  margin: 0;
+}
+
+.ant-spin {
+  height: 100vh;
+  width: 100vw;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  & > .ant-spin-dot {
+    font-size: 60px;
+    margin-bottom: 10vh;
+  }
+
+  & .ant-spin-dot-item {
+    background-color: $color-primary;
+  }
+}
+
+.ant-dropdown > .ant-dropdown-menu {
+  padding: 8px;
+
+  & > .ant-dropdown-menu-item {
+    margin: 2px;
+  }
+}
+
+.ant-menu > .ant-menu-item {
+  margin: 0 10px;
+}
+
+.ant-menu .ant-menu-sub > li {
+  margin-left: 4px;
+  margin-right: 4px;
+  font-size: 1.5rem;
+}
+
+.ant-menu-light .ant-menu-item-selected {
+  background-color: #dff7f4;
+}
+
+.ant-card {
+  position: relative;
+
+  & .ant-card-meta-title {
+    font-size: 2rem;
+  }
+
+  & .ant-card-actions {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+  }
+
+  & .ant-card-actions > li > span:hover {
+    color: rgba(0, 0, 0, 0.45);
+  }
+
+  & .ant-card-actions > li > .anticon-copy:hover {
+    color: $color-primary;
+  }
+}
+
+.ant-card:not(.ant-card-bordered) {
+  box-shadow: none;
+}
