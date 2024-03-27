@@ -5,7 +5,7 @@ import TextCard from '@/components/TextCard';
 const Ielts = () => {
   return (
     <>
-      <CountdownClock />
+      
     </>
   );
 };

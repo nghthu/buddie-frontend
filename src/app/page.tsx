@@ -1,3 +1,4 @@
+'use client';
 import { Button } from 'antd';
 import { CheckCircleOutlined } from '@ant-design/icons';
 import clsx from 'clsx';

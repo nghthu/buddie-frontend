@@ -39,7 +39,7 @@ const Header = (props: Props) => {
   return (
     <div className={styles.header}>
       <Link href='/home'>
-        <div className={styles.logo} onClick={() => tabClickHandler('home')}>
+        <div className={styles.logo} onClick={() =>tabClickHandler('home')}>
           <img src='/images/logo.png'></img>
           <div>
             <h2>buddie</h2>
@@ -63,13 +63,13 @@ const Header = (props: Props) => {
             Cộng đồng
           </p>
         </Link>
-        <Link href='/ielts' onClick={() => tabClickHandler('ielts')}>
+        <Link href='/ielts/reading' onClick={() => tabClickHandler('ielts')}>
           <p className={clsx(activatedTab === 'ielts' && styles.activate)}>
             Ielts cùng AI✨
           </p>
         </Link>
         <div className={clsx(styles.avatarMenu)}>
-          <img src='images/avatar.jpg' className={clsx(styles.avatar)} />
+          <img src='/images/avatar.jpg' className={clsx(styles.avatar)} />
           <Dropdown
             menu={{ items: accountItems }}
             placement='bottomRight'
