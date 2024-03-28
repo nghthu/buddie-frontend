@@ -9,16 +9,22 @@ export default function Home() {
     <div className={styles.container}>
       <div className={styles.star}></div>
       {[...Array(15)].map((_, index) => (
-        <div className={styles[`meteor-${index + 1}`]}></div>
+        <div
+          className={styles[`meteor-${index + 1}`]}
+          key={index}
+        ></div>
       ))}
 
       <div className={styles.information}>
-        <Link href='/login' className={styles['login-btn']}>
+        <Link
+          href="/login"
+          className={styles['login-btn']}
+        >
           <button>Đi đến trang đăng nhập</button>
         </Link>
         <h1>Bạn muốn học tiếng Anh hiệu quả?</h1>
         <div className={styles.banner}>
-          <img src='/images/logo.png'></img>
+          <img src="/images/logo.png"></img>
           <p>
             Thử ngay trên Buddie! Trang web kết hợp việc học tiếng Anh truyền
             thống và sự hỗ trợ mạnh mẽ của AI

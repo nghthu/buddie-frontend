@@ -1,0 +1,20 @@
+.form {
+    display: flex;
+    flex-direction: column;
+    text-align: center;
+}
+
+.title {
+    margin-bottom: 20px;
+}
+
+.forgot-password {
+    font-size: 1.4rem;
+    align-self: flex-start;
+    padding: 0;
+    margin-bottom: 25px;
+}
+
+.login-btn {
+    width: 100%;
+}

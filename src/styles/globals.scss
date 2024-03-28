@@ -21,6 +21,10 @@ body {
   background-color: $color-background;
 }
 
+h1, h2, h3, h4, h5, h6 {
+  font-family: $font-family-default;
+}
+
 body:has(.overflow-hidden) {
   overflow: hidden;
 }
@@ -40,7 +44,7 @@ span {
 
 .ant-btn {
   font-family: $font-family-default;
-  border-radius: 5px;
+  border-radius: 8px;
   font-weight: 400;
   height: auto;
 }
@@ -64,26 +68,14 @@ span {
 }
 
 .ant-btn-default {
-  color: $color-btn-default-text;
   background-color: $color-btn-default-bg;
+  color: $color-btn-default-text;
   border-color: $color-btn-default-border;
 
   &:not(:disabled):not(.ant-btn-disabled):hover {
     background-color: $color-btn-default-bg-hover;
-    color: $color-btn-default-text;
-    border-color: $color-btn-default-border;
-  }
-}
-
-.ant-btn-transparent {
-  background-color: $color-btn-transparent-bg;
-  color: $color-btn-transparent-text;
-  border-color: $color-btn-transparent-border;
-
-  &:not(:disabled):not(.ant-btn-disabled):hover {
-    background-color: $color-btn-transparent-bg-hover;
-    color: $color-btn-transparent-text-hover;
-    border-color: $color-btn-transparent-border-hover;
+    color: $color-btn-default-text-hover;
+    border-color: $color-btn-default-border-hover;
   }
 }
 

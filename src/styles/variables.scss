@@ -12,18 +12,12 @@ $color-btn-primary-bg-hover: #57c3bc;
 $color-btn-primary-text: #fff;
 
 // default button
-$color-btn-default-bg: $color-primary;
-$color-btn-default-text: #fff;
+$color-btn-default-bg: default;
+$color-btn-default-bg-hover: $color-primary;
+$color-btn-default-text: $color-primary;
+$color-btn-default-text-hover: #fff;
 $color-btn-default-border: $color-primary;
-$color-btn-default-bg-hover: #57c3bc;
-
-// transparent button
-$color-btn-transparent-bg: transparent;
-$color-btn-transparent-bg-hover: $color-primary;
-$color-btn-transparent-text: $color-primary;
-$color-btn-transparent-text-hover: #fff;
-$color-btn-transparent-border: $color-primary;
-$color-btn-transparent-border-hover: $color-primary;
+$color-btn-default-border-hover: $color-primary;
 
 // black button
 $color-btn-black-bg: #000;
