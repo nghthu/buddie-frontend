@@ -10,12 +10,15 @@ const IeltsReading = () => {
   const [activePart, setActivePart] = useState("landing");
   const [testTime, setTestTime] = useState("20:00");
   const changePart = (part: string) => {
-    console.log(testTime);
+    console.log(part);
     setActivePart(part);
   }
   const handleSelectChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     setTestTime(event.target.value);
   }
+  // get question as whole, keep parts:[....] only
+  // process the question to parts
+  // pass each part's data to the ReadingLayout
   if (activePart === "landing") {
     return (
       <>
@@ -50,7 +53,8 @@ const IeltsReading = () => {
     return (
       <>
         <SkillHeader title={"Luyện tập IELTS Reading"} countdownTime={testTime}></SkillHeader>
-        <ReadingLayout paddingLeft={"2%"} paddingRight={"2%"} />
+        {/* chừa props để truyền data của part đó vào */}
+        <ReadingLayout paddingLeft={"2%"} paddingRight={"2%"} setState={()=>changePart("part2")}/>
       </>
     );
   };
