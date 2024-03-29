@@ -3,10 +3,34 @@
     padding: 10px;
     padding-left: 5rem;
     padding-right: 5rem;
+}
+
+.webButtonColor1 {
     background-color: #10A9A0;
-    color:white;
+    color: white;
+
     &:hover {
         cursor: pointer;
         background-color: #57C3BC;
+    }
+}
+
+.webButtonColor2 {
+    background-color: #ED1B35;
+    color: white;
+
+    &:hover {
+        cursor: pointer;
+        background-color: #F08994;
+    }
+}
+
+.webButtonColor3 {
+    background-color: #6B5D86;
+    color: white;
+
+    &:hover {
+        cursor: pointer;
+        background-color: #D1AEBB;
     }
 }
