@@ -1,22 +1,25 @@
 'use client';
-import { LockOutlined, MailOutlined } from '@ant-design/icons';
+import { LockOutlined, MailOutlined, UserOutlined } from '@ant-design/icons';
 import { Button, Form, FormProps, Input } from 'antd';
-import styles from '@/styles/components/LoginForm.module.scss';
+import styles from '@/styles/components/SignupForm.module.scss';
 
-export interface LoginProps {
+export interface SignupProps {
+  full_name?: string;
   email?: string;
   password?: string;
 }
 
 const emailRegex = /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/;
 const passwordRegex = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[a-zA-Z]).{8,}$/;
+const fullNameRegex = /^(?=.{1,50}$)[A-Za-z]+(?:\s[A-Za-z]+)*$/;
 
-const LoginForm = () => {
-  const onFinish: FormProps<LoginProps>['onFinish'] = (values) => {
+const SignupForm = () => {
+  const [form] = Form.useForm<SignupProps>();
+  const onFinish: FormProps<SignupProps>['onFinish'] = (values) => {
     console.log('Success:', values);
   };
 
-  const onFinishFailed: FormProps<LoginProps>['onFinishFailed'] = (
+  const onFinishFailed: FormProps<SignupProps>['onFinishFailed'] = (
     errorInfo
   ) => {
     console.log('Failed:', errorInfo);
@@ -24,12 +27,42 @@ const LoginForm = () => {
 
   return (
     <Form
+      form={form}
       className={styles.form}
       onFinish={onFinish}
       size="large"
       onFinishFailed={onFinishFailed}
     >
-      <h1 className={styles.title}>Đăng nhập</h1>
+      <h1 className={styles.title}>Đăng ký</h1>
+
+      <Form.Item
+        name="full_name"
+        rules={[
+          {
+            required: true,
+            message: 'Họ tên không được bỏ trống.',
+          },
+          () => ({
+            validator(_, value) {
+              if (!value || fullNameRegex.test(value)) {
+                return Promise.resolve();
+              }
+              return Promise.reject(
+                new Error(
+                  'Họ tên chứa tối đa 50 ký tự, bắt đầu bằng chữ cái, có thể chứa dấu cách, không được chứa thêm ký tự khác.'
+                )
+              );
+            },
+          }),
+        ]}
+      >
+        <Input
+          prefix={<UserOutlined className="site-form-item-icon" />}
+          type="text"
+          placeholder="Họ tên"
+        />
+      </Form.Item>
+
       <Form.Item
         name="email"
         rules={[
@@ -49,10 +82,14 @@ const LoginForm = () => {
           placeholder="Email"
         />
       </Form.Item>
+
       <Form.Item
         name="password"
         rules={[
-          { required: true, message: 'Mật khẩu không được bỏ trống.' },
+          {
+            required: true,
+            message: 'Mật khẩu không được bỏ trống.',
+          },
           () => ({
             validator(_, value) {
               if (!value || passwordRegex.test(value)) {
@@ -73,24 +110,18 @@ const LoginForm = () => {
           placeholder="Mật khẩu"
         />
       </Form.Item>
-      <Button
-        type="link"
-        className={styles['forgot-password']}
-      >
-        Quên mật khẩu
-      </Button>
 
       <Form.Item style={{ marginBottom: '0px' }}>
         <Button
           type="primary"
           htmlType="submit"
-          className={styles['login-btn']}
+          className={styles['signup-btn']}
         >
-          Đăng nhập
+          Đăng ký
         </Button>
       </Form.Item>
     </Form>
   );
 };
 
-export default LoginForm;
+export default SignupForm;

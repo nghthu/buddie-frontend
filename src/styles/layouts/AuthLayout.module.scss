@@ -2,8 +2,8 @@ $n: 15;
 $s: 300;
 
 .container {
-  height: 100%;
-  overflow: hidden;
+  height: 100vh;
+  overflow-x: hidden;
   background-image: radial-gradient(ellipse at top, #080e21 0%, #1b2735 95%);
   position: relative;
   color: white;

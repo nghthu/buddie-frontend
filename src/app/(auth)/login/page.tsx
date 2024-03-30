@@ -31,7 +31,7 @@ const Login = () => {
           />
         }
       >
-        Đăng nhập với Google
+        Đăng nhập bằng Google
       </Button>
       <Button
         className={styles['third-party-login-btn']}
@@ -43,12 +43,13 @@ const Login = () => {
           />
         }
       >
-        Đăng nhập với Facebook
+        Đăng nhập bằng Facebook
       </Button>
       <div className={styles['to-signup-wrapper']}>
         Chưa có tài khoản?{' '}
         <Button
           type="link"
+          href="/signup"
           className={styles['to-signup']}
         >
           Đăng ký

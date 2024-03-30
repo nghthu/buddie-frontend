@@ -12,14 +12,6 @@ export default function AuthLayout({
   children: React.ReactNode;
 }>) {
   return (
-    // <div className={styles.wrapper}>
-    //   <img
-    //     className={styles.background}
-    //     src="/images/star_sky_background.png"
-    //     alt="Star sky background"
-    //   />
-    //   {children}
-    // </div>
     <div className={styles.container}>
       <div className={styles.star}></div>
       {[...Array(15)].map((_, index) => (

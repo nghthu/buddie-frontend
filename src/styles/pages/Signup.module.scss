@@ -38,7 +38,7 @@
   padding: 3px;
 }
 
-.third-party-login-btn {
+.third-party-signup-btn {
   display: flex;
   align-items: center;
   margin-bottom: 16px;
@@ -46,20 +46,20 @@
   justify-content: center;
 }
 
-.third-party-login-btn:not(:disabled):not(.ant-btn-disabled) {
+.third-party-signup-btn:not(:disabled):not(.ant-btn-disabled) {
   &:hover {
     background-color: transparent;
     color: $color-text-normal;
   }
 }
 
-.to-signup-wrapper {
+.to-login-wrapper {
   font-size: 1.4rem;
   align-self: center;
   margin-top: 5px;
 }
 
-.to-signup {
+.to-login {
   padding: 0;
   padding-left: 4px;
 }
