@@ -1,0 +1,60 @@
+@use '../variables' as *;
+
+.main {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 620px;
+  width: 480px;
+  margin: 80px auto;
+  background-color: #fff;
+  border-radius: 24px;
+  color: #000;
+  padding: 40px 60px;
+}
+
+.spin {
+  height: auto;
+  width: auto;
+}
+
+.container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+
+  & p {
+    font-size: 1.6rem;
+  }
+
+  & h1 {
+    font-size: 2.6rem;
+  }
+
+  & h2 {
+    font-size: 1.7rem;
+  }
+}
+
+.mail-icon-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  width: 60px;
+  height: 60px;
+  padding: 10px;
+  background-color: rgba(16, 169, 160, 0.2);
+}
+
+.mail-icon {
+  color: $color-primary;
+  font-size: 2.6rem;
+}
+
+// .container {
+//   display: flex;
+//   flex-direction: row;
+// }

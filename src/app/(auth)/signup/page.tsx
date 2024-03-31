@@ -1,4 +1,4 @@
-import { Button, Divider, Form, FormProps, Input } from 'antd';
+import { Button, Divider } from 'antd';
 import styles from '@/styles/pages/Signup.module.scss';
 import SignupForm from '@/components/SignupForm';
 

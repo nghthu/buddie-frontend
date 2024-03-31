@@ -1,10 +1,4 @@
-import type { Metadata } from 'next';
 import styles from '@/styles/layouts/AuthLayout.module.scss';
-
-export const metadata: Metadata = {
-  title: 'Buddy',
-  description: 'Học tiếng Anh cùng AI',
-};
 
 export default function AuthLayout({
   children,
