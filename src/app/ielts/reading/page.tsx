@@ -10,7 +10,6 @@ const IeltsReading = () => {
   const [activePart, setActivePart] = useState("landing");
   const [testTime, setTestTime] = useState("20:00");
   const changePart = (part: string) => {
-    console.log(part);
     setActivePart(part);
   }
   const handleSelectChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
