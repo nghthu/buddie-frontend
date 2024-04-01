@@ -45,7 +45,6 @@ export default function PracticePage() {
     setChatVisible(false);
   };
 
-  console.log(part, typeof part);
   return (
     <>
       <div className={styles.container}>
