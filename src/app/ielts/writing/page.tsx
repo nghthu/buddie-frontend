@@ -7,7 +7,7 @@ export default function WritingPage() {
       <div className={styles.container}>
         <p className={styles.title}>Luyện tập IETLS Writing</p>
 
-        <div className={styles.mainContainer}>
+        <div className={styles.landingContainer}>
           <p className={styles.textLanding}>
             Phần thi IELTS Writing gồm 2 phần, hãy lựa chọn phần thi mà bạn muốn
             luyện tập.
@@ -33,10 +33,7 @@ export default function WritingPage() {
               </button>
             </Link>
             <Link href="/ielts/writing/practicing?part=all">
-              <button
-                className={styles.primaryButton}
-                style={{ backgroundColor: '#6b5d86' }}
-              >
+              <button className={styles.practiceAllButton}>
                 Luyện tập tất cả
               </button>
             </Link>

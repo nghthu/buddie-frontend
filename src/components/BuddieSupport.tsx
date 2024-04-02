@@ -3,7 +3,7 @@
 import Card from '@/components/Card';
 import styles from '@/styles/components/BuddieSuport.module.scss';
 
-const BuddieSuport = () => {
+const BuddieSuport = (props: { onClose: () => void }) => {
   const DUMMY_REQUESTS = [
     {
       request: 'Tóm tắt',
@@ -52,6 +52,7 @@ const BuddieSuport = () => {
       showCloseButton
       backgroundColor="#ECEEF9"
       className={styles['chat-box']}
+      onClose={props.onClose}
     >
       <div className={styles.container}>
         {DUMMY_REQUESTS.map((chat, index) => (

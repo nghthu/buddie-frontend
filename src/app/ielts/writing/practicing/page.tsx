@@ -6,6 +6,7 @@ import styles from '@/styles/pages/Writing.module.scss';
 import WritingFunctionMenu from '@/components/WritingFunctionMenu';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
+import BuddieSuport from '@/components/BuddieSupport';
 
 export default function PracticePage() {
   const [menuVisible, setMenuVisible] = useState(false);
@@ -45,26 +46,18 @@ export default function PracticePage() {
     setChatVisible(false);
   };
 
-  console.log(part, typeof part);
   return (
     <>
       <div className={styles.container}>
         <p className={styles.title}>IETLS Writing Task 1</p>
 
         <div
-          className={styles.mainContainer}
+          className={`${styles.practiceContainer} ${
+            chatVisible ? styles.chatVisible : styles.chatHidden
+          }`}
           onClick={hideMenu}
-          style={{
-            flexDirection: 'row',
-            gap: '30px',
-            overflow: chatVisible ? 'auto' : 'visible',
-            height: chatVisible ? '100vh' : 'fit-content',
-          }}
         >
-          <div
-            className={styles.practiceContainer}
-            style={{ overflowY: chatVisible ? 'auto' : 'visible' }}
-          >
+          <div className={styles.taskContainer}>
             <div className={styles.task}>
               The graph below shows the number of tourists visiting a particular
               Caribbean island between 2010 and 2017. Summarize the information
@@ -91,9 +84,16 @@ export default function PracticePage() {
               </div>
             )}
             <div className={styles.answerHeader}>
-              <p className={styles.textPracticing}>
-                You should spend about 20 minutes on this task
-              </p>
+              <div className={styles.instruction}>
+                <img
+                  className={styles.instructionImg}
+                  src="/images/logo.png"
+                  alt=""
+                />
+                <p className={styles.textPracticing}>
+                  You should spend about 20 minutes on this task
+                </p>
+              </div>
               <CountdownClock />
             </div>
             <div className={styles.answerContainer}>
@@ -109,10 +109,7 @@ export default function PracticePage() {
                 onMenuItemClick={showChat}
               />
             </div>
-            <div
-              className={styles.buttonContainer}
-              style={{ justifyContent: 'space-between' }}
-            >
+            <div className={styles.practiceButtonContainer}>
               <Link href="/ielts/writing">
                 <button className={styles.redButton}>Thoát</button>
               </Link>
@@ -124,59 +121,16 @@ export default function PracticePage() {
                     : '/ielts/writing/result'
                 }
               >
-                <button
-                  className={styles.primaryButton}
-                  style={{ width: '295px' }}
-                >
-                  Xong
-                </button>
+                <button className={styles.primaryButton}>Xong</button>
               </Link>
             </div>
           </div>
 
-          <div
-            className={
-              chatVisible
-                ? styles.chatContainerVisible
-                : styles.chatContainerHidden
-            }
-          >
+          {chatVisible && (
             <div>
-              <div className={styles.chatUser}>
-                <img
-                  src="/images/avatar.jpg"
-                  alt=""
-                  className={styles.userAvatar}
-                />
-                <p className={styles.username}>Bạn</p>
-              </div>
-              <p className={styles.chatMessage}>{selectedMenuItem}</p>
+              <BuddieSuport onClose={hideChat} />
             </div>
-
-            <div>
-              <div className={styles.chatUser}>
-                <img
-                  src="/images/logo.png"
-                  alt=""
-                  className={styles.userAvatar}
-                />
-                <p className={styles.username}>Buddie</p>
-              </div>
-              <p className={styles.chatMessage}>
-                The graph illustrates the fluctuating number of tourists
-                visiting a Caribbean island from 2010 to 2017, with an overall
-                upward trend, peaking in 2015 possibly due to factors such as
-                marketing campaigns or infrastructure improvements.
-              </p>
-            </div>
-            <button
-              className={styles.closeButton}
-              onClick={hideChat}
-              style={{ cursor: 'pointer' }}
-            >
-              X
-            </button>
-          </div>
+          )}
         </div>
       </div>
     </>

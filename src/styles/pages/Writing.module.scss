@@ -6,7 +6,7 @@
   padding-inline: 60px;
 }
 
-.mainContainer {
+.landingContainer {
   background-color: #f5f6fa;
   border-radius: 25px;
   padding: 30px;
@@ -17,6 +17,24 @@
 }
 
 .practiceContainer {
+  background-color: #f5f6fa;
+  border-radius: 25px;
+  padding: 30px;
+  display: flex;
+  flex-direction: row;
+  gap: 30px;
+}
+
+.practiceContainer.chatVisible {
+  overflow: auto;
+  height: 100vh;
+}
+
+.practiceContainer.chatHidden {
+  height: fit-content;
+}
+
+.taskContainer {
   display: flex;
   flex-direction: column;
   gap: 30px;
@@ -61,8 +79,30 @@
   gap: 50px;
 }
 
+.practiceButtonContainer {
+  display: flex;
+  justify-content: space-between;
+  gap: 50px;
+
+  .primaryButton {
+    width: 295px;
+  }
+}
+
 .primaryButton {
   background-color: $color-btn-primary-bg;
+  color: $color-btn-primary-text;
+  border: 0;
+  border-radius: 10px;
+  padding: 10px 30px;
+  font-family: $font-family-default;
+  font-size: 20px;
+  font-weight: 400;
+  cursor: pointer;
+}
+
+.practiceAllButton {
+  background-color: #6b5d86;
   color: $color-btn-primary-text;
   border: 0;
   border-radius: 10px;
@@ -135,50 +175,12 @@
   border: 1px solid #000;
 }
 
-.chatContainerVisible {
+.instruction {
   display: flex;
-  flex-direction: column;
-  height: 83vh;
-  background-color: #eceef9;
-  border-radius: 25px;
-  padding: 20px 10px;
-  position: relative;
+  flex-direction: row;
 }
 
-.closeButton {
-  position: absolute;
-  width: 30px;
-  height: 30px;
-  top: 20px;
-  right: 20px;
-  background-color: transparent;
-  border: none;
-}
-
-.chatContainerHidden {
-  display: none;
-}
-
-.chatUser {
-  display: flex;
-  align-items: center;
-
-  .userAvatar {
-    width: 50px;
-    height: 50px;
-    border-radius: 50%;
-    margin-inline: 10px;
-    background-color: #fff9c7;
-  }
-
-  .username {
-    font-size: 20px;
-    font-weight: 500;
-    flex-grow: 1;
-  }
-}
-
-.chatMessage {
-  margin-bottom: 10px;
-  margin-left: 70px;
+.instructionImg {
+  width: 80px;
+  transform: scaleX(-1);
 }
