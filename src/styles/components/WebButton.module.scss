@@ -1,28 +1,8 @@
 .webButton {
-    border-radius: 15px;
-    padding: 10px;
-    padding-left: 5rem;
-    padding-right: 5rem;
-}
-
-.webButtonColor1 {
-    background-color: #10A9A0;
-    color: white;
-
-    &:hover {
-        cursor: pointer;
-        background-color: #57C3BC;
-    }
-}
-
-.webButtonColor2 {
-    background-color: #ED1B35;
-    color: white;
-
-    &:hover {
-        cursor: pointer;
-        background-color: #F08994;
-    }
+    padding: 8px;
+    padding-left: 3rem;
+    padding-right: 3rem;
+    font-size:2rem;
 }
 
 .webButtonColor3 {

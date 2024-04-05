@@ -1,16 +1,21 @@
-export default function DropdownLayout(props: { question?: string, options?: string[], answer?: string }) {
+import { ConfigProvider, Select } from 'antd';
+import styles from '@/styles/components/questionLayouts.module.scss';
+export default function DropdownLayout(props: { question?: string, options?: string[], answer?: string, questionIndex?: number | string, setAnswer?: Function}) {
     if (props.options) {
-        const dropdownchoice: JSX.Element[] = [];
-        dropdownchoice.push(<h3 key={"<h3></h3>"}>{props.question}</h3>);
-        const dropdownchoiceTemp = <select key={"<select></select>"} onChange={() => {/*lift state lên cho cái page hoặc cái reading layout, truyền vào đây function change state để update câu trả lời của user*/ }} style={{ paddingLeft: "1rem", paddingRight: "1rem", fontSize:"2rem" }}>
-            {props.options.map((option: string, index: number) => {
-                return <option key={option+"<option></option>"} value={option}>{option}</option>
-            })}
-        </select>;
-        // add all elements of dropdownchoiceTemp into dropdownchoice
-        dropdownchoice.push(dropdownchoiceTemp);
+        const selecOptions = props.options.map((option: string, index: number) => {
+            return { label: option, value: option };
+        });
+        const select = <Select className={styles.dropdownGroup} defaultValue={props.options[0]} onChange={() => { }} options={selecOptions} />;
         return (
-            <div style={{ width: "100%", display: "flex", alignItems: "center", gap: "1rem" }}>{dropdownchoice}</div>
+            <ConfigProvider theme={{
+                "components": {
+                    "Select": {
+                        "fontSize": 20
+                    }
+                }
+            }}>
+                <div className={styles.dropdownWrapper}><h3>{props.question}</h3>{select}</div>
+            </ConfigProvider>
         )
     } else {
         return (<></>)

@@ -1,13 +1,12 @@
 import styles from '@/styles/components/TextCard.module.scss';
+import clsx from 'clsx';
 
-const TextCard = (props: { children: React.ReactNode; width: string; height: string; backgroundColor?: string, display?: string, justifyContent?: string }) => {
+const TextCard = (props: { children: React.ReactNode; width: string; height: string; className?: string }) => {
   return (
     <div
-      className={styles.card}
+      className={clsx(styles.card,props.className?props.className:"")}
       style={{
-        width: props.width, height: props.height,
-        backgroundColor: props.backgroundColor, display: props.display,
-        justifyContent: props.justifyContent, flexWrap: "wrap"
+        width: props.width, height: props.height
       }}
     >
       {props.children}

@@ -1,17 +1,27 @@
-export default function MultiChoiceLayout(props: { question?: string, options?: string[], answers?: string }) {
+import { Checkbox, ConfigProvider } from 'antd';
+import styles from '@/styles/components/questionLayouts.module.scss';
+export default function MultiChoiceLayout(props: { question?: string, options?: string[], answers?: string, questionIndex?: number | string, setAnswer?: Function}) {
     if (props.options) {
-        const multichoice: JSX.Element[] = [];
-        multichoice.push(<h3 key={"<h3></h3>"}>{props.question}</h3>);
-        const multichoiceTemp = props.options.map((option: string, index: number) => {
-            return <div key={option} style={{ width: "100%", display: "flex", alignItems: "center", gap: "1rem" }}>
-                <input key={option+"<input>"} style={{ width: "2rem", height: "2rem" }} type="checkbox" name={props.question} value={option} />
-                <label htmlFor="option1">{option}</label>
-            </div>;
-        });
-        // add all elements of multichoiceTemp into multichoice
-        multichoice.push(...multichoiceTemp);
+        const multiChoiceGroup = <Checkbox.Group onChange={() => { }} options={props.options} className={styles.multiChoiceGroup}></Checkbox.Group>;
+
+        const multiChoiceWrapper = <div className={styles.multiChoiceWrapper}><h3 style={{whiteSpace:"pre-wrap"}}>{props.question}</h3>{multiChoiceGroup}</div>;
+
         return (
-            <>{ multichoice }</>
+            <>
+                <ConfigProvider
+                    theme={{
+                        components: {
+                            Checkbox: {
+                                colorPrimary: "#10a9a0",
+                                controlInteractiveSize: 20,
+                                colorPrimaryHover: "#D5F4ED",
+                                fontSize:20
+                            }
+                        }
+                    }}>
+                    {multiChoiceWrapper}
+                </ConfigProvider>
+            </>
         )
     } else {
         return (<></>)

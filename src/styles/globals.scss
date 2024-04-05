@@ -63,6 +63,14 @@ span {
   }
 }
 
+.ant-btn-red {
+  color: $color-btn-red-text;
+  background-color: $color-btn-red-bg;
+  
+  &:not(:disabled):not(.ant-btn-disabled):hover {
+    background-color: $color-btn-red-bg-hover;
+  }
+}
 .ant-btn-default {
   color: $color-btn-default-text;
   background-color: $color-btn-default-bg;

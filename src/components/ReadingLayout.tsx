@@ -1,46 +1,67 @@
+'use client';
+import { Button } from "antd";
 import DropdownLayout from "./DropdownLayout";
 import MultiChoiceLayout from "./MultiChoiceLayout";
 import ReadingContextLayout from "./ReadingContextLayout";
 import SingleChoiceLayout from "./SingleChoiceLayout";
+import FillTheBlankLayout from "./FillTheBlankLayout";
 import TextCard from "./TextCard";
-import WebButton from "./WebButton";
 
+import questionLayouts from '@/styles/components/questionLayouts.module.scss';
+import textCardStyles from '@/styles/components/TextCard.module.scss';
+import buttonStyles from '@/styles/components/WebButton.module.scss';
+import clsx from "clsx";
+import BuddieSuport from "./BuddieSupport";
 
-export default function ReadingLayout(props: { context?: string, questionsAndAnswers?: string, paddingLeft?: string, paddingRight?: string, setState: React.MouseEventHandler<HTMLDivElement> }) {
-    // const questionTypes = ["single choice", "multiple choice", "fill in the blank", "dropdown"];
-    // get a part's data, get the questions
-    // decide which question type to display for each question
-    // props are for demo only
-    const questionTypes = ["single choice", "multiple choice", "fill in the blank", "dropdown"]
+interface data {
+    part_number: number,
+    part_duration: number,
+    part_recording: string,
+    part_prompt: string,
+    part_image_urls: Array<string>,
+    question_groups: Array<object>;
+}
+
+export default function ReadingLayout(props: { context?: string, questionsAndAnswers?: string, paddingLeft?: string, paddingRight?: string, setPrevState: React.MouseEventHandler<HTMLDivElement>, setNextState: React.MouseEventHandler<HTMLDivElement>, data: data, setAnswer: Function }) {
+    const questionGroups = props.data["question_groups"].map((questionGroup: any, index: number) => {
+        const questions = questionGroup["questions"].map((question: any, index: number) => {
+            return (<>
+                {question["question_type"] === "single_choice" && <SingleChoiceLayout question={question["question_prompt"]} options={question["options"]} answer={question["answer"]} questionIndex={question["question_number"]} />}
+                {question["question_type"] === "multiple_choice" && <MultiChoiceLayout question={question["question_prompt"]} options={question["options"]} answers={question["answer"]} questionIndex={question["question_number"]} />}
+                {question["question_type"] === "selection" && <DropdownLayout question={question["question_prompt"]} options={question["options"]} answer={question["answer"]} questionIndex={question["question_number"]} />}
+                {question["question_type"] === "completion" && <FillTheBlankLayout question={question["question_prompt"]} answer={question["answer"]} questionIndex={question["question_number"]} />}
+            </>
+            )
+        });
+        return <TextCard width={"100"} height={"auto"} className={"cardFlex"}>
+            {questionGroup["question_groups_info"]["question_groups_prompt"] && <h3 style={{ whiteSpace: "pre-wrap" }}>{questionGroup["question_groups_info"]["question_groups_prompt"]}</h3>}
+            {questionGroup["question_groups_info"]["question_groups_image_urls"] && questionGroup["question_groups_info"]["question_groups_image_urls"].length > 0 && <>
+                {questionGroup["question_groups_info"]["question_groups_image_urls"].map((url: string, index: number) => {
+                    return <img key={index} src={url} alt={"question group image"} style={{ width: "100%", height: "auto" }} />
+                })}
+            </>}
+            {questions}
+        </TextCard>
+    });
     return (
         <div style={{ display: "flex", gap: "1rem", paddingLeft: props.paddingLeft, paddingRight: props.paddingRight, fontSize: "2rem" }}>
-
-            <TextCard width={"60%"} height={"calc(100vh - 140px"} backgroundColor={"#F5F6FA"}>
-                <ReadingContextLayout />
-            </TextCard>
-            {/* logic xử lý chọn kiểu câu hỏi để display
-            Có thể sẽ gọn lại do dùng .map hoặc array để loop qua data và render 
-            phần dưới đây chỉ để demo ui, không mang tính chất dùng thật*/}
-            <div style={{ width: "40%", height: "calc(100vh - 140px)", overflowY: "scroll", display: "flex", flexDirection: "column", gap: "2rem" }}>
-
-                <TextCard width={"100"} height={"auto"} display="flex">
-                    <SingleChoiceLayout question="question1" options={["option1", "option2", "option3"]} />
-                    <SingleChoiceLayout question="question2" options={["option1", "option2", "option3"]} />
+            <div className={questionLayouts.contextWrapper}>
+                <TextCard width={"100%"} height={"100%"} className={clsx(textCardStyles["card_background-color_very-light-grey"], textCardStyles["card_overflow_scroll"])}>
+                    <ReadingContextLayout context={props.data.part_prompt} />
                 </TextCard>
+                <div style={{ display: "flex", width: "100%", justifyContent: "space-around" }}>
+                    <Button className={clsx(buttonStyles.webButton, "ant-btn-red")} type={"primary"} onClick={() => { }}>Kết thúc</Button>
+                    <Button className={buttonStyles.webButton} type={"primary"} onClick={() => { }}>Nộp bài</Button>
+                </div>
+            </div>
+            <div className={questionLayouts.questionContainer}>
+                {questionGroups}
                 <TextCard width={"100"} height={"auto"}>
-                    <MultiChoiceLayout question="question3" options={["option1", "option2", "option3"]} />
-                    <MultiChoiceLayout question="question4" options={["option1", "option2", "option3", "option4", "option5"]} />
-                </TextCard>
-                <TextCard width={"100"} height={"auto"}>
-                    <DropdownLayout question="question5" options={["option1", "option2", "option3"]} />
-                    <DropdownLayout question="question6" options={["option1", "option2", "option3"]} />
-                </TextCard>
-                <TextCard width={"100"} height={"auto"}>
-                    Buddie's response goes here
+                    <BuddieSuport />
                 </TextCard>
                 <div style={{ width: "100%", display: "flex", justifyContent: "space-around" }}>
-                    <WebButton text="Previous" backgroundColorNumber="2" onClick={() => { }} />
-                    <WebButton text="Next" onClick={props.setState} />
+                    <Button className={clsx(buttonStyles.webButton, "ant-btn-red")} type={"primary"} onClick={props.setPrevState}>Phần trước</Button>
+                    <Button className={buttonStyles.webButton} type={"primary"} onClick={props.setNextState}>Phần tiếp theo</Button>
                 </div>
 
             </div>
