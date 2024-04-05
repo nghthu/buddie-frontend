@@ -13,21 +13,31 @@ export default function PracticePage() {
   const [menuPosition, setMenuPosition] = useState({ x: 0, y: 0 });
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const [chatVisible, setChatVisible] = useState(false);
-  const [selectedMenuItem, setSelectedMenuItem] = useState('');
   const searchParams = useSearchParams();
   const part = searchParams.get('part');
+  const [selection, setSelection] = useState<string>('');
+  const [chatRequests, setChatRequests] = useState<
+    Array<{ avatar: string; request: string; response: string }>
+  >([]);
 
   const showMenu = (event: React.MouseEvent) => {
     event.preventDefault();
-    let selection = '';
+
+    let newSelection = '';
     if ((event.target as Element).tagName === 'TEXTAREA') {
-      selection =
-        textareaRef.current?.value.substring(
-          textareaRef.current?.selectionStart || 0,
-          textareaRef.current?.selectionEnd || 0
-        ) || '';
+      newSelection =
+        '"' +
+          textareaRef.current?.value.substring(
+            textareaRef.current?.selectionStart || 0,
+            textareaRef.current?.selectionEnd || 0
+          ) +
+          '"' || '';
     }
-    if (selection || (event.target as Element).tagName === 'IMG') {
+    if (!newSelection && (event.target as Element).tagName === 'IMG') {
+      newSelection = 'Image';
+    }
+    if (newSelection) {
+      setSelection(newSelection);
       setMenuVisible(true);
       setMenuPosition({ x: event.clientX, y: event.clientY });
     }
@@ -38,8 +48,20 @@ export default function PracticePage() {
   };
 
   const showChat = (message: string) => {
-    setSelectedMenuItem(message);
+    const request = {
+      avatar: '/images/avatar.jpg',
+      request: message + ' ' + selection,
+      response: 'Dummy response',
+    };
+
+    setChatRequests((prevRequests) => [...prevRequests, request]);
     setChatVisible(true);
+
+    // Clear the selection
+    if (textareaRef.current) {
+      textareaRef.current.selectionStart = 0;
+      textareaRef.current.selectionEnd = 0;
+    }
   };
 
   const hideChat = () => {
@@ -128,7 +150,10 @@ export default function PracticePage() {
 
           {chatVisible && (
             <div>
-              <BuddieSuport onClose={hideChat} />
+              <BuddieSuport
+                onClose={hideChat}
+                requests={chatRequests}
+              />
             </div>
           )}
         </div>
