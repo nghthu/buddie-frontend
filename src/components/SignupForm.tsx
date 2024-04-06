@@ -1,17 +1,16 @@
 'use client';
 
 import { LockOutlined, MailOutlined, UserOutlined } from '@ant-design/icons';
-import { Alert, Button, Form, FormProps, Input, message } from 'antd';
+import { Alert, Button, Form, FormProps, Input, Space } from 'antd';
 import {
   useCreateUserWithEmailAndPassword,
   useUpdateProfile,
   useSignInWithEmailAndPassword,
-  useSendEmailVerification,
 } from 'react-firebase-hooks/auth';
-import styles from '@/styles/components/SignupForm.module.scss';
-import { auth } from '@/lib/firebase';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import styles from '@/styles/components/SignupForm.module.scss';
+import { auth } from '@/lib';
 
 export interface SignupProps {
   full_name?: string;
@@ -28,76 +27,40 @@ const SignupForm = () => {
   const [createUserWithEmailAndPassword, createdUser, creating, createError] =
     useCreateUserWithEmailAndPassword(auth);
   const [updateProfile, updating, updateError] = useUpdateProfile(auth);
-  const [signInWithEmailAndPassword, signedInUser, signingIn, signInError] =
+  const [signInWithEmailAndPassword, signInUser, signInLoading, signInError] =
     useSignInWithEmailAndPassword(auth);
-  const [updateNameSuccessfully, setUpdateNameSuccessfully] = useState(false);
   const router = useRouter();
-  const [sendEmailVerification, sending, sendingEmailError] =
-    useSendEmailVerification(auth);
 
-  const isEmailExists = useMemo(() => {
-    if (createError?.code === 'auth/email-already-in-use') {
-      return true;
-    }
-    return false;
-  }, [createError]);
+  const errors = [createError, updateError, signInError];
+  const existingAuthError = createError || updateError || signInError;
 
   useEffect(() => {
     if (createdUser) {
-      updateProfile({
-        displayName: form.getFieldValue('full_name'),
-      }).then((updateNameSuccessfully) => {
+      const updateNameAndSignIn = async () => {
+        const updateNameSuccessfully = await updateProfile({
+          displayName: form.getFieldValue('full_name'),
+        });
         if (updateNameSuccessfully) {
-          sendEmailVerification();
-          setUpdateNameSuccessfully(true);
-        } else {
-          setUpdateNameSuccessfully(false);
+          signInWithEmailAndPassword(
+            form.getFieldValue('email'),
+            form.getFieldValue('password')
+          ).then((emailSignInUser) => {
+            if (emailSignInUser && !emailSignInUser.user.emailVerified) {
+              router.push('/verify');
+            } else {
+              router.push('/');
+            }
+          });
         }
-      });
+      };
+      updateNameAndSignIn();
     }
   }, [createdUser]);
-
-  useEffect(() => {
-    if (updateNameSuccessfully) {
-      signInWithEmailAndPassword(
-        form.getFieldValue('email'),
-        form.getFieldValue('password')
-      ).then((signedInUser) => {
-        if (signedInUser && !signedInUser.user.emailVerified) {
-          router.push('/verify');
-        } else {
-          router.push('/');
-        }
-      });
-    }
-  }, [updateNameSuccessfully]);
 
   const onFinish: FormProps<SignupProps>['onFinish'] = (values) => {
     const { email, password } = values as Required<SignupProps>;
     createUserWithEmailAndPassword(email, password);
   };
-
-  const onFinishFailed: FormProps<SignupProps>['onFinishFailed'] = (
-    errorInfo
-  ) => {
-    console.error('Sign up failed:', errorInfo);
-  };
-
-  if (createError) {
-    console.error(createError.message);
-  }
-
-  if (updateError) {
-    console.error(updateError.message);
-  }
-
-  if (signInError) {
-    console.error(signInError.message);
-  }
-
-  if (sendingEmailError) {
-    console.error(sendingEmailError.message);
-  }
 
   return (
     <Form
@@ -105,7 +68,6 @@ const SignupForm = () => {
       className={styles.form}
       onFinish={onFinish}
       size="large"
-      onFinishFailed={onFinishFailed}
     >
       <h1 className={styles.title}>Đăng ký</h1>
 
@@ -185,13 +147,33 @@ const SignupForm = () => {
         />
       </Form.Item>
 
-      <Form.Item hidden={!isEmailExists}>
-        <Alert
-          className={styles.alert}
-          message="Email đã tồn tại"
-          type="error"
-          showIcon
-        />
+      <Form.Item hidden={!existingAuthError}>
+        <Space
+          direction="vertical"
+          className={styles['alert-space']}
+          size="middle"
+        >
+          {errors.map((error) => {
+            if (!error) {
+              return;
+            }
+            console.error(error);
+
+            let message = error?.message;
+            if ('code' in error && error.code === 'auth/email-already-in-use') {
+              message = 'Email đã tồn tại';
+            }
+
+            return (
+              <Alert
+                className={styles.alert}
+                message={message}
+                type="error"
+                showIcon
+              />
+            );
+          })}
+        </Space>
       </Form.Item>
 
       <Form.Item style={{ marginBottom: '0px' }}>
@@ -199,7 +181,7 @@ const SignupForm = () => {
           type="primary"
           htmlType="submit"
           className={styles['signup-btn']}
-          loading={creating || updating || signingIn}
+          loading={creating || updating || signInLoading}
         >
           Đăng ký
         </Button>

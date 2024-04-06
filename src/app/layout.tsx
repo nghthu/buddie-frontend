@@ -1,5 +1,7 @@
 import type { Metadata } from 'next';
 import '@/styles/globals.scss';
+import { Provider } from 'react-redux';
+import { store } from '@/store';
 
 export const metadata: Metadata = {
   title: 'Buddy',

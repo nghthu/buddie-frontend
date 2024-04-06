@@ -1,7 +1,11 @@
 'use client';
 import { LockOutlined, MailOutlined } from '@ant-design/icons';
-import { Button, Form, FormProps, Input } from 'antd';
+import { Alert, Button, Form, FormProps, Input } from 'antd';
+import { useSignInWithEmailAndPassword } from 'react-firebase-hooks/auth';
 import styles from '@/styles/components/LoginForm.module.scss';
+import { auth } from '@/lib';
+import { useRouter } from 'next/navigation';
+import { useEffect, useMemo } from 'react';
 
 export interface LoginProps {
   email?: string;
@@ -12,22 +16,39 @@ const emailRegex = /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/;
 const passwordRegex = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[a-zA-Z]).{8,}$/;
 
 const LoginForm = () => {
+  const [form] = Form.useForm<LoginProps>();
+  const [signInWithEmailAndPassword, signInUser, signInLoading, signInError] =
+    useSignInWithEmailAndPassword(auth);
+  const router = useRouter();
+
+  const isInvalidCredential = useMemo(() => {
+    if (signInError?.code === 'auth/invalid-credential') {
+      return true;
+    }
+    return false;
+  }, [signInError]);
+
+  useEffect(() => {
+    if (signInUser) {
+      router.push('/profile');
+    }
+  }, [signInUser]);
+
   const onFinish: FormProps<LoginProps>['onFinish'] = (values) => {
-    console.log('Success:', values);
+    const { email, password } = values as Required<LoginProps>;
+    signInWithEmailAndPassword(email, password);
   };
 
-  const onFinishFailed: FormProps<LoginProps>['onFinishFailed'] = (
-    errorInfo
-  ) => {
-    console.log('Failed:', errorInfo);
-  };
+  if (signInError) {
+    console.error(signInError.message);
+  }
 
   return (
     <Form
+      form={form}
       className={styles.form}
       onFinish={onFinish}
       size="large"
-      onFinishFailed={onFinishFailed}
     >
       <h1 className={styles.title}>Đăng nhập</h1>
       <Form.Item
@@ -73,6 +94,16 @@ const LoginForm = () => {
           placeholder="Mật khẩu"
         />
       </Form.Item>
+
+      <Form.Item hidden={!isInvalidCredential}>
+        <Alert
+          className={styles.alert}
+          message="Thông tin đăng nhập không đúng."
+          type="error"
+          showIcon
+        />
+      </Form.Item>
+
       <Button
         type="link"
         className={styles['forgot-password']}
@@ -84,6 +115,7 @@ const LoginForm = () => {
         <Button
           type="primary"
           htmlType="submit"
+          loading={signInLoading}
           className={styles['login-btn']}
         >
           Đăng nhập

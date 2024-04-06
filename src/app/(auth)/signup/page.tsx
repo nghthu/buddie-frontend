@@ -2,6 +2,15 @@ import { Button, Divider } from 'antd';
 import styles from '@/styles/pages/Signup.module.scss';
 import SignupForm from '@/components/SignupForm';
 
+import type { Metadata } from 'next';
+import GoogleSignInButton from '@/components/GoogleSignInButton';
+import FacebookSignInButton from '@/components/FacebookSignInButton';
+
+export const metadata: Metadata = {
+  title: 'Đăng ký - Buddie',
+  description: 'Đăng ký tài khoản Buddie',
+};
+
 const Signup = () => {
   return (
     <main className={styles.main}>
@@ -21,30 +30,8 @@ const Signup = () => {
       >
         hoặc
       </Divider>
-      <Button
-        className={styles['third-party-signup-btn']}
-        icon={
-          <img
-            src="/images/google.svg"
-            alt="Google"
-            className={styles['third-party-logo']}
-          />
-        }
-      >
-        Đăng ký bằng Google
-      </Button>
-      <Button
-        className={styles['third-party-signup-btn']}
-        icon={
-          <img
-            src="/images/facebook.svg"
-            alt="Facebook"
-            className={styles['third-party-logo']}
-          />
-        }
-      >
-        Đăng ký bằng Facebook
-      </Button>
+      <GoogleSignInButton text="Đăng ký bằng Google" />
+      <FacebookSignInButton text="Đăng ký bằng Facebook" />
       <div className={styles['to-login-wrapper']}>
         Đã có tài khoản?{' '}
         <Button

@@ -1,8 +1,8 @@
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Xác nhận email - Buddie',
-  description: 'Xác nhận email của tài khoản Buddie',
+  title: 'Xác minh email - Buddie',
+  description: 'Xác minh email tài khoản Buddie',
 };
 
 export default function VerifyLayout({
