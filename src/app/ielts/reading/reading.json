@@ -1,5 +1,5 @@
 {
-  "duration": 60,
+  "duration": 3600,
   "created_at": "",
   "updated_at": "",
   "tags": ["IELTS", "IELTS Reading", "2024"],
@@ -7,7 +7,7 @@
   "parts": [
     {
       "part_number": 1,
-      "part_duration": 20,
+      "part_duration": 1200,
       "part_recording": "",
       "part_prompt": "You should spend about 20 minutes on Questions 1-13 which are based on Reading Passage 1.\n\nAUSTRALIA’S PLATYPUS\n\nOf all the creatures on the earth, the Australian platypus, Omithorbynchusparadoxus, is perhaps one of the most mysterious and reclusive. Derived from the Latin platys meaning ‘flat and broad’ and pous meaning ‘foot’, the platypus has long been an iconic symbol of Australia. Upon being discovered in Australia in the 1700s, sketches of this unusual creature were made and sent back to England whereupon they were considered by experts to be a hoax. Indeed, the incredible collection of its body parts – broad, flat tail, rubbery snout, webbed feet and short dense fur – make it one of the world’s most unusual animals.\n\nOfficially classified as a mammal, the egg-laying platypus is mostly active during the night, a nocturnal animal. As if this combination of characteristics and behaviours were not unusual enough, the platypus is the only Australian mammal known to be venomous. The male platypus has a sharply pointed, moveable spur on its hind foot which delivers a poison capable of killing smaller animals and causing severe pain to humans. The spur – about 2 centimetres in length – is quite similar to the fang of a snake and, if provoked, is used as a means of defence. Those who have been stung by a platypus’ spur report an immediate swelling around the wound followed by increased swelling throughout the affected limb. Excruciating, almost paralysing pain in the affected area accompanies the sting which, in some victims has been known to last for a period of months. One report from a victim who was stung in the palm of the hand states that “…the spur could not be pulled out of the hand until the platypus was killed.” During the breeding season, the amount of venom in the male platypus increases. This has led some zoologists to theorise that the poisonous spur is primarily for asserting dominance amongst fellow-males. To be stung by a male platypus is a rare event with only a very small number of people being on the receiving end of this most reclusive creature.\n\nIn the same area of the hind foot where the male has the poisonous spur, the female platypus only develops two buds which drop off in their first year of life never to appear again. The female platypus produces a clutch of one to three eggs in late winter or spring, incubating them in an underground burrow. The eggs are 15-18 millimetres long and have a whitish, papery shell like those of lizards and snakes. The mother is believed to keep the eggs warm by placing them between her lower belly and curled-up tail for a period of about 10 or 11 days as she rests in an underground nest made of leaves or other vegetation collected from the water. The baby platypus drinks a rich milk which is secreted from two round patches of skin midway along the mother’s bell)’. It is believed that a baby platypus feeds by slurping up milk with rhythmic sweeps of its stubby bill. When the juveniles first enter the water at the age of about four months, they are nearly (80-90%) as long as an adult. Male platypus do not help to raise the young.\n\nIn Australia, the platypus is officially classified as ‘Common but Vulnerable’. As a species, it is not currently considered to be endangered. However, platypus populations are believed to have declined or disappeared in many catchments 1, particularly in urban and agricultural landscapes. In most cases, the specific underlying reasons for the reduction in numbers remain unknown. Platypus surveys have only been carried out in a few catchments in eastern Australia. It is therefore impossible to provide an accurate estimate of the total number of platypus remaining in the wild. Based on recent studies, the average platypus population density along relatively good quality streams in the foothills of Victoria’s Great Dividing Range is only around one to two animals per kilometre of channel. Because platypus are predators near the top of the food chain and require large amounts of food to survive (up to about 30% of a given animal’s body weight each day), it is believed that their numbers are most often limited by the availability of food, mainly in the form of bottom-dwelling aquatic invertebrates such as shrimps, worms, yabbies, pea-shell mussels, and immature and adult aquatic insects. Small frogs and fish eggs are also eaten occasionally, along with some terrestrial insects that fall into the water from overhanging vegetation.\n\nCatchments are an area of land drained by a creek or river system, or a place set aside for collecting water which runs off the surface of the land.\n\nUntil the early twentieth century, platypus were widely killed for (heir fur. The species is now protected by law throughout Australia. Platypus are wild animals with specialised living requirements. It is illegal for members of the public to keep them in captivity. A platypus which has been accidentally captured along a stream or found wandering in an unusual place should never be taken home and treated as a pet, even for a brief time. The animal will not survive the experience. Only a small number of Australian zoos and universities hold a permit to maintain platypus in captivity for legitimate display or research purposes. Current Australian government policy does not allow’ this species to be taken overseas for any reason.",
       "part_image_urls": [
@@ -27,7 +27,7 @@
           "questions": [
             {
               "question_number": 1,
-              "question_type": "completion",
+              "question_type": "selection",
               "question_prompt": "",
               "question_image_urls": [],
               "question_duration": 0,
@@ -36,7 +36,7 @@
             },
             {
               "question_number": 2,
-              "question_type": "completion",
+              "question_type": "selection",
               "question_prompt": "",
               "question_image_urls": [],
               "question_duration": 0,
@@ -45,7 +45,7 @@
             },
             {
               "question_number": 3,
-              "question_type": "completion",
+              "question_type": "selection",
               "question_prompt": "",
               "question_image_urls": [],
               "question_duration": 0,
@@ -54,7 +54,7 @@
             },
             {
               "question_number": 4,
-              "question_type": "completion",
+              "question_type": "selection",
               "question_prompt": "",
               "question_image_urls": [],
               "question_duration": 0,
@@ -63,7 +63,7 @@
             },
             {
               "question_number": 5,
-              "question_type": "completion",
+              "question_type": "selection",
               "question_prompt": "",
               "question_image_urls": [],
               "question_duration": 0,
@@ -174,7 +174,7 @@
     },
     {
       "part_number": 2,
-      "part_duration": 20,
+      "part_duration": 1200,
       "part_recording": "",
       "part_prompt": "You should spend about 20 minutes on Questions 14-26, which are based on Reading Passage 2\n\nCreature sleeps\n\nA. Almost every living creature sleeps. For humans, it is typically something we dislike doing when we are younger and, as we age, something we increasingly look forward to at the end of each day. On the one hand, it is something that we absolutely need to sustain our life and on the other, we tend to feel guilty if we spend more time in bed than we should. Sleep researcher Professor Stanley Limpton believes that 7 hours – the average amount of sleep most people get per night – is not enough. Limpton points out that the average person is now getting 2 hours less sleep than those who lived 100 years ago and contends that this lack of sleep is one of the main reasons so many people are often clumsy, unhappy, irritable and agitated. Other scientists share Limpton’s thinking. Many other researchers feel that we are not getting enough sleep and the negative impacts are being regularly felt around the world in the workplace and in the home.\n\nB. The first experiments in recorded scientific history on the effects of people not getting enough sleep took place in the late 1800s. According to records, three volunteers were deprived of sleep for a total of 90 hours. Later on, in 1920 more experiments in sleep deprivation were conducted by scientists where several people were deprived of sleep for a period of 60 hours. The results of many sleep deprivation experiments have been recorded and conducted by American ‘sleep scientist’ Nathaniel Kleitman. Often referred to as ‘the father of modern sleep research’, Kleitman’s work has formed the foundation for many areas of current sleep research. In one experiment, Kleitman examined thirty five volunteers who had been awake for 60 hours and also conducted an experiment on himself, remaining awake for a total of 100 hours. It was revealed that people who are sleep-deprived for periods of more than 60 hours try to fall asleep in any environment and show- signs of mental disturbances, visions and hallucinations. As the length of sleep deprivation increases, so too does the mental decline in an individual. Having studied a group of 3 sleep deprived people, sleep researcher Dr. Tim Oswald, concluded that chronic sleep deprivation often leads to drastic consequences. Oswald’s experiments reinstated the necessity of sleep for proper human functioning.\n\nC. Studies of sleep patterns in some of the more remote areas of the world have also been a subject of interest amongst sleep researchers. It is well-known that during the summer months in both the Arctic and Antarctic Circles the phenomenon known as the midnight sun occurs. Given fair weather conditions, the sun is visible for a continuous 24 hours. One summer, Dr. Peter Suedfeld traveled to the Arctic and conducted a series of research projects. All participants were required to get rid of all clocks, watches and any other timekeeping devices and conduct work and sleep according to their own ‘body dock’. Those involved in the experiment were required to note down when they- had a nap and when they actually went to bed. The results were that most people slept around 10 hours per day and all participants reported feeling completely invigorated and refreshed.\n\nD. The affect of sleep interruptions have also been a focal point of some sleep research. In urban societies, traffic and aircraft noise are often referred to as ‘the bane of urban existence’. Tom Grimstead took people who were classified as ‘good sleepers’ from quiet neighbourhoods and introduced into their bedrooms and night the noise equivalents of a major urban road. An actimeter – a device which measures the amount of movement in sleep – was used to gauge the quality of the participant’s sleep. The participants emerged from the experiment in a depressed-like state after four days. Grimstead reported that participants had depression and mood scores similar to people with clinical depression…a reduction in certain performance tasks was also noted’.\n\nE. Another area of interest in the field of sleep study involves such famous people as Thomas Edison and Winston Churchill who, reportedly, were known to be and have been classified as short sleepers. A short sleeper is one who claims to be able to get by with only 4 or 5 hours of sleep per night. Dr David Joske. secretary’ of the British Sleep Association believes that ‘genetically short sleepers may have some natural resistance to the effects of sleep deprivation but it is not entirely certain why some people seem to require more and others less՝. Determining what makes up the differences between short and long sleepers has been difficult for researchers. Says Joske, ‘When we brought long and short sleepers into controlled environments which were dark and soundproof we found that all participants slept between nine and ten hours, which seemed to preclude the short sleeper category.’\n\nF. A study in Norway was undertaken on a number of bus drivers. They were hooked up to various computers which monitored their states of being awake. The study revealed that bus drivers were asleep for as much as 25% of the time they were driving the bus. What the drivers w ere having was a series of ‘micro-sleeps’ – short periods of time of 10 to 20 seconds where they would be classified as being asleep. In the micro-sleep state, the individual may appear awake, even with their eyes open but in fact they are actually sleeping.",
       "part_image_urls": [
@@ -195,7 +195,7 @@
           "questions": [
             {
               "question_number": 14,
-              "question_type": "completion",
+              "question_type": "selection",
               "question_prompt": "",
               "question_image_urls": [],
               "question_duration": 0,
@@ -215,7 +215,7 @@
             },
             {
               "question_number": 15,
-              "question_type": "completion",
+              "question_type": "selection",
               "question_prompt": "",
               "question_image_urls": [],
               "question_duration": 0,
@@ -235,7 +235,7 @@
             },
             {
               "question_number": 16,
-              "question_type": "completion",
+              "question_type": "selection",
               "question_prompt": "",
               "question_image_urls": [],
               "question_duration": 0,
@@ -255,7 +255,7 @@
             },
             {
               "question_number": 17,
-              "question_type": "completion",
+              "question_type": "selection",
               "question_prompt": "",
               "question_image_urls": [],
               "question_duration": 0,
@@ -275,7 +275,7 @@
             },
             {
               "question_number": 18,
-              "question_type": "completion",
+              "question_type": "selection",
               "question_prompt": "",
               "question_image_urls": [],
               "question_duration": 0,
@@ -309,7 +309,7 @@
           "questions": [
             {
               "question_number": 19,
-              "question_type": "completion",
+              "question_type": "selection",
               "question_prompt": "",
               "question_image_urls": [],
               "question_duration": 0,
@@ -318,7 +318,7 @@
             },
             {
               "question_number": 20,
-              "question_type": "completion",
+              "question_type": "selection",
               "question_prompt": "",
               "question_image_urls": [],
               "question_duration": 0,
@@ -327,7 +327,7 @@
             },
             {
               "question_number": 21,
-              "question_type": "completion",
+              "question_type": "selection",
               "question_prompt": "",
               "question_image_urls": [],
               "question_duration": 0,
@@ -336,7 +336,7 @@
             },
             {
               "question_number": 22,
-              "question_type": "completion",
+              "question_type": "selection",
               "question_prompt": "",
               "question_image_urls": [],
               "question_duration": 0,
@@ -345,7 +345,7 @@
             },
             {
               "question_number": 23,
-              "question_type": "completion",
+              "question_type": "selection",
               "question_prompt": "",
               "question_image_urls": [],
               "question_duration": 0,
@@ -401,7 +401,7 @@
     },
     {
       "part_number": 3,
-      "part_duration": 20,
+      "part_duration": 1200,
       "part_recording": "",
       "part_prompt": "You should spend about 20 minutes on Questions 27-40, which are based on Reading Passage 3.\n\nTHE SEARCH FOR FRESH WATER\n\nThe assertion that water has always been the essence of life is nothing new. Water comes in many forms: spring water, sea and river water, rainwater, and fog and dew water. Yet water is becoming scarce and this scarcity is becoming a very real worry for governments all around the world. The reality is that one of the main obstacles to the economic development of a particular country is its lack of an adequate supply of fresh water. Current figures show that an inhabitant of a wealthy, modern town consumes 100-400 litres of water daily. In some developing countries the amount of water consumed does not exceed 20-30 litres per day. Rich or poor, annual water consumption has continued to grow, increasing fourfold over the last 50 years.\n\nThe world’s fresh water supplies are drawn from a number of sources. The largest cache of the estimated 35 million km3 fresh water reserve is located in glaciers and snow. The amount contained in these ‘storehouses’ has been estimated to be around 24 million km3. Ground water is also a big contributor to the world’s fresh water supplies amounting to an estimated 10.5 million km3. Considering that the total volume of water, salt and fresh, is estimated to be around 400 million km3 it can be clearly seen that the amount of fresh water available in the world is only the proverbial ‘drop in the bucket՝. Artesian wells, rivers and lakes only account for about 0.1 and 0.5 million km3 respectively, all of which include atmospheric precipitation such as rain and snow.\n\nSince water is such an important commodity, various attempts to acquire stores of it have been tried with varying degrees of success. The question of what are the alternative water sources available to us today is not an easy one to answer but is certainly worthy of our best efforts to find one. One such area of interest has been desalination – the turning of salt water into drinkable water. As there is much more salt water on the earth than dry land, the idea of using desalinated seawater seems a logical one. However, some estimates put the annual quantity of desalinated water at only around ten cubic kilometres – a tiny amount given the amount of sea water available. In parts of Senegal, for example, the greenhouse effect has been one way to desalinate seawater whereby the salt in the water is separated from the water through a process of evaporation. As part of the process, water vapour forms on large panes of glass at outside air temperature and is transported via gravity into drums. This method yields only a few cubic meters per day of fresh water but is surprisingly energy efficient. In larger scale production however, the energy efficiency plummets. The best systems bum at least a tonne of fossil fuel to produce approximately one hundred cubic metres of fresh water. This amounts to almost $ 1 per cubic metre – a considerable cost.\n\nAlthough there are several different areas from which water can be sourced, paradoxically the most extensive are the most difficult to tap. The atmosphere, for example, contains vast amounts of fresh water composed of 2% condensed water in the form of clouds and 98% water vapour. The vastness of this water source is comparable to the renewable liquid water resources of all inhabited lands. The amounts are easy to calculate, but being able and knowing how to economically obtain this water in liquid form is most challenging. One approach in drawing water from the atmosphere is fog nets. Places such as the coastal desens of West Africa and areas of Chile and Peru have favourable condensation conditions. In these areas, ocean humidity condenses in the form of fog on the mid-range mountains (over 500m). This fog composed of droplets of suspended water can be collected in nets. In the 1960s, a University in Northern Chile conducted the first major experiments with fog nets. Drawing on the knowledge gained from these experiments, further testing was done which culminated in one village using fog nets to yield a healthy daily average of 11,000 litres of water. On a smaller scale, fog-collecting nets have recently been used in the Canary Islands and Namibia.\n\nUnfortunately, due to its need for a combination of several factors, fog is not readily available. Dew however appears far more frequently and is less subject to the constraints of climate and geography. In order for dew to form there needs to be some humidity in the air and a reasonably clear sky. Many hot areas of countries that suffer from a lack of water such as the Sahel region of Northern Africa for example, experience significant quantities of dew. When the temperature is lowered over a short space of time by ten degrees or so, the water-harvesting possibilities from the air yield an amazing ten grams of water from each cubic meter of air – significant drops in air temperature make for greater yields. Unlike fog, dew formation can occur even in a relatively dry atmosphere, such as a desert. All it takes is for the right mix of temperatures between the earth and the air to combine and dew formation occurs.",
       "part_image_urls": [
@@ -414,7 +414,7 @@
             "question_groups_duration": 0,
             "question_groups_prompt": "Choose the correct letter, A, B. C or D\nWrite your answers in boxes 27-29 on your answer sheet.",
             "question_groups_recording": "",
-            "question_groups_image_urls": [""]
+            "question_groups_image_urls": []
           },
           "questions": [
             {
@@ -475,7 +475,7 @@
           "questions": [
             {
               "question_number": 30,
-              "question_type": "completion",
+              "question_type": "selection",
               "question_prompt": "",
               "question_image_urls": [],
               "question_duration": 0,
@@ -484,7 +484,7 @@
             },
             {
               "question_number": 31,
-              "question_type": "completion",
+              "question_type": "selection",
               "question_prompt": "",
               "question_image_urls": [],
               "question_duration": 0,
@@ -493,7 +493,7 @@
             },
             {
               "question_number": 32,
-              "question_type": "completion",
+              "question_type": "selection",
               "question_prompt": "",
               "question_image_urls": [],
               "question_duration": 0,
@@ -502,7 +502,7 @@
             },
             {
               "question_number": 33,
-              "question_type": "completion",
+              "question_type": "selection",
               "question_prompt": "",
               "question_image_urls": [],
               "question_duration": 0,
@@ -511,7 +511,7 @@
             },
             {
               "question_number": 34,
-              "question_type": "completion",
+              "question_type": "selection",
               "question_prompt": "",
               "question_image_urls": [],
               "question_duration": 0,
@@ -534,7 +534,7 @@
           "questions": [
             {
               "question_number": 35,
-              "question_type": "completion",
+              "question_type": "selection",
               "question_prompt": "",
               "question_image_urls": [],
               "question_duration": 0,
@@ -543,7 +543,7 @@
             },
             {
               "question_number": 36,
-              "question_type": "completion",
+              "question_type": "selection",
               "question_prompt": "",
               "question_image_urls": [],
               "question_duration": 0,
@@ -552,7 +552,7 @@
             },
             {
               "question_number": 37,
-              "question_type": "completion",
+              "question_type": "selection",
               "question_prompt": "",
               "question_image_urls": [],
               "question_duration": 0,
@@ -561,7 +561,7 @@
             },
             {
               "question_number": 38,
-              "question_type": "completion",
+              "question_type": "selection",
               "question_prompt": "",
               "question_image_urls": [],
               "question_duration": 0,
@@ -570,7 +570,7 @@
             },
             {
               "question_number": 39,
-              "question_type": "completion",
+              "question_type": "selection",
               "question_prompt": "",
               "question_image_urls": [],
               "question_duration": 0,
@@ -579,7 +579,7 @@
             },
             {
               "question_number": 40,
-              "question_type": "completion",
+              "question_type": "selection",
               "question_prompt": "",
               "question_image_urls": [],
               "question_duration": 0,

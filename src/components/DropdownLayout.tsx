@@ -14,7 +14,7 @@ export default function DropdownLayout(props: { question?: string, options?: str
                     }
                 }
             }}>
-                <div className={styles.dropdownWrapper}><h3>{props.question}</h3>{select}</div>
+                <div className={styles.dropdownWrapper}>{props.questionIndex}<h3>{props.question}</h3>{select}</div>
             </ConfigProvider>
         )
     } else {
