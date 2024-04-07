@@ -1,0 +1,27 @@
+.form {
+  display: flex;
+  flex-direction: column;
+  text-align: center;
+
+  :global(.ant-form-item-explain) {
+    display: flex;
+    text-align: left;
+  }
+}
+
+.title {
+  margin-bottom: 20px;
+  font-size: 2.4rem;
+}
+
+.signup-btn {
+  width: 100%;
+}
+
+.alert {
+  text-align: left;
+}
+
+.alert-space {
+  width: 100%;
+}

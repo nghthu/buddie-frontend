@@ -1,0 +1,22 @@
+@use '../variables' as *;
+
+.facebook-logo {
+  width: 30px;
+  height: 30px;
+  padding: 3px;
+}
+
+.facebook-btn {
+  display: flex;
+  align-items: center;
+  margin-bottom: 16px;
+  color: $color-text-normal;
+  justify-content: center;
+}
+
+.facebook-btn:not(:disabled):not(.ant-btn-disabled) {
+  &:hover {
+    background-color: transparent;
+    color: $color-text-normal;
+  }
+}
