@@ -6,7 +6,7 @@ import {
   useCreateUserWithEmailAndPassword,
   useUpdateProfile,
   useSignInWithEmailAndPassword,
-  useAuthState,
+  useSendEmailVerification,
 } from 'react-firebase-hooks/auth';
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
@@ -25,45 +25,47 @@ const fullNameRegex = /^(?=.{1,50}$)[A-Za-z]+(?:\s[A-Za-z]+)*$/;
 
 const SignupForm = () => {
   const [form] = Form.useForm<SignupProps>();
-  const [authStateUser, authStateLoading, authStateError] = useAuthState(auth);
   const [createUserWithEmailAndPassword, createdUser, creating, createError] =
     useCreateUserWithEmailAndPassword(auth);
   const [updateProfile, updating, updateError] = useUpdateProfile(auth);
   const [signInWithEmailAndPassword, signInUser, signInLoading, signInError] =
     useSignInWithEmailAndPassword(auth);
+  const [sendEmailVerification, sending, sendingEmailError] =
+    useSendEmailVerification(auth);
   const router = useRouter();
 
   const errors = [createError, updateError, signInError];
   const existingAuthError = createError || updateError || signInError;
 
   useEffect(() => {
-    if (authStateUser) {
-      router.replace('/profile');
-    }
-  }, [authStateUser]);
-
-  useEffect(() => {
     if (createdUser) {
-      const updateNameAndSignIn = async () => {
-        const updateNameSuccessfully = await updateProfile({
-          displayName: form.getFieldValue('full_name'),
-        });
-        if (updateNameSuccessfully) {
-          signInWithEmailAndPassword(
-            form.getFieldValue('email'),
-            form.getFieldValue('password')
-          ).then((emailSignInUser) => {
-            if (emailSignInUser && !emailSignInUser.user.emailVerified) {
-              router.push('/verify');
-            } else {
-              router.push('/');
-            }
-          });
-        }
-      };
       updateNameAndSignIn();
     }
   }, [createdUser]);
+
+  const updateNameAndSignIn = async () => {
+    const {
+      email,
+      password,
+      full_name: fullName,
+    } = form.getFieldsValue() as Required<SignupProps>;
+
+    const updateNameSuccessfully = await updateProfile({
+      displayName: fullName,
+    });
+
+    if (updateNameSuccessfully) {
+      sendEmailVerification();
+
+      signInWithEmailAndPassword(email, password).then((emailSignInUser) => {
+        if (emailSignInUser && !emailSignInUser.user.emailVerified) {
+          router.push('/verify');
+        } else {
+          router.push('/profile');
+        }
+      });
+    }
+  };
 
   const onFinish: FormProps<SignupProps>['onFinish'] = (values) => {
     const { email, password } = values as Required<SignupProps>;

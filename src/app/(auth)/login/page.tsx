@@ -1,8 +1,7 @@
 import { Button, Divider } from 'antd';
+import type { Metadata } from 'next';
 import styles from '@/styles/pages/Login.module.scss';
 import LoginForm from '@/components/LoginForm';
-
-import type { Metadata } from 'next';
 import GoogleSignInButton from '@/components/GoogleSignInButton';
 import FacebookSignInButton from '@/components/FacebookSignInButton';
 
@@ -16,7 +15,7 @@ const Login = () => {
     <main className={styles.main}>
       <div className={styles.logo}>
         <img
-          src="/images/logo.png"
+          src="/images/logo/main.svg"
           alt="buddie-logo"
           className={styles['logo-img']}
         />

@@ -1,14 +1,12 @@
 'use client';
+
 import { LockOutlined, MailOutlined } from '@ant-design/icons';
 import { Alert, Button, Form, FormProps, Input } from 'antd';
-import {
-  useAuthState,
-  useSignInWithEmailAndPassword,
-} from 'react-firebase-hooks/auth';
+import { useSignInWithEmailAndPassword } from 'react-firebase-hooks/auth';
 import styles from '@/styles/components/LoginForm.module.scss';
 import { auth } from '@/lib';
 import { useRouter } from 'next/navigation';
-import { useEffect, useMemo } from 'react';
+import { useEffect } from 'react';
 
 export interface LoginProps {
   email?: string;
@@ -20,7 +18,6 @@ const passwordRegex = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[a-zA-Z]).{8,}$/;
 
 const LoginForm = () => {
   const [form] = Form.useForm<LoginProps>();
-  const [authStateUser, authStateLoading, authStateError] = useAuthState(auth);
   const [signInWithEmailAndPassword, signInUser, signInLoading, signInError] =
     useSignInWithEmailAndPassword(auth);
   const router = useRouter();
@@ -28,12 +25,6 @@ const LoginForm = () => {
     signInError?.code === 'auth/invalid-credential'
       ? 'Thông tin đăng nhập không đúng'
       : signInError?.message;
-
-  useEffect(() => {
-    if (authStateUser) {
-      router.replace('/profile');
-    }
-  }, [authStateUser]);
 
   useEffect(() => {
     if (signInUser) {

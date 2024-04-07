@@ -14,7 +14,7 @@ const ForgotPassword = () => {
     <main className={styles.main}>
       <div className={styles.logo}>
         <img
-          src="/images/logo.png"
+          src="/images/logo/main.svg"
           alt="buddie-logo"
           className={styles['logo-img']}
         />

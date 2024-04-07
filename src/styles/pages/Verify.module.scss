@@ -6,7 +6,7 @@
   align-items: center;
   min-height: 570px;
   width: 480px;
-  margin: 90px auto;
+  margin: 100px auto;
   background-color: #fff;
   border-radius: 24px;
   color: #000;
@@ -60,4 +60,15 @@
 
 .resend-btn {
   width: 100%;
+}
+
+.logout-btn {
+  position: absolute;
+  right: 3%;
+  top: 3%;
+  color: #fff;
+
+  &:hover {
+    color: $color-primary !important;
+  }
 }
