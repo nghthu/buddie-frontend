@@ -12,8 +12,7 @@ const question_groups = [
     is_single_question: false,
     question_groups_info: {
       question_groups_duration: 0,
-      question_groups_prompt:
-        'Circle the correct letter, A, B, C or D.\nExample\nWhat is Thomas’s new home phone number?\nA. 9731 4322\nB. 9813 4562\n(C). 9452 3456\nD, 9340 2367',
+      question_groups_prompt: 'Circle the correct letter, A, B, C or D.',
       question_groups_recording: '',
       question_groups_image_urls: [],
     },
@@ -212,9 +211,9 @@ const ListeningPractice = () => {
       >
         {question_groups.map((group, index) => (
           <div key={index}>
-            <h4 className={styles['question-prompt']}>
+            <h3 className={styles['question-prompt']}>
               {group.question_groups_info.question_groups_prompt}
-            </h4>
+            </h3>
             {group.question_groups_info.question_groups_image_urls.map(
               (imageUrl, imageIndex) => (
                 <img
@@ -226,9 +225,9 @@ const ListeningPractice = () => {
             )}
             {group.questions.map((question) => (
               <div key={question.question_number}>
-                <h5>
+                <p>
                   Câu hỏi {question.question_number}: {question.question_prompt}
-                </h5>
+                </p>
                 {question.question_image_urls.map((imageUrl, imageIndex) => (
                   <img
                     key={imageIndex}
