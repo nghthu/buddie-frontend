@@ -25,12 +25,6 @@ const AudioPlayer: React.FC<AudioPlayerProps> = ({ audioUrl }) => {
     }
   };
 
-  const handleLoad = () => {
-    console.log('handleLoad');
-    if (audioRef.current) {
-    }
-  };
-
   const handleTimeUpdate = () => {
     if (audioRef.current) {
       setCurrentTime(audioRef.current.currentTime);
@@ -42,8 +36,6 @@ const AudioPlayer: React.FC<AudioPlayerProps> = ({ audioUrl }) => {
       <audio
         ref={audioRef}
         src={audioUrl}
-        // onPlay={handleLoad}
-        // onLoadedMetadata={handleLoad}
         onTimeUpdate={handleTimeUpdate}
       />
       <div className={styles.controls}>
