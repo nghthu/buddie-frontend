@@ -6,6 +6,7 @@ import {
   useCreateUserWithEmailAndPassword,
   useUpdateProfile,
   useSignInWithEmailAndPassword,
+  useAuthState,
 } from 'react-firebase-hooks/auth';
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
@@ -24,6 +25,7 @@ const fullNameRegex = /^(?=.{1,50}$)[A-Za-z]+(?:\s[A-Za-z]+)*$/;
 
 const SignupForm = () => {
   const [form] = Form.useForm<SignupProps>();
+  const [authStateUser, authStateLoading, authStateError] = useAuthState(auth);
   const [createUserWithEmailAndPassword, createdUser, creating, createError] =
     useCreateUserWithEmailAndPassword(auth);
   const [updateProfile, updating, updateError] = useUpdateProfile(auth);
@@ -33,6 +35,12 @@ const SignupForm = () => {
 
   const errors = [createError, updateError, signInError];
   const existingAuthError = createError || updateError || signInError;
+
+  useEffect(() => {
+    if (authStateUser) {
+      router.replace('/profile');
+    }
+  }, [authStateUser]);
 
   useEffect(() => {
     if (createdUser) {
@@ -153,7 +161,7 @@ const SignupForm = () => {
           className={styles['alert-space']}
           size="middle"
         >
-          {errors.map((error) => {
+          {errors.map((error, index) => {
             if (!error) {
               return;
             }
@@ -166,6 +174,7 @@ const SignupForm = () => {
 
             return (
               <Alert
+                key={index}
                 className={styles.alert}
                 message={message}
                 type="error"
