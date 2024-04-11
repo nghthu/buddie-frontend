@@ -1,0 +1,27 @@
+.answers {
+  display: flex;
+  flex-direction: column;
+  margin-top: 5px;
+  margin-bottom: 10px;
+}
+
+.action-btn {
+  width: 100%;
+  display: flex;
+  justify-content: space-evenly;
+  & button:first-child {
+    background-color: #ed1b35;
+    border-color: #ed1b35 !important;
+
+    &:hover {
+      background-color: #ed1b33b5 !important;
+      border-color: #ed1b35 !important;
+    }
+  }
+}
+
+.question-prompt {
+  // font-style: italic;
+  // color: #10a9a0;
+  white-space: pre-line;
+}

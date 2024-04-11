@@ -1,0 +1,28 @@
+.introduction {
+  & li {
+    margin-left: 40px;
+  }
+  & img {
+    width: 60px;
+    height: 60px;
+    margin-top: -20px;
+    margin-right: -60px;
+    margin-left: auto;
+    display: block;
+  }
+}
+
+.select {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  margin-bottom: 20px;
+  margin-top: 10px;
+}
+
+.start-btn {
+  width: 200px;
+  margin: auto;
+  display: block;
+  margin-top: 40px;
+}
