@@ -1,3 +1,4 @@
+'use client';
 import { Button } from 'antd';
 import { CheckCircleOutlined } from '@ant-design/icons';
 import clsx from 'clsx';
@@ -7,7 +8,11 @@ import Link from 'next/link';
 export default function Home() {
   return (
     <div className={styles.container}>
-      <div className={styles.star}></div>
+      <div className={styles.starContainer}>
+        {[...Array(300)].map((_, index) => (
+          <div className={styles[`star-${index + 1}`]}></div>  
+        ))}
+      </div>
       {[...Array(15)].map((_, index) => (
         <div
           className={styles[`meteor-${index + 1}`]}

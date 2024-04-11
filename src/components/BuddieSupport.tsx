@@ -1,11 +1,9 @@
-'use client';
-
 import Card from '@/components/Card';
 import styles from '@/styles/components/BuddieSuport.module.scss';
 
 const BuddieSuport = (props: {
   onClose: () => void;
-  requests: Array<{ request: string; avatar: string; response: string }>;
+  requests?: Array<{ request: string; avatar: string; response: string }>;
 }) => {
   const translateHandler = () => {};
 
@@ -19,7 +17,7 @@ const BuddieSuport = (props: {
       onClose={props.onClose}
     >
       <div className={styles.container}>
-        {props.requests.map((chat, index) => (
+        {props.requests?.map((chat, index) => (
           <div key={index}>
             <div className={styles.chat}>
               <div className={styles.user}>

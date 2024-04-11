@@ -1,0 +1,19 @@
+.wrapper {
+  display: flex;
+  padding-left: 2%;
+  padding-right: 2%;
+  position: sticky;
+  top: 70px;
+  background-color: white;
+
+  $justify-contents: center, space-between, space-around, space-evenly;
+  @each $justify-content in $justify-contents {
+    &.wrapper#{$justify-content} {
+      justify-content: $justify-content;
+    }
+  }
+}
+
+.header {
+  color: #10a9a0;
+}

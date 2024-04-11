@@ -70,11 +70,11 @@ const Header = (props: Props) => {
           </p>
         </Link>
         <Link
-          href="/IELTS"
-          onClick={() => tabClickHandler('IELTS')}
+          href="/ielts"
+          onClick={() => tabClickHandler('ielts')}
         >
-          <p className={clsx(activatedTab === 'IELTS' && styles.activate)}>
-            IELTS cùng AI✨
+          <p className={clsx(activatedTab === 'ielts' && styles.activate)}>
+            Ielts cùng AI✨
           </p>
         </Link>
         <div className={clsx(styles.avatarMenu)}>

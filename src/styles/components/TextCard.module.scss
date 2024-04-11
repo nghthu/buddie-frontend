@@ -4,3 +4,34 @@
   padding: 10px 20px 10px 20px;
   background-color: white;
 }
+
+$card-background-color: (
+  "white": white,
+  "very-light-grey": #f5f6fa
+);
+
+@each $color, $value in $card-background-color {
+  .card_background-color_#{$color} {
+    background-color: $value;
+  }
+}
+
+$justify-contents: center, space-between, space-around, space-evenly;
+
+.cardFlex {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+@each $justify-content in $justify-contents {
+  .cardFlex_Justify_#{$justify-content} {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: $justify-content;
+  }
+}
+
+.card_overflow_scroll {
+  overflow-y: scroll;
+}
