@@ -24,7 +24,7 @@ export default function Home() {
         </Link>
         <h1>Bạn muốn học tiếng Anh hiệu quả?</h1>
         <div className={styles.banner}>
-          <img src="/images/logo.png"></img>
+          <img src="/images/logo/main.svg"></img>
           <p>
             Thử ngay trên Buddie! Trang web kết hợp việc học tiếng Anh truyền
             thống và sự hỗ trợ mạnh mẽ của AI

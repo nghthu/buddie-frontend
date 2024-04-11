@@ -30,7 +30,7 @@ const LoginForm = () => {
     if (signInUser) {
       router.push('/profile');
     }
-  }, [signInUser]);
+  }, [signInUser, router]);
 
   const onFinish: FormProps<LoginProps>['onFinish'] = async (values) => {
     const { email, password } = values as Required<LoginProps>;

@@ -21,7 +21,14 @@ const FacebookSignInButton = ({ text }: FacebookSignInButtonProps) => {
     if (user) {
       router.push('/verify');
     }
-  }, [user]);
+  }, [user, router]);
+
+  const showErrorModal = (error: string) => {
+    modal.error({
+      title: 'Lỗi đăng nhập Facebook',
+      content: error,
+    });
+  };
 
   useEffect(() => {
     if (error) {
@@ -33,13 +40,6 @@ const FacebookSignInButton = ({ text }: FacebookSignInButtonProps) => {
       showErrorModal(error.message);
     }
   }, [error]);
-
-  const showErrorModal = (error: string) => {
-    modal.error({
-      title: 'Lỗi đăng nhập Facebook',
-      content: error,
-    });
-  };
 
   return (
     <>

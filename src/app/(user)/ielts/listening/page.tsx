@@ -40,7 +40,7 @@ const Listening = () => {
           Mỗi audio chỉ phát 1 lần duy nhất. Mỗi phần sẽ có đúng 10 câu hỏi
           thuộc một hay nhiều dạng khác nhau.
         </p>
-        <img src="/images/logo.png" />
+        <img src="/images/logo/main.svg" />
       </div>
       <TextCard
         width="70%"

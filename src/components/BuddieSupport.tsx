@@ -66,7 +66,7 @@ const BuddieSuport = () => {
             <div className={styles.chat}>
               <div className={styles.buddie}>
                 <div className={styles['buddie-avatar']}>
-                  <img src="images/logo.png" />
+                  <img src="images/logo/main.svg" />
                 </div>
                 <p>Buddie</p>
               </div>

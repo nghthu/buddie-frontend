@@ -4,6 +4,7 @@ import styles from '@/styles/pages/Login.module.scss';
 import LoginForm from '@/components/LoginForm';
 import GoogleSignInButton from '@/components/GoogleSignInButton';
 import FacebookSignInButton from '@/components/FacebookSignInButton';
+import Link from 'next/link';
 
 export const metadata: Metadata = {
   title: 'Đăng nhập - Buddie',
@@ -32,14 +33,15 @@ const Login = () => {
       <GoogleSignInButton text="Đăng nhập bằng Google" />
       <FacebookSignInButton text="Đăng nhập bằng Facebook" />
       <div className={styles['to-signup-wrapper']}>
-        Chưa có tài khoản?{' '}
-        <Button
-          type="link"
-          href="/signup"
-          className={styles['to-signup']}
-        >
-          Đăng ký
-        </Button>
+        Chưa có tài khoản?
+        <Link href="signup">
+          <Button
+            type="link"
+            className={styles['to-signup']}
+          >
+            Đăng ký
+          </Button>
+        </Link>
       </div>
     </main>
   );

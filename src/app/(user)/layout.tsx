@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useAuthState } from 'react-firebase-hooks/auth';
 import { auth } from '@/lib';
 import { useEffect } from 'react';
+import Header from '@/components/Header';
 
 const UserLayout = ({
   children,
@@ -22,10 +23,15 @@ const UserLayout = ({
     if (user && !user?.emailVerified) {
       router.replace('/verify');
     }
-  }, [user]);
+  }, [user, loading, error, router]);
 
   if (user && user.emailVerified) {
-    return children;
+    return (
+      <>
+        <Header activatedTab="home" />
+        {children}
+      </>
+    );
   }
 
   return <Spin size="large" />;

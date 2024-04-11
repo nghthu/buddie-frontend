@@ -37,12 +37,6 @@ const SignupForm = () => {
   const errors = [createError, updateError, signInError];
   const existingAuthError = createError || updateError || signInError;
 
-  useEffect(() => {
-    if (createdUser) {
-      updateNameAndSignIn();
-    }
-  }, [createdUser]);
-
   const updateNameAndSignIn = async () => {
     const {
       email,
@@ -66,6 +60,12 @@ const SignupForm = () => {
       });
     }
   };
+
+  useEffect(() => {
+    if (createdUser) {
+      updateNameAndSignIn();
+    }
+  }, [createdUser, updateNameAndSignIn]);
 
   const onFinish: FormProps<SignupProps>['onFinish'] = (values) => {
     const { email, password } = values as Required<SignupProps>;

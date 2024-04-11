@@ -5,6 +5,7 @@ import SignupForm from '@/components/SignupForm';
 import type { Metadata } from 'next';
 import GoogleSignInButton from '@/components/GoogleSignInButton';
 import FacebookSignInButton from '@/components/FacebookSignInButton';
+import Link from 'next/link';
 
 export const metadata: Metadata = {
   title: 'Đăng ký - Buddie',
@@ -33,14 +34,15 @@ const Signup = () => {
       <GoogleSignInButton text="Đăng ký bằng Google" />
       <FacebookSignInButton text="Đăng ký bằng Facebook" />
       <div className={styles['to-login-wrapper']}>
-        Đã có tài khoản?{' '}
-        <Button
-          type="link"
-          href="/login"
-          className={styles['to-login']}
-        >
-          Đăng nhập
-        </Button>
+        Đã có tài khoản?
+        <Link href="login">
+          <Button
+            type="link"
+            className={styles['to-login']}
+          >
+            Đăng nhập
+          </Button>
+        </Link>
       </div>
     </main>
   );
