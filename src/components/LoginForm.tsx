@@ -7,6 +7,7 @@ import styles from '@/styles/components/LoginForm.module.scss';
 import { auth } from '@/lib';
 import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
+import Link from 'next/link';
 
 export interface LoginProps {
   email?: string;
@@ -102,13 +103,14 @@ const LoginForm = () => {
         />
       </Form.Item>
 
-      <Button
-        type="link"
-        href="/forgot-password"
-        className={styles['forgot-password']}
-      >
-        Quên mật khẩu
-      </Button>
+      <Link href="/forgot-password">
+        <Button
+          type="link"
+          className={styles['forgot-password']}
+        >
+          Quên mật khẩu
+        </Button>
+      </Link>
 
       <Form.Item style={{ marginBottom: '0px' }}>
         <Button
