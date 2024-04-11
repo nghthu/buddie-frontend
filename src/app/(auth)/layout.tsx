@@ -28,7 +28,7 @@ export default function AuthLayout({
     if (pathname === '/verify' && !user) {
       return router.replace('/login');
     }
-  }, [user]);
+  }, [user, router, pathname]);
 
   if (loading) {
     return <Spin size="large" />;

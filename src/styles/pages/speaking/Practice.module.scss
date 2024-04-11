@@ -1,0 +1,36 @@
+.question {
+  display: flex;
+  width: 100%;
+  gap: 10px;
+  & img {
+    transform: scaleX(-1);
+    width: 40px;
+    height: 40px;
+  }
+}
+
+.audio-btn {
+  border-radius: 50%;
+  width: 50px;
+  height: 50px !important;
+}
+
+.next {
+  // margin-left: auto;
+  margin-top: 50px;
+}
+
+.action-btn {
+  width: 100%;
+  display: flex;
+  justify-content: space-evenly;
+  & button:first-child {
+    background-color: #ed1b35;
+    border-color: #ed1b35 !important;
+    color: white;
+    &:hover {
+      background-color: #ed1b33b5 !important;
+      border-color: #ed1b35 !important;
+    }
+  }
+}

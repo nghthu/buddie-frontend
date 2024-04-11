@@ -1,48 +1,10 @@
-'use client';
-
 import Card from '@/components/Card';
 import styles from '@/styles/components/BuddieSuport.module.scss';
 
-const BuddieSuport = () => {
-  const DUMMY_REQUESTS = [
-    {
-      request: 'Tóm tắt',
-      avatar: 'images/avatar.jpg',
-      response:
-        'The graph illustrates the fluctuating number of tourists visiting a Caribbean island from 2010 to 2017, with an overall upward trend, peaking in 2015 possibly due to factors such as marketing campaigns or infrastructure improvements.',
-    },
-    {
-      request: 'Tóm tắt',
-      avatar: 'images/avatar.jpg',
-      response:
-        'The graph illustrates the fluctuating number of tourists visiting a Caribbean island from 2010 to 2017, with an overall upward trend, peaking in 2015 possibly due to factors such as marketing campaigns or infrastructure improvements.',
-    },
-    {
-      request: 'Tóm tắt',
-      avatar: 'images/avatar.jpg',
-      response:
-        'The graph illustrates the fluctuating number of tourists visiting a Caribbean island from 2010 to 2017, with an overall upward trend, peaking in 2015 possibly due to factors such as marketing campaigns or infrastructure improvements.',
-    },
-    {
-      request: 'Tóm tắt',
-      avatar: 'images/avatar.jpg',
-      response:
-        'The graph illustrates the fluctuating number of tourists visiting a Caribbean island from 2010 to 2017, with an overall upward trend, peaking in 2015 possibly due to factors such as marketing campaigns or infrastructure improvements.',
-    },
-    {
-      request: 'Tóm tắt',
-      avatar: 'images/avatar.jpg',
-      response:
-        'The graph illustrates the fluctuating number of tourists visiting a Caribbean island from 2010 to 2017, with an overall upward trend, peaking in 2015 possibly due to factors such as marketing campaigns or infrastructure improvements.',
-    },
-    {
-      request: 'Tóm tắt',
-      avatar: 'images/avatar.jpg',
-      response:
-        'The graph illustrates the fluctuating number of tourists visiting a Caribbean island from 2010 to 2017, with an overall upward trend, peaking in 2015 possibly due to factors such as marketing campaigns or infrastructure improvements.',
-    },
-  ];
-
+const BuddieSuport = (props: {
+  onClose: () => void;
+  requests?: Array<{ request: string; avatar: string; response: string }>;
+}) => {
   const translateHandler = () => {};
 
   return (
@@ -52,9 +14,10 @@ const BuddieSuport = () => {
       showCloseButton
       backgroundColor="#ECEEF9"
       className={styles['chat-box']}
+      onClose={props.onClose}
     >
       <div className={styles.container}>
-        {DUMMY_REQUESTS.map((chat, index) => (
+        {props.requests?.map((chat, index) => (
           <div key={index}>
             <div className={styles.chat}>
               <div className={styles.user}>
@@ -66,7 +29,7 @@ const BuddieSuport = () => {
             <div className={styles.chat}>
               <div className={styles.buddie}>
                 <div className={styles['buddie-avatar']}>
-                  <img src="images/logo.png" />
+                  <img src="images/logo/main.svg" />
                 </div>
                 <p>Buddie</p>
               </div>

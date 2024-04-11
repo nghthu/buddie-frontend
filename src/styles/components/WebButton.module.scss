@@ -1,0 +1,15 @@
+.webButton {
+  padding: 8px;
+  padding-left: 3rem;
+  padding-right: 3rem;
+}
+
+.webButtonColor3 {
+  background-color: #6b5d86;
+  color: white;
+
+  &:hover {
+    cursor: pointer;
+    background-color: #d1aebb;
+  }
+}

@@ -3,6 +3,7 @@ import { LeftOutlined } from '@ant-design/icons';
 import styles from '@/styles/pages/ForgotPassword.module.scss';
 import ForgotPasswordForm from '@/components/ForgotPasswordForm';
 import { Metadata } from 'next';
+import Link from 'next/link';
 
 export const metadata: Metadata = {
   title: 'Quên mật khẩu - Buddie',
@@ -22,15 +23,15 @@ const ForgotPassword = () => {
       </div>
 
       <ForgotPasswordForm />
-
-      <Button
-        type="link"
-        href="/login"
-        icon={<LeftOutlined />}
-        className={styles['to-login']}
-      >
-        Quay lại trang đăng nhập
-      </Button>
+      <Link href="/login">
+        <Button
+          type="link"
+          icon={<LeftOutlined />}
+          className={styles['to-login']}
+        >
+          Quay lại trang đăng nhập
+        </Button>
+      </Link>
     </main>
   );
 };

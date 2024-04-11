@@ -29,7 +29,7 @@ const ForgotPasswordForm = () => {
     if (authStateUser) {
       router.replace('/profile');
     }
-  }, [authStateUser]);
+  }, [authStateUser, router]);
 
   const onFinish: FormProps<ForgotPasswordProps>['onFinish'] = async (
     values

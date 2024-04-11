@@ -8,7 +8,7 @@
 
 html {
   font-size: 62.5%;
-  height: 100%;
+  height: auto;
 }
 
 body {
@@ -67,6 +67,14 @@ span {
   }
 }
 
+.ant-btn-red {
+  color: $color-btn-red-text;
+  background-color: $color-btn-red-bg;
+  
+  &:not(:disabled):not(.ant-btn-disabled):hover {
+    background-color: $color-btn-red-bg-hover;
+  }
+}
 .ant-btn-default {
   background-color: $color-btn-default-bg;
   color: $color-btn-default-text;

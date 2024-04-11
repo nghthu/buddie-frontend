@@ -20,7 +20,14 @@ const GoogleSignInButton = ({ text }: GoogleSignInButtonProps) => {
     if (user) {
       router.push('/');
     }
-  }, [user]);
+  }, [user, router]);
+
+  const showErrorModal = (error: string) => {
+    modal.error({
+      title: 'Lỗi đăng nhập Google',
+      content: error,
+    });
+  };
 
   useEffect(() => {
     if (error) {
@@ -31,14 +38,7 @@ const GoogleSignInButton = ({ text }: GoogleSignInButtonProps) => {
       }
       showErrorModal(error.message);
     }
-  }, [error]);
-
-  const showErrorModal = (error: string) => {
-    modal.error({
-      title: 'Lỗi đăng nhập Google',
-      content: error,
-    });
-  };
+  }, [error, showErrorModal]);
 
   return (
     <>

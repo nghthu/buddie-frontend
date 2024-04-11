@@ -1,5 +1,6 @@
 import { FrownOutlined } from '@ant-design/icons';
 import { Button, Result } from 'antd';
+import Link from 'next/link';
 
 const AuthorizationError = () => {
   return (
@@ -9,12 +10,9 @@ const AuthorizationError = () => {
       title="403"
       subTitle="Bạn không có quyền truy cập vào trang này."
       extra={
-        <Button
-          type="primary"
-          href="/"
-        >
-          Quay về trang chủ
-        </Button>
+        <Link href="/">
+          <Button type="primary">Quay về trang chủ</Button>
+        </Link>
       }
     />
   );
