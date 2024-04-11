@@ -1,7 +1,7 @@
 import { Button } from 'antd';
 import { CheckCircleOutlined } from '@ant-design/icons';
 import clsx from 'clsx';
-import styles from '@/styles/pages/Root.module.scss';
+import styles from '@/styles/pages/Home.module.scss';
 import Link from 'next/link';
 
 export default function Home() {
@@ -34,10 +34,7 @@ export default function Home() {
         <button className={styles['try-now-btn']}>Thử ngay nào!</button>
 
         <div className={styles.featureList}>
-          <p>
-            <CheckCircleOutlined style={{ color: '#10A956' }} />
-            &emsp;Thử sức bản thân với bộ đề thi thử IELTS
-          </p>
+          <p>17 &emsp;Thử sức bản thân với bộ đề thi thử IELTS</p>
           <p>
             <CheckCircleOutlined style={{ color: '#10A956' }} />
             &emsp;AI hỗ trợ người học cả 4 kỹ năng! Việc gì khó, cứ để AI lo!

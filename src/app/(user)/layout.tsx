@@ -29,7 +29,7 @@ const UserLayout = ({
     return (
       <>
         <Header activatedTab="home" />
-        {children}
+        {children}p
       </>
     );
   }
