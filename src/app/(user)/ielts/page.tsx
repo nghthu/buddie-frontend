@@ -3,10 +3,10 @@
 import { useAuthState } from 'react-firebase-hooks/auth';
 import { auth } from '@/lib';
 
-const Ielts = () => {
+const IELTS = () => {
   const [user, loading, error] = useAuthState(auth);
 
   return <></>;
 };
 
-export default Ielts;
+export default IELTS;

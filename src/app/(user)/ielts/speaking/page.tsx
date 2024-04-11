@@ -15,13 +15,13 @@ const Speaking = () => {
       </div>
       <div className={styles['btn-group']}>
         <Link href="speaking/part-1">
-          <Button>Ielts Speaking part 1</Button>
+          <Button>IELTS Speaking part 1</Button>
         </Link>
         <Link href="speaking/part-2">
-          <Button>Ielts Speaking part 1</Button>
+          <Button>IELTS Speaking part 1</Button>
         </Link>
         <Link href="speaking/part-3">
-          <Button>Ielts Speaking part 1</Button>
+          <Button>IELTS Speaking part 1</Button>
         </Link>{' '}
       </div>
       <p>Hoặc</p>

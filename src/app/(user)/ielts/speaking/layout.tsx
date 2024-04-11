@@ -4,7 +4,7 @@ import styles from '@/styles/pages/speaking/Layout.module.scss';
 const SpeakingLayout = ({ children }: { children: React.ReactNode }) => {
   return (
     <>
-      <h2 className={styles.header}>Luyện tập Ielts Speaking</h2>
+      <h2 className={styles.header}>Luyện tập IELTS Speaking</h2>
       <Card
         width="97%"
         height="75%"

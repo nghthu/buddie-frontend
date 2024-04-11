@@ -1,0 +1,178 @@
+@use '@/styles/variables.scss' as *;
+
+.container {
+  display: grid;
+  gap: 20px;
+  padding-inline: 60px;
+}
+
+.landingContainer {
+  background-color: #f5f6fa;
+  border-radius: 25px;
+  padding: 30px;
+  display: flex;
+  flex-direction: column;
+  gap: 100px;
+  overflow-y: auto;
+}
+
+.practiceContainer {
+  background-color: #f5f6fa;
+  border-radius: 25px;
+  padding: 30px;
+  display: flex;
+  flex-direction: row;
+  gap: 30px;
+}
+
+.practiceContainer.chatVisible {
+  overflow: auto;
+  height: 100vh;
+}
+
+.practiceContainer.chatHidden {
+  height: fit-content;
+}
+
+.taskContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+  overflow-y: auto;
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+.title {
+  color: $color-primary;
+  text-align: center;
+  font-weight: 600;
+}
+
+.textLanding {
+  text-align: center;
+  font-weight: 450;
+}
+
+.timeContainer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.timeInput {
+  width: 222px;
+  height: 40;
+  padding: 10px;
+  margin: 0 20px;
+  color: #383637;
+  font-family: $font-family-default;
+  border-radius: 10px;
+}
+
+.buttonContainer {
+  display: flex;
+  justify-content: center;
+  gap: 50px;
+}
+
+.practiceButtonContainer {
+  display: flex;
+  justify-content: space-between;
+  gap: 50px;
+
+  .primaryButton {
+    width: 140px;
+  }
+}
+
+.primaryButton {
+  background-color: $color-btn-primary-bg;
+  color: $color-btn-primary-text;
+  border: 0;
+  border-radius: 10px;
+  padding: 10px 30px;
+  font-family: $font-family-default;
+  font-weight: 400;
+  cursor: pointer;
+}
+
+.practiceAllButton {
+  background-color: #6b5d86;
+  color: $color-btn-primary-text;
+  border: 0;
+  border-radius: 10px;
+  padding: 10px 30px;
+  font-family: $font-family-default;
+  font-weight: 400;
+  cursor: pointer;
+}
+
+.redButton {
+  background-color: $color-btn-red-bg;
+  color: $color-btn-primary-text;
+  border: 0;
+  border-radius: 10px;
+  padding: 10px 30px;
+  font-family: $font-family-default;
+  font-weight: 400;
+  cursor: pointer;
+}
+
+.task {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px;
+  border-radius: 10px;
+  background-color: #fff;
+  border: 1px solid #000;
+  font-weight: 450px;
+}
+
+.textPracticing {
+  text-align: left;
+  font-weight: 450px;
+}
+
+.imgContainer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  img {
+    border-radius: 25px;
+  }
+}
+
+.answerHeader {
+  display: flex;
+  justify-content: space-between;
+}
+
+.answerContainer {
+  display: flex;
+  flex-direction: column;
+}
+
+.answerInput {
+  width: auto;
+  height: 420px;
+  padding: 20px;
+  margin-top: 10px;
+  color: #000;
+  font-family: $font-family-default;
+  border-radius: 15px;
+  border: 1px solid #000;
+}
+
+.instruction {
+  display: flex;
+  flex-direction: row;
+}
+
+.instructionImg {
+  width: 80px;
+  transform: scaleX(-1);
+}

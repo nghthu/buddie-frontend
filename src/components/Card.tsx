@@ -11,16 +11,26 @@ const Card = (props: {
   backgroundColor?: string;
   showCloseButton?: boolean;
   className?: string;
+  onClose?: () => void;
 }) => {
   const [isCollapsed, setIsCollapsed] = useState(false);
   const closeCardHandler = () => {
     setIsCollapsed(true);
+    props.onClose && props.onClose();
   };
 
   return (
     <div
-      className={clsx(styles.card, props.className, isCollapsed && styles.collapse)}
-      style={{ width: props.width, height: props.height, backgroundColor: props.backgroundColor }}
+      className={clsx(
+        styles.card,
+        props.className,
+        isCollapsed && styles.collapse
+      )}
+      style={{
+        width: props.width,
+        height: props.height,
+        backgroundColor: props.backgroundColor,
+      }}
     >
       {props.showCloseButton && (
         <img

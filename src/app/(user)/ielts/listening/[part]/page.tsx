@@ -22,7 +22,7 @@ const question_groups = [
         question_type: 'single_choice',
         question_prompt: '',
         question_image_urls: [
-          'https://ieltsonlinetests.com/sites/default/files/fileman/Uploads/9/7/6.1.png',
+          'https://IELTSonlinetests.com/sites/default/files/fileman/Uploads/9/7/6.1.png',
         ],
         question_duration: 0,
         options: ['Image A', 'Image B', 'Image C', 'Image D'],
@@ -33,7 +33,7 @@ const question_groups = [
         question_type: 'single_choice',
         question_prompt: '',
         question_image_urls: [
-          'https://ieltsonlinetests.com/sites/default/files/fileman/Uploads/9/7/6.1%20(1).png',
+          'https://IELTSonlinetests.com/sites/default/files/fileman/Uploads/9/7/6.1%20(1).png',
         ],
         question_duration: 0,
         options: ['Image A', 'Image B', 'Image C', 'Image D'],
@@ -58,7 +58,7 @@ const question_groups = [
         question_type: 'single_choice',
         question_prompt: '',
         question_image_urls: [
-          'https://ieltsonlinetests.com/sites/default/files/fileman/Uploads/9/7/6.2.png',
+          'https://IELTSonlinetests.com/sites/default/files/fileman/Uploads/9/7/6.2.png',
         ],
         question_duration: 0,
         options: ['Image A', 'Image B', 'Image C', 'Image D'],
@@ -174,7 +174,7 @@ const ListeningPractice = () => {
           Perkin's early interest in science led him to conduct chemistry
           experiments in his makeshift laboratory at home.
         </p>
-        <img src="https://ieltsonlinetests.com/sites/default/files/fileman/Uploads/9/7/6.1.png" />
+        <img src="https://IELTSonlinetests.com/sites/default/files/fileman/Uploads/9/7/6.1.png" />
         <Radio.Group
           // onChange={selectPartHandler}
           value={1}

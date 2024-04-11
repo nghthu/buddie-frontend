@@ -27,7 +27,7 @@ const Header = (props: Props) => {
       type: 'divider',
     },
     {
-      label: '3rd menu item',
+      label: 'Đăng xuất',
       key: '3',
     },
   ];
@@ -70,11 +70,11 @@ const Header = (props: Props) => {
           </p>
         </Link>
         <Link
-          href="/ielts"
-          onClick={() => tabClickHandler('ielts')}
+          href="/IELTS"
+          onClick={() => tabClickHandler('IELTS')}
         >
-          <p className={clsx(activatedTab === 'ielts' && styles.activate)}>
-            Ielts cùng AI✨
+          <p className={clsx(activatedTab === 'IELTS' && styles.activate)}>
+            IELTS cùng AI✨
           </p>
         </Link>
         <div className={clsx(styles.avatarMenu)}>
