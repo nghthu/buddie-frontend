@@ -3,7 +3,7 @@
 import styles from '@/styles/components/FacebookSignInButton.module.scss';
 import { useSignInWithFacebook } from 'react-firebase-hooks/auth';
 import { useRouter } from 'next/navigation';
-import { useEffect } from 'react';
+import { useCallback, useEffect } from 'react';
 import { Button, Modal } from 'antd';
 import { auth } from '@/lib';
 
@@ -23,12 +23,15 @@ const FacebookSignInButton = ({ text }: FacebookSignInButtonProps) => {
     }
   }, [user, router]);
 
-  const showErrorModal = (error: string) => {
-    modal.error({
-      title: 'Lỗi đăng nhập Facebook',
-      content: error,
-    });
-  };
+  const showErrorModal = useCallback(
+    (error: string) => {
+      modal.error({
+        title: 'Lỗi đăng nhập Facebook',
+        content: error,
+      });
+    },
+    [modal]
+  );
 
   useEffect(() => {
     if (error) {
@@ -39,7 +42,7 @@ const FacebookSignInButton = ({ text }: FacebookSignInButtonProps) => {
       }
       showErrorModal(error.message);
     }
-  }, [error]);
+  }, [error, showErrorModal]);
 
   return (
     <>

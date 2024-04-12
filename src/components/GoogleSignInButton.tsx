@@ -5,7 +5,7 @@ import styles from '@/styles/components/GoogleSignInButton.module.scss';
 import { useSignInWithGoogle } from 'react-firebase-hooks/auth';
 import { auth } from '@/lib';
 import { useRouter } from 'next/navigation';
-import { useEffect } from 'react';
+import { useCallback, useEffect } from 'react';
 
 interface GoogleSignInButtonProps {
   text: string;
@@ -22,12 +22,15 @@ const GoogleSignInButton = ({ text }: GoogleSignInButtonProps) => {
     }
   }, [user, router]);
 
-  const showErrorModal = (error: string) => {
-    modal.error({
-      title: 'Lỗi đăng nhập Google',
-      content: error,
-    });
-  };
+  const showErrorModal = useCallback(
+    (error: string) => {
+      modal.error({
+        title: 'Lỗi đăng nhập Google',
+        content: error,
+      });
+    },
+    [modal]
+  );
 
   useEffect(() => {
     if (error) {

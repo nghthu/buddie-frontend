@@ -7,7 +7,7 @@ import {
   useSignOut,
 } from 'react-firebase-hooks/auth';
 import { LogoutOutlined, MailFilled } from '@ant-design/icons';
-import { Alert, Button, Space, Spin } from 'antd';
+import { Alert, Button, Space } from 'antd';
 import styles from '@/styles/pages/Verify.module.scss';
 import { auth } from '@/lib/firebase';
 
@@ -25,7 +25,7 @@ const Verify = () => {
     } else {
       setSendingSuccess(false);
     }
-  }, []);
+  }, [sendEmailVerification, setSendingSuccess]);
 
   if (sendingEmailError) {
     console.error(sendingEmailError.message);

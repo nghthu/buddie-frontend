@@ -8,7 +8,7 @@ import {
   useSignInWithEmailAndPassword,
   useSendEmailVerification,
 } from 'react-firebase-hooks/auth';
-import { useEffect } from 'react';
+import { useCallback, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import styles from '@/styles/components/SignupForm.module.scss';
 import { auth } from '@/lib';
@@ -37,7 +37,7 @@ const SignupForm = () => {
   const errors = [createError, updateError, signInError];
   const existingAuthError = createError || updateError || signInError;
 
-  const updateNameAndSignIn = async () => {
+  const updateNameAndSignIn = useCallback(async () => {
     const {
       email,
       password,
@@ -59,7 +59,13 @@ const SignupForm = () => {
         }
       });
     }
-  };
+  }, [
+    form,
+    updateProfile,
+    sendEmailVerification,
+    signInWithEmailAndPassword,
+    router,
+  ]);
 
   useEffect(() => {
     if (createdUser) {
