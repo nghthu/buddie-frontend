@@ -1,12 +1,24 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import CountdownClock from '@/components/CountdownClock';
-import styles from '@/styles/pages/Writing.module.scss';
+import styles from '@/styles/pages/writing/Writing.module.scss';
 import WritingFunctionMenu from '@/components/WritingFunctionMenu';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
-import BuddieSuport from '@/components/BuddieSupport';
+import BuddieSupport from '@/components/BuddieSupport';
+import { CloseChatContext } from '@/components/CloseChatContext';
+
+type PartData =
+  | {
+      part_number: number;
+      part_duration: number;
+      part_recording: string;
+      part_prompt: string;
+      part_image_urls: string[];
+      question_groups: any[];
+    }
+  | undefined;
 
 export default function PracticePage() {
   const [menuVisible, setMenuVisible] = useState(false);
@@ -19,6 +31,77 @@ export default function PracticePage() {
   const [chatRequests, setChatRequests] = useState<
     Array<{ avatar: string; request: string; response: string }>
   >([]);
+
+  //Dummy data
+  const partsData = {
+    parts: [
+      {
+        part_number: 1,
+        part_duration: 1200,
+        part_recording: '',
+        part_prompt: '',
+        part_image_urls: [],
+        question_groups: [
+          {
+            is_single_question: true,
+            question_groups_info: {},
+            questions: [
+              {
+                question_number: 1,
+                question_type: 'writing',
+                question_prompt:
+                  'You should spend about 20 minutes on this task.\n\nThe bar chart below describes some changes about the percentage of people were born in Australia and who were born outside Australia living in urban, rural and town between 1995 and 2010.\nSummarise the information by selecting and reporting the main features and make comparisons where relevant.\nYou should write at least 150 words.',
+                question_image_urls: [
+                  'https://iotcdn.oss-ap-southeast-1.aliyuncs.com/2021-12/Platypus-01_0.png',
+                ],
+                question_duration: 1200,
+              },
+            ],
+          },
+        ],
+      },
+      {
+        part_number: 2,
+        part_duration: 2400,
+        part_recording: '',
+        part_prompt: '',
+        part_image_urls: [],
+        question_groups: [
+          {
+            is_single_question: true,
+            question_groups_info: {},
+            questions: [
+              {
+                question_number: 2,
+                question_type: 'writing',
+                question_prompt:
+                  'You should spend about 40 minutes on this task.\nRich countries often give money to poorer countries, but it does not solve poverty. Therefore, developed countries should give other types of help to the poor countries rather than financial aid. To what extent do you agree or disagree?\nYou should write at least 250 words.',
+                question_image_urls: [],
+                question_duration: 2400,
+              },
+            ],
+          },
+        ],
+      },
+    ],
+  };
+
+  const [partData, setPartData] = useState<PartData>(undefined);
+
+  useEffect(() => {
+    if (part === '1' || part === 'all') {
+      const part1Data = partsData.parts.find((p) => p.part_number === 1);
+      setPartData(part1Data);
+    } else if (part === '2') {
+      const part2Data = partsData.parts.find((p) => p.part_number === 2);
+      setPartData(part2Data);
+    }
+  }, [part]);
+
+  const question =
+    partData?.question_groups[0].questions[
+      Math.floor(Math.random() * partData.question_groups[0].questions.length)
+    ];
 
   const showMenu = (event: React.MouseEvent) => {
     event.preventDefault();
@@ -36,7 +119,7 @@ export default function PracticePage() {
     if (!newSelection && (event.target as Element).tagName === 'IMG') {
       newSelection = 'Image';
     }
-    if (newSelection) {
+    if (newSelection != '""') {
       setSelection(newSelection);
       setMenuVisible(true);
       setMenuPosition({ x: event.clientX, y: event.clientY });
@@ -47,11 +130,36 @@ export default function PracticePage() {
     setMenuVisible(false);
   };
 
-  const showChat = (message: string) => {
+  const callParaphraseAPI = async (topic: string, content: string) => {
+    const response = await fetch('/api/ai/paraphrase-writing/', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        type: 'essay',
+        topic: topic,
+        content: content,
+      }),
+    });
+
+    const data = await response.json();
+    return data;
+  };
+
+  const showChat = async (message: string) => {
+    let apiResponse;
+    if (message === 'Viết lại') {
+      apiResponse = await callParaphraseAPI(
+        question?.question_prompt,
+        selection
+      );
+    }
+
     const request = {
       avatar: '/images/avatar.jpg',
       request: message + ' ' + selection,
-      response: 'Dummy response',
+      response: apiResponse.data.paraphrased,
     };
 
     setChatRequests((prevRequests) => [...prevRequests, request]);
@@ -71,7 +179,9 @@ export default function PracticePage() {
   return (
     <>
       <div className={styles.container}>
-        <h2 className={styles.title}>IETLS Writing Task 1</h2>
+        <h2 className={styles.title}>
+          IETLS Writing Task {partData?.part_number}
+        </h2>
 
         <div
           className={`${styles.practiceContainer} ${
@@ -80,14 +190,7 @@ export default function PracticePage() {
           onClick={hideMenu}
         >
           <div className={styles.taskContainer}>
-            <div className={styles.task}>
-              The graph below shows the number of tourists visiting a particular
-              Caribbean island between 2010 and 2017. Summarize the information
-              by selecting and reporting the main features, and make comparisons
-              where relevant. <br />
-              <br />
-              Write at least 150 words.
-            </div>
+            <div className={styles.task}>{question?.question_prompt}</div>
 
             {part !== '2' && (
               <div
@@ -95,7 +198,7 @@ export default function PracticePage() {
                 onContextMenu={showMenu}
               >
                 <img
-                  src="https://vcdn-vnexpress.vnecdn.net/2021/09/28/hoc-1-8243-1632817857.png"
+                  src={question?.question_image_urls[0]}
                   alt="IELTS Writing Task 1"
                 />
                 <WritingFunctionMenu
@@ -150,10 +253,9 @@ export default function PracticePage() {
 
           {chatVisible && (
             <div>
-              <BuddieSuport
-                onClose={hideChat}
-                requests={chatRequests}
-              />
+              <CloseChatContext.Provider value={hideChat}>
+                <BuddieSupport requests={chatRequests} />
+              </CloseChatContext.Provider>
             </div>
           )}
         </div>

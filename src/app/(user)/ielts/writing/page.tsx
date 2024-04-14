@@ -1,4 +1,4 @@
-import styles from '@/styles/pages/Writing.module.scss';
+import styles from '@/styles/pages/writing/Writing.module.scss';
 import Link from 'next/link';
 
 export default function WritingPage() {
