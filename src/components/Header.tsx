@@ -1,17 +1,20 @@
 'use client';
 
 import { CaretDownOutlined, LogoutOutlined } from '@ant-design/icons';
+import { useSignOut } from 'react-firebase-hooks/auth';
 import type { MenuProps } from 'antd';
 import { Button, Dropdown, Space, notification } from 'antd';
-import styles from '@/styles/components/Header.module.scss';
 import clsx from 'clsx';
 import Link from 'next/link';
 import { useState } from 'react';
+import type { User } from 'firebase/auth';
+import styles from '@/styles/components/Header.module.scss';
 import { auth } from '@/lib';
-import { useSignOut } from 'react-firebase-hooks/auth';
+import Image from 'next/image';
 
 interface Props {
   activatedTab: string;
+  user: User;
 }
 
 const Header = (props: Props) => {
@@ -54,7 +57,7 @@ const Header = (props: Props) => {
   if (!logoutLoading && logoutError) {
     console.error(logoutError.message);
     notificationApi.error({
-      message: 'Log out failed',
+      message: 'Đăng xuất không thành công',
       description: logoutError.message,
     });
   }
@@ -68,7 +71,12 @@ const Header = (props: Props) => {
             className={styles.logo}
             onClick={() => tabClickHandler('home')}
           >
-            <img src="/images/logo/main.svg"></img>
+            <Image
+              height={60}
+              width={60}
+              src="/images/logo/main.svg"
+              alt="Buddie logo"
+            />
             <div>
               <h2>buddie</h2>
               <p>Học tiếng Anh cùng AI</p>
@@ -102,25 +110,26 @@ const Header = (props: Props) => {
               IELTS cùng AI ✨
             </p>
           </Link>
-          <div className={clsx(styles.avatarMenu)}>
-            <img
-              src="/images/avatar.jpg"
-              className={clsx(styles.avatar)}
-            />
-            <Dropdown
-              className={clsx(styles.dropdown)}
-              menu={{ items: accountItems }}
-              placement="bottomRight"
-              trigger={['click']}
-              overlayStyle={{ marginTop: '10px' }}
-            >
-              <a onClick={(e) => e.preventDefault()}>
-                <Space>
-                  <CaretDownOutlined />
-                </Space>
-              </a>
-            </Dropdown>
-          </div>
+          <Dropdown
+            className={clsx(styles.dropdown)}
+            menu={{ items: accountItems }}
+            placement="bottomRight"
+            trigger={['click']}
+            overlayStyle={{ marginTop: '10px' }}
+          >
+            <a onClick={(e) => e.preventDefault()}>
+              <Space>
+                <img
+                  height={40}
+                  width={40}
+                  src={props.user.photoURL || ''}
+                  alt={props.user.displayName || 'Avatar'}
+                  className={clsx(styles.avatar)}
+                />
+                <CaretDownOutlined className={clsx(styles['dropdown-icon'])} />
+              </Space>
+            </a>
+          </Dropdown>
         </div>
       </div>
     </>

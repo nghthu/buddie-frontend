@@ -4,6 +4,7 @@ import styles from '@/styles/pages/ForgotPassword.module.scss';
 import ForgotPasswordForm from '@/components/ForgotPasswordForm';
 import { Metadata } from 'next';
 import Link from 'next/link';
+import Image from 'next/image';
 
 export const metadata: Metadata = {
   title: 'Quên mật khẩu - Buddie',
@@ -14,9 +15,11 @@ const ForgotPassword = () => {
   return (
     <main className={styles.main}>
       <div className={styles.logo}>
-        <img
+        <Image
+          height={70}
+          width={70}
           src="/images/logo/main.svg"
-          alt="buddie-logo"
+          alt="Buddie logo"
           className={styles['logo-img']}
         />
         <h2 className={styles['logo-text']}>buddie</h2>

@@ -20,15 +20,22 @@ const UserLayout = ({
       router.replace('/login');
     }
 
-    if (user && !user?.emailVerified) {
-      router.replace('/verify');
+    if (user) {
+      user.reload().then(() => {
+        if (!user.emailVerified) {
+          router.replace('/verify');
+        }
+      });
     }
   }, [user, loading, error, router]);
 
-  if (user && user.emailVerified) {
+  if (user?.emailVerified) {
     return (
       <>
-        <Header activatedTab="home" />
+        <Header
+          activatedTab="home"
+          user={user}
+        />
         {children}
       </>
     );

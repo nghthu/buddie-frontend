@@ -17,16 +17,17 @@ export default function AuthLayout({
   const pathname = usePathname();
 
   useEffect(() => {
-    if (user) {
-      if (user.emailVerified) {
-        return router.replace('/profile');
-      } else if (pathname !== '/verify') {
-        return router.replace('/verify');
-      }
-    }
-
     if (pathname === '/verify' && !user) {
       return router.replace('/login');
+    }
+    if (user) {
+      user.reload().then(() => {
+        if (user.emailVerified) {
+          return router.replace('/profile');
+        } else if (pathname !== '/verify') {
+          return router.replace('/verify');
+        }
+      });
     }
   }, [user, router, pathname]);
 

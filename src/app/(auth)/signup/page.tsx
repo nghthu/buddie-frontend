@@ -6,6 +6,7 @@ import type { Metadata } from 'next';
 import GoogleSignInButton from '@/components/GoogleSignInButton';
 import FacebookSignInButton from '@/components/FacebookSignInButton';
 import Link from 'next/link';
+import Image from 'next/image';
 
 export const metadata: Metadata = {
   title: 'Đăng ký - Buddie',
@@ -16,9 +17,11 @@ const Signup = () => {
   return (
     <main className={styles.main}>
       <div className={styles.logo}>
-        <img
+        <Image
+          height={70}
+          width={70}
           src="/images/logo/main.svg"
-          alt="buddie-logo"
+          alt="Buddie logo"
           className={styles['logo-img']}
         />
         <h2 className={styles['logo-text']}>buddie</h2>

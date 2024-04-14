@@ -56,9 +56,13 @@
   text-align: center;
 }
 
-.avatarMenu {
+.dropdown {
   display: flex;
   align-items: center;
+
+  & .dropdown-icon {
+    vertical-align: 0;
+  }
 }
 
 .avatar {
