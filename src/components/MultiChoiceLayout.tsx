@@ -1,24 +1,34 @@
 import { Checkbox, ConfigProvider } from 'antd';
 import styles from '@/styles/components/questionLayouts.module.scss';
+
 export default function MultiChoiceLayout(props: {
   question?: string;
   options?: string[];
-  answers?: string;
-  questionIndex?: number | string;
-  setAnswer?: Function;
+  answers: string | string[];
+  questionIndex: number | string;
+  setAnswer: React.Dispatch<React.SetStateAction<object>>;
+  userAnswer: string|string[]|undefined;
 }) {
+  function handleSetAnswer(checkedValues: string[]) {
+    props.setAnswer((prev) => ({
+      ...prev,
+      [props.questionIndex]: checkedValues,
+    }));
+  }
   if (props.options) {
     const multiChoiceGroup = (
       <Checkbox.Group
-        onChange={() => {}}
+        onChange={(checkedValues: string[]) => { handleSetAnswer(checkedValues) }}
         options={props.options}
         className={styles.multiChoiceGroup}
+        defaultValue={props.userAnswer as string[]|undefined}
       ></Checkbox.Group>
     );
 
     const multiChoiceWrapper = (
       <div className={styles.multiChoiceWrapper}>
         <h3 style={{ whiteSpace: 'pre-wrap' }}>{props.question}</h3>
+        <h3 style={{ whiteSpace: 'pre-wrap' }}>Câu {props.questionIndex}</h3>
         {multiChoiceGroup}
       </div>
     );

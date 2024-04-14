@@ -4,23 +4,17 @@ import jsonDummyData from './reading.json';
 import SkillHeader from '@/components/SkillHeader';
 import TextCard from '@/components/TextCard';
 import React, { useState } from 'react';
-import ReadingLayout from '@/components/ReadingLayout';
 import textCardStyles from '@/styles/components/TextCard.module.scss';
 import styles from '@/styles/components/WebButton.module.scss';
 import clsx from 'clsx';
-import { Button } from 'antd';
-
+import { Button, Select } from 'antd';
+import Link from 'next/link';
 const IeltsReading = () => {
-  const [activePart, setActivePart] = useState('landing');
   const [testTime, setTestTime] = useState('20:00');
-  const [answers, setAnswers] = useState({}); // {1: "A", 2: ["B","C"], 3: "False", 4:"arthitis"}
-  const changePart = (part: string) => {
-    setActivePart(part);
+
+  const handleSelectChange = (value: string) => {
+    setTestTime(value);
   };
-  const handleSelectChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-    setTestTime(event.target.value);
-  };
-  if (activePart === 'landing') {
     return (
       <>
         <SkillHeader title={'Luyện tập IELTS Reading'}></SkillHeader>
@@ -61,63 +55,31 @@ const IeltsReading = () => {
               }}
             >
               <label htmlFor="testTime">Chọn thời gian</label>
-              <select
+              <Select
+                defaultValue="unlimited"
+                style={{ width: 170 }}
                 onChange={handleSelectChange}
-                id="testTime"
-                style={{ paddingLeft: '1rem', paddingRight: '1rem' }}
-              >
-                <option value="20:00">20 phút</option>
-                <option value="30:00">30 phút</option>
-                <option value="60:00">60 phút</option>
-                <option value="unlimited">Không giới hạn</option>
-              </select>
+                options={[
+                  { value: '15', label: '15 phút' },
+                  { value: '30', label: '30 phút' },
+                  { value: '45', label: '45 phút' },
+                  { value: '60', label: '60 phút' },
+                  { value: 'unlimited', label: 'Không giới hạn' },
+                ]}
+              />
             </div>
-            <Button
-              className={styles.webButton}
-              type={'primary'}
-              onClick={() => changePart('1')}
-            >
-              Bắt đầu
-            </Button>
+            <Link href={`/ielts/reading/661b5d4b0d4e11e6b2817f1b/1?time=${testTime}`}>
+              <Button
+                className={styles.webButton}
+                type={'primary'}
+                onClick={() => {}}
+              >
+                Bắt đầu
+              </Button>
+            </Link>
           </TextCard>
         </div>
       </>
     );
-  }
-  const jsonData = JSON.parse(JSON.stringify(jsonDummyData));
-
-  const parts = jsonData['parts'].map((part: any) => {
-    const prevPart = Math.max(part['part_number'] - 1, 1);
-    const nextPart = Math.min(
-      part['part_number'] + 1,
-      jsonData['parts'].length
-    );
-    return (
-      <>
-        {activePart === String(part['part_number']) && (
-          <>
-            <ReadingLayout
-              paddingLeft={'2%'}
-              paddingRight={'2%'}
-              setPrevState={() => changePart(String(prevPart))}
-              setNextState={() => changePart(String(nextPart))}
-              data={part}
-              setAnswer={() => setAnswers({ ...answers })}
-            />
-          </>
-        )}
-      </>
-    );
-  });
-  return (
-    <>
-      <SkillHeader
-        title={'Luyện tập IELTS Reading'}
-        countdownTime={testTime}
-      />
-      {parts}
-    </>
-  );
-};
-
+  };
 export default IeltsReading;

@@ -1,3 +1,10 @@
+.readingLayout {
+  padding-left: 2%;
+  padding-right: 2%;
+  display: flex;
+  gap: 1rem;
+}
+
 .questionContainer {
   width: 40%;
   height: calc(99vh - 140px);
@@ -55,4 +62,10 @@
 .radio {
   display: flex;
   align-items: center;
+}
+
+.buttonWrapper {
+  width: 100%;
+  display: flex;
+  justify-content: space-around;
 }

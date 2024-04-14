@@ -12,6 +12,7 @@ import textCardStyles from '@/styles/components/TextCard.module.scss';
 import buttonStyles from '@/styles/components/WebButton.module.scss';
 import clsx from 'clsx';
 import BuddieSuport from './BuddieSupport';
+import { useState } from 'react';
 
 interface data {
   part_number: number;
@@ -21,29 +22,46 @@ interface data {
   part_image_urls: Array<string>;
   question_groups: Array<object>;
 }
-
+interface questiongroup {
+  "is_single_question": boolean | object;
+  "question_groups_info": { "question_groups_duration": number; "question_groups_prompt": string; "question_groups_image_urls": Array<string>; "question_groups_recording": string };
+  "questions": Array<question>;
+}
+interface question {
+  "question_number": number;
+  "question_type": string;
+  "question_prompt": string;
+  "question_image_urls": Array<string>;
+  "question_duration": number;
+  "options": Array<string>;
+  "answer": Array<string> | string;
+}
+interface answer {
+  [key: number]: string | Array<string>;
+}
 export default function ReadingLayout(props: {
-  context?: string;
-  questionsAndAnswers?: string;
-  paddingLeft?: string;
-  paddingRight?: string;
   setPrevState: React.MouseEventHandler<HTMLDivElement>;
   setNextState: React.MouseEventHandler<HTMLDivElement>;
   data: data;
-  setAnswer: Function;
+  setAnswer: React.Dispatch<React.SetStateAction<object>>;
+  answers: answer;
 }) {
+  const [currentQuestionGroup, setCurrentQuestionGroup] = useState(1);
+  const maxGroup = props.data['question_groups'].length;
   const questionGroups = props.data['question_groups'].map(
-    (questionGroup: any, index: number) => {
+    (questionGroup: questiongroup, index: number) => {
       const questions = questionGroup['questions'].map(
-        (question: any, index: number) => {
+        (question: question) => {
           return (
             <>
               {question['question_type'] === 'single_choice' && (
                 <SingleChoiceLayout
                   question={question['question_prompt']}
                   options={question['options']}
-                  answer={question['answer']}
+                  answer={question['answer'] as string}
                   questionIndex={question['question_number']}
+                  setAnswer={props.setAnswer}
+                  userAnswer={props.answers[question['question_number']]}
                 />
               )}
               {question['question_type'] === 'multiple_choice' && (
@@ -52,21 +70,27 @@ export default function ReadingLayout(props: {
                   options={question['options']}
                   answers={question['answer']}
                   questionIndex={question['question_number']}
+                  setAnswer={props.setAnswer}
+                  userAnswer={props.answers[question['question_number']]}
                 />
               )}
               {question['question_type'] === 'selection' && (
                 <DropdownLayout
                   question={question['question_prompt']}
                   options={question['options']}
-                  answer={question['answer']}
+                  answer={question['answer'] as string}
                   questionIndex={question['question_number']}
+                  setAnswer={props.setAnswer}
+                  userAnswer={props.answers[question['question_number']]}
                 />
               )}
               {question['question_type'] === 'completion' && (
                 <FillTheBlankLayout
                   question={question['question_prompt']}
-                  answer={question['answer']}
+                  answer={question['answer'] as string}
                   questionIndex={question['question_number']}
+                  setAnswer={props.setAnswer}
+                  userAnswer={props.answers[question['question_number']]}
                 />
               )}
             </>
@@ -74,7 +98,7 @@ export default function ReadingLayout(props: {
         }
       );
       return (
-        <TextCard
+        <TextCard key={index}
           width={'100'}
           height={'auto'}
           className={'cardFlex'}
@@ -110,13 +134,7 @@ export default function ReadingLayout(props: {
     }
   );
   return (
-    <div
-      style={{
-        display: 'flex',
-        gap: '1rem',
-        paddingLeft: props.paddingLeft,
-        paddingRight: props.paddingRight,
-      }}
+    <div className={questionLayouts.readingLayout}
     >
       <div className={questionLayouts.contextWrapper}>
         <TextCard
@@ -129,58 +147,63 @@ export default function ReadingLayout(props: {
         >
           <ReadingContextLayout context={props.data.part_prompt} />
         </TextCard>
-        <div
-          style={{
-            display: 'flex',
-            width: '100%',
-            justifyContent: 'space-around',
-          }}
-        >
+        <div className={questionLayouts.buttonWrapper}>
           <Button
             className={clsx(buttonStyles.webButton, 'ant-btn-red')}
             type={'primary'}
-            onClick={() => {}}
+            onClick={() => { }}
           >
             Kết thúc
           </Button>
           <Button
             className={buttonStyles.webButton}
             type={'primary'}
-            onClick={() => {}}
+            onClick={() => { }}
           >
             Nộp bài
           </Button>
         </div>
       </div>
       <div className={questionLayouts.questionContainer}>
-        {questionGroups}
+        {questionGroups[currentQuestionGroup - 1]}
         <TextCard
           width={'100'}
           height={'auto'}
         >
-          <BuddieSuport />
+          Buddie support here
         </TextCard>
-        <div
-          style={{
-            width: '100%',
-            display: 'flex',
-            justifyContent: 'space-around',
-          }}
-        >
-          <Button
+
+        <div className={questionLayouts.buttonWrapper}>
+          {currentQuestionGroup === 1 && <Button
             className={clsx(buttonStyles.webButton, 'ant-btn-red')}
             type={'primary'}
             onClick={props.setPrevState}
           >
-            Phần trước
-          </Button>
-          <Button
+            Bài đọc trước
+          </Button>}
+          {currentQuestionGroup > 1 && <Button
+            className={clsx(buttonStyles.webButton, 'ant-btn-red')}
+            type={'primary'}
+            onClick={() => { setCurrentQuestionGroup((prev) => prev - 1) }}
+          >
+            Các câu hỏi trước
+          </Button>}
+
+          {currentQuestionGroup >= maxGroup && <Button
             className={buttonStyles.webButton}
             type={'primary'}
             onClick={props.setNextState}
           >
-            Phần tiếp theo
-          </Button>
+            Bài đọc tiếp theo
+          </Button>}
+
+          {currentQuestionGroup < maxGroup && <Button
+            className={buttonStyles.webButton}
+            type={'primary'}
+            onClick={() => { setCurrentQuestionGroup((prev) => prev + 1) }}
+          >
+            Các câu hỏi tiếp theo
+          </Button>}
         </div>
       </div>
     </div>
