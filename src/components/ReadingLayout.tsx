@@ -65,12 +65,12 @@ export default function ReadingLayout(props: {
                   userAnswer={props.answers[question['question_number']]}
                 />
               )}
-              {question['question_type'] === 'multiple_choice' && (
+              {question['question_type'] === 'multiple_choices' && (
                 <MultiChoiceLayout
                   key={question['question_number']}
                   question={question['question_prompt']}
                   options={question['options']}
-                  answers={question['answer']}
+                  answers={question['answer'] as string[]}
                   questionIndex={question['question_number']}
                   setAnswer={props.setAnswer}
                   userAnswer={props.answers[question['question_number']]}
@@ -107,16 +107,13 @@ export default function ReadingLayout(props: {
           height={'auto'}
           className={'cardFlex'}
         >
-          {questionGroup['question_groups_info']['question_groups_prompt'] && (
+          {questionGroup['question_groups_info'] && questionGroup['question_groups_info']['question_groups_prompt'] && (
             <h3 style={{ whiteSpace: 'pre-wrap' }}>
               {questionGroup['question_groups_info']['question_groups_prompt']}
             </h3>
           )}
-          {questionGroup['question_groups_info'][
-            'question_groups_image_urls'
-          ] &&
-            questionGroup['question_groups_info']['question_groups_image_urls']
-              .length > 0 && (
+          {questionGroup['question_groups_info'] && questionGroup['question_groups_info']['question_groups_image_urls'] &&
+            questionGroup['question_groups_info']['question_groups_image_urls'].length > 0 && (
               <>
                 {questionGroup['question_groups_info'][
                   'question_groups_image_urls'
@@ -132,6 +129,7 @@ export default function ReadingLayout(props: {
                 })}
               </>
             )}
+
           {questions}
         </TextCard>
       );

@@ -44,14 +44,13 @@ export default function IeltsPart({params}:{params:{id:string, part:string}}) {
                 const partData = data['data']['parts'].filter((subpart: subpart) => subpart['part_number'] === Number(params.part));
                 setJsonData(partData);
                 setActivePart(params.part);
-
             }
         };
         fetchData();
     }, []);
     const parts = jsonData.map((part: subpart) => {
-        const prevPart = Math.max(part['part_number'] - 1, 1);
-        const nextPart = Math.min(part['part_number'] + 1, jsonData.length);
+        const prevPart = params.part === 'all'? Math.max(part['part_number'] - 1, 1) : Number(params.part);
+        const nextPart = params.part === 'all'? Math.min(part['part_number'] + 1, jsonData.length): Number(params.part);
         return (
             <>
                 {activePart === String(part['part_number']) && (
