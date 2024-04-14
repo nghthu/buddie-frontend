@@ -12,6 +12,7 @@ import { useCallback, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import styles from '@/styles/components/SignupForm.module.scss';
 import { auth } from '@/lib';
+import { DefaultUserProfile } from '@/utils';
 
 export interface SignupProps {
   full_name?: string;
@@ -46,6 +47,7 @@ const SignupForm = () => {
 
     const updateNameSuccessfully = await updateProfile({
       displayName: fullName,
+      photoURL: createdUser?.user.photoURL || DefaultUserProfile.AVATAR,
     });
 
     if (updateNameSuccessfully) {
