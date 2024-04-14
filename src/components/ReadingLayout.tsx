@@ -56,6 +56,7 @@ export default function ReadingLayout(props: {
             <>
               {question['question_type'] === 'single_choice' && (
                 <SingleChoiceLayout
+                  key={question['question_number']}
                   question={question['question_prompt']}
                   options={question['options']}
                   answer={question['answer'] as string}
@@ -66,6 +67,7 @@ export default function ReadingLayout(props: {
               )}
               {question['question_type'] === 'multiple_choice' && (
                 <MultiChoiceLayout
+                  key={question['question_number']}
                   question={question['question_prompt']}
                   options={question['options']}
                   answers={question['answer']}
@@ -76,6 +78,7 @@ export default function ReadingLayout(props: {
               )}
               {question['question_type'] === 'selection' && (
                 <DropdownLayout
+                  key={question['question_number']}
                   question={question['question_prompt']}
                   options={question['options']}
                   answer={question['answer'] as string}
@@ -86,6 +89,7 @@ export default function ReadingLayout(props: {
               )}
               {question['question_type'] === 'completion' && (
                 <FillTheBlankLayout
+                  key={question['question_number']}
                   question={question['question_prompt']}
                   answer={question['answer'] as string}
                   questionIndex={question['question_number']}
@@ -134,8 +138,7 @@ export default function ReadingLayout(props: {
     }
   );
   return (
-    <div className={questionLayouts.readingLayout}
-    >
+    <div className={questionLayouts.readingLayout}>
       <div className={questionLayouts.contextWrapper}>
         <TextCard
           width={'100%'}

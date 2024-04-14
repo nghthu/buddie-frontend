@@ -57,6 +57,7 @@ export default function IeltsPart({params}:{params:{id:string, part:string}}) {
                 {activePart === String(part['part_number']) && (
                     <>
                         <ReadingLayout
+                            key = {part['part_number']}
                             setPrevState={() => changePart(String(prevPart))}
                             setNextState={() => changePart(String(nextPart))}
                             data={part}
