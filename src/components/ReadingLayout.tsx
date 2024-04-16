@@ -167,12 +167,7 @@ export default function ReadingLayout(props: {
       </div>
       <div className={questionLayouts.questionContainer}>
         {questionGroups[currentQuestionGroup - 1]}
-        <TextCard
-          width={'100'}
-          height={'auto'}
-        >
           Buddie support here
-        </TextCard>
 
         <div className={questionLayouts.buttonWrapper}>
           {currentQuestionGroup === 1 && <Button

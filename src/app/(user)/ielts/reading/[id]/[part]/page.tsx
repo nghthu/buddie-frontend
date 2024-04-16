@@ -69,7 +69,7 @@ export default function IeltsPart({params}:{params:{id:string, part:string}}) {
         );
     });
     return (
-        <>
+        <>  
             <SkillHeader
                 title={metaData['test_name']}
                 countdownTime={testTime}
