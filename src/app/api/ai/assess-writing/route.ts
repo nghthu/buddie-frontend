@@ -4,7 +4,7 @@ export const POST = async function assessWriting(req: Request) {
   try {
     const reqData = await req.json();
     const response = await fetch(
-      `https://q40nfgqaj4.execute-api.ap-southeast-2.amazonaws.com/api/v1/ai/assess-writing`,
+      `${process.env.API_BASE_URL}/api/v1/ai/assess-writing`,
       {
         method: 'POST',
         headers: {

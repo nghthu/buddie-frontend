@@ -31,6 +31,10 @@ export default function PracticePage() {
   const [chatRequests, setChatRequests] = useState<
     Array<{ avatar: string; request: string; response: string }>
   >([]);
+  const [partData, setPartData] = useState<PartData>(undefined);
+  const [resultData, setResultData] = useState<
+    Array<{ topic: string; content: string }>
+  >([]);
 
   //Dummy data
   const partsData = {
@@ -86,22 +90,38 @@ export default function PracticePage() {
     ],
   };
 
-  const [partData, setPartData] = useState<PartData>(undefined);
-
-  useEffect(() => {
-    if (part === '1' || part === 'all') {
-      const part1Data = partsData.parts.find((p) => p.part_number === 1);
-      setPartData(part1Data);
-    } else if (part === '2') {
-      const part2Data = partsData.parts.find((p) => p.part_number === 2);
-      setPartData(part2Data);
-    }
-  }, [part]);
-
   const question =
     partData?.question_groups[0].questions[
       Math.floor(Math.random() * partData.question_groups[0].questions.length)
     ];
+
+  useEffect(() => {
+    let partData;
+    if (part === '1' || part === 'all') {
+      partData = partsData.parts.find((p) => p.part_number === 1);
+    } else if (part === '2') {
+      partData = partsData.parts.find((p) => p.part_number === 2);
+    }
+
+    setPartData(partData);
+  }, [part]);
+
+  useEffect(() => {
+    localStorage.setItem('resultData', JSON.stringify(resultData));
+  }, [resultData]);
+
+  const handleDoneButtonClick = () => {
+    if (question && textareaRef.current) {
+      setResultData((prevResults) => [
+        ...prevResults,
+        {
+          topic: question?.question_prompt,
+          content: textareaRef.current?.value || '',
+        },
+      ]);
+    }
+    console.log(resultData);
+  };
 
   const showMenu = (event: React.MouseEvent) => {
     event.preventDefault();
@@ -115,10 +135,10 @@ export default function PracticePage() {
             textareaRef.current?.selectionEnd || 0
           ) +
           '"' || '';
+    } else if ((event.target as Element).tagName === 'DIV') {
+      newSelection = '"' + window.getSelection()?.toString() + '"' || '';
     }
-    if (!newSelection && (event.target as Element).tagName === 'IMG') {
-      newSelection = 'Image';
-    }
+
     if (newSelection != '""') {
       setSelection(newSelection);
       setMenuVisible(true);
@@ -190,13 +210,15 @@ export default function PracticePage() {
           onClick={hideMenu}
         >
           <div className={styles.taskContainer}>
-            <div className={styles.task}>{question?.question_prompt}</div>
+            <div
+              className={styles.task}
+              onContextMenu={showMenu}
+            >
+              {question?.question_prompt}
+            </div>
 
             {part !== '2' && (
-              <div
-                className={styles.imgContainer}
-                onContextMenu={showMenu}
-              >
+              <div className={styles.imgContainer}>
                 <img
                   src={question?.question_image_urls[0]}
                   alt="IELTS Writing Task 1"
@@ -243,10 +265,17 @@ export default function PracticePage() {
                 href={
                   part === 'all'
                     ? '/ielts/writing/practicing?part=2'
-                    : '/ielts/writing/result'
+                    : {
+                        pathname: '/ielts/writing/result',
+                      }
                 }
               >
-                <button className={styles.primaryButton}>Xong</button>
+                <button
+                  className={styles.primaryButton}
+                  onClick={handleDoneButtonClick}
+                >
+                  Xong
+                </button>
               </Link>
             </div>
           </div>
