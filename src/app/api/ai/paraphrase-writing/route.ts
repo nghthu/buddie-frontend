@@ -7,9 +7,7 @@ export const POST = async function paraphrase(req: Request) {
       `${process.env.API_BASE_URL}/api/v1/ai/paraphrase-writing`,
       {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: req.headers,
         body: JSON.stringify({
           type: 'essay',
           topic: reqData.topic,

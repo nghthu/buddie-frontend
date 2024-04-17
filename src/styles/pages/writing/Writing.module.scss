@@ -63,12 +63,15 @@
 
 .timeInput {
   width: 222px;
-  height: 40;
+  height: 40px;
   padding: 10px;
   margin: 0 20px;
   color: #383637;
   font-family: $font-family-default;
   border-radius: 10px;
+  appearance: none;
+  background: white;
+  border: 1px solid #ccc;
 }
 
 .buttonContainer {

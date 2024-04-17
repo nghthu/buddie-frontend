@@ -8,6 +8,7 @@ import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import BuddieSupport from '@/components/BuddieSupport';
 import { CloseChatContext } from '@/components/CloseChatContext';
+import { auth } from '@/lib';
 
 type PartData =
   | {
@@ -35,6 +36,7 @@ export default function PracticePage() {
   const [resultData, setResultData] = useState<
     Array<{ topic: string; content: string }>
   >([]);
+  const user = auth.currentUser;
 
   //Dummy data
   const partsData = {
@@ -151,10 +153,13 @@ export default function PracticePage() {
   };
 
   const callParaphraseAPI = async (topic: string, content: string) => {
+    const token = await user?.getIdToken();
+
     const response = await fetch('/api/ai/paraphrase-writing/', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
+        authorization: `Bearer ${token}`,
       },
       body: JSON.stringify({
         type: 'essay',
@@ -169,21 +174,32 @@ export default function PracticePage() {
 
   const showChat = async (message: string) => {
     let apiResponse;
+    let request = {
+      avatar: '/images/avatar.jpg',
+      request: message + ' ' + selection,
+      response: 'Đang xử lý... đợi Buddie chút nhé!',
+    };
+
+    setChatRequests((prevRequests) => [...prevRequests, request]);
+    setChatVisible(true);
+
+    if (message === 'Dịch') {
+      request.response = 'Đang dịch...';
+    }
+
     if (message === 'Viết lại') {
       apiResponse = await callParaphraseAPI(
         question?.question_prompt,
         selection
       );
+      request.response = apiResponse.data.paraphrased;
     }
 
-    const request = {
-      avatar: '/images/avatar.jpg',
-      request: message + ' ' + selection,
-      response: apiResponse.data.paraphrased,
-    };
-
-    setChatRequests((prevRequests) => [...prevRequests, request]);
-    setChatVisible(true);
+    setChatRequests((prevRequests) => {
+      let newRequests = [...prevRequests];
+      newRequests[newRequests.length - 1] = request;
+      return newRequests;
+    });
 
     // Clear the selection
     if (textareaRef.current) {

@@ -14,11 +14,14 @@ export default function WritingPage() {
           </p>
           <div className={styles.timeContainer}>
             <p className={styles.textLanding}>Chọn thời gian:</p>
-            <input
-              type="number"
-              placeholder="Không giới hạn"
-              className={styles.timeInput}
-            />
+            <select className={styles.timeInput}>
+              <option value="">Không giới hạn</option>
+              <option value="5">5 phút</option>
+              <option value="10">10 phút</option>
+              <option value="15">15 phút</option>
+              <option value="30">30 phút</option>
+              <option value="60">60 phút</option>
+            </select>
             <p className={styles.textLanding}>phút</p>
           </div>
           <div className={styles.buttonContainer}>

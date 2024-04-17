@@ -2,11 +2,15 @@
 
 import styles from '@/styles/pages/writing/Writing.module.scss';
 import { useEffect, useState } from 'react';
+import { auth } from '@/lib';
+import { Spin } from 'antd';
 
 export default function ResultPage() {
   const [resultData, setResultData] = useState<
     Array<{ topic: string; content: string }>
   >([]);
+  const user = auth.currentUser;
+  const [isLoading, setIsLoading] = useState(true);
 
   type ResultData =
     | {
@@ -50,18 +54,20 @@ export default function ResultPage() {
     undefined
   );
 
-  useEffect(() => {
-    const storedResultData = localStorage.getItem('resultData');
-    if (storedResultData) {
-      setResultData(JSON.parse(storedResultData));
-    }
-  }, []);
+  // useEffect(() => {
+  //   const storedResultData = localStorage.getItem('resultData');
+  //   if (storedResultData) {
+  //     setResultData(JSON.parse(storedResultData));
+  //   }
+  // }, []);
 
   const callAssessAPI = async (topic: string, content: string) => {
+    const token = await user?.getIdToken();
     const response = await fetch('/api/ai/assess-writing/', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
+        authorization: `Bearer ${token}`,
       },
       body: JSON.stringify({
         type: 'essay',
@@ -76,63 +82,72 @@ export default function ResultPage() {
 
   useEffect(() => {
     const getResults = async () => {
-      if (resultData[0]) {
+      const storedResultData = localStorage.getItem('resultData');
+      let parsedResultData = [];
+      if (storedResultData) {
+        parsedResultData = JSON.parse(storedResultData);
+        setResultData(parsedResultData);
+      }
+
+      if (parsedResultData[0]) {
         const result = await callAssessAPI(
-          resultData[0].topic,
-          resultData[0].content
+          parsedResultData[0].topic,
+          parsedResultData[0].content
         );
         setPartOneResult(result.data);
       }
 
-      if (resultData.length > 1) {
+      if (parsedResultData.length > 1) {
         const result = await callAssessAPI(
-          resultData[1].topic,
-          resultData[1].content
+          parsedResultData[1].topic,
+          parsedResultData[1].content
         );
         setPartTwoResult(result.data);
       }
+
+      setIsLoading(false);
     };
 
     getResults();
-  }, [resultData]);
+  }, []);
 
   const results: (ResultData | undefined)[] = [partOneResult, partTwoResult];
 
-  return (
-    <>
-      <div className={styles.container}>
-        <h2 className={styles.title}>Kết quả</h2>
-        <div className={styles.mainContainer}>
-          {results.map(
-            (result, index) =>
-              result && (
-                <div
-                  className={styles.resultContainer}
-                  key={index}
-                >
-                  <h3 className={styles.resultTitle}>Task {index + 1}</h3>
-                  <div className={styles.resultContent}>
-                    <p>Đề bài: {result.topic}</p>
-                    <p>Final Score: {result.assessment.final_score}</p>
-                    {Object.entries(result.assessment).map(([key, value]) => {
-                      if (key !== 'final_score' && typeof value === 'object') {
-                        return (
-                          <div key={key}>
-                            <h4>{key}</h4>
-                            <p>Band Score: {value.band_score}</p>
-                            <p>Examiner Feedback: {value.examiner_feedback}</p>
-                            <p>Band Descriptors: {value.band_descriptors}</p>
-                          </div>
-                        );
-                      }
-                      return null;
-                    })}
-                  </div>
+  return isLoading ? (
+    <Spin size="large" />
+  ) : (
+    <div className={styles.container}>
+      <h2 className={styles.title}>Kết quả</h2>
+      <div className={styles.mainContainer}>
+        {results.map(
+          (result, index) =>
+            result && (
+              <div
+                className={styles.resultContainer}
+                key={index}
+              >
+                <h3 className={styles.resultTitle}>Task {index + 1}</h3>
+                <div className={styles.resultContent}>
+                  <p>Đề bài: {result.topic}</p>
+                  <p>Final Score: {result.assessment.final_score}</p>
+                  {Object.entries(result.assessment).map(([key, value]) => {
+                    if (key !== 'final_score' && typeof value === 'object') {
+                      return (
+                        <div key={key}>
+                          <h4>{key}</h4>
+                          <p>Band Score: {value.band_score}</p>
+                          <p>Examiner Feedback: {value.examiner_feedback}</p>
+                          <p>Band Descriptors: {value.band_descriptors}</p>
+                        </div>
+                      );
+                    }
+                    return null;
+                  })}
                 </div>
-              )
-          )}
-        </div>
+              </div>
+            )
+        )}
       </div>
-    </>
+    </div>
   );
 }
