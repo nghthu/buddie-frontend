@@ -7,7 +7,7 @@
 
 .questionContainer {
   width: 40%;
-  height: calc(99vh - 140px);
+  height: calc(100vh - 120px);
   overflow-y: scroll;
   display: flex;
   flex-direction: column;
@@ -16,7 +16,7 @@
 
 .contextWrapper {
   width: 60%;
-  height: calc(99vh - 140px);
+  height: calc(100vh - 120px);
   display: flex;
   flex-direction: column;
   position: relative;

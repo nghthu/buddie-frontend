@@ -2,7 +2,7 @@ import styles from '@/styles/components/SkillHeader.module.scss';
 import CountdownClock from '@/components/CountdownClock';
 import clsx from 'clsx';
 
-const SkillHeader = (props: { title: string; countdownTime?: string }) => {
+const SkillHeader = (props: { title: string; countdownTime?: string, children?:React.ReactNode }) => {
   return (
     <div
       className={clsx(
@@ -15,6 +15,7 @@ const SkillHeader = (props: { title: string; countdownTime?: string }) => {
       )}
     >
       <h2 className={styles.header}>{props.title}</h2>
+      {props.children}
       {props.countdownTime && props.countdownTime !== 'unlimited' && (
         <CountdownClock countdownTime={props.countdownTime} />
       )}

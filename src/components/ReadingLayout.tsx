@@ -156,7 +156,7 @@ export default function ReadingLayout(props: {
             textCardStyles['card_overflow_scroll']
           )}
         >
-          <ReadingContextLayout context={props.data.part_prompt} />
+          <ReadingContextLayout context={props.data.part_prompt} images = {props.data.part_image_urls}/>
         </TextCard>
         <div className={questionLayouts.buttonWrapper}>
           <Button
@@ -179,15 +179,6 @@ export default function ReadingLayout(props: {
         {questionGroups[currentQuestionGroup - 1]}
         Buddie support here
         <div className={questionLayouts.buttonWrapper}>
-          {currentQuestionGroup === 1 && (
-            <Button
-              className={clsx(buttonStyles.webButton, 'ant-btn-red')}
-              type={'primary'}
-              onClick={props.setPrevState}
-            >
-              Bài đọc trước
-            </Button>
-          )}
           {currentQuestionGroup > 1 && (
             <Button
               className={clsx(buttonStyles.webButton, 'ant-btn-red')}
@@ -199,17 +190,6 @@ export default function ReadingLayout(props: {
               Các câu hỏi trước
             </Button>
           )}
-
-          {currentQuestionGroup >= maxGroup && (
-            <Button
-              className={buttonStyles.webButton}
-              type={'primary'}
-              onClick={props.setNextState}
-            >
-              Bài đọc tiếp theo
-            </Button>
-          )}
-
           {currentQuestionGroup < maxGroup && (
             <Button
               className={buttonStyles.webButton}
