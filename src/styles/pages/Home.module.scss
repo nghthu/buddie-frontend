@@ -17,15 +17,15 @@ $shadow: ();
 //   $shadow: $shadow, ($x + px $y + px #fff) !global;
 // }
 .starContainer {
-  position:absolute;
-  top:0;
-  min-width:100%;
-  min-height:100%;
+  position: absolute;
+  top: 0;
+  min-width: 100%;
+  min-height: 100%;
   pointer-events: none;
 }
 @for $i from 1 through $s {
-  $t: percentage(random(100)/100);
-  $l: percentage(random(100)/100);
+  $t: percentage(random(100) / 100);
+  $l: percentage(random(100) / 100);
   .star-#{$i} {
     top: $t;
     left: $l;
@@ -52,7 +52,6 @@ $shadow: ();
   position: relative;
   top: 0;
   left: 0;
-
 }
 
 @for $i from 1 through $n {
@@ -84,10 +83,10 @@ $shadow: ();
 @keyframes meteor {
   0% {
     opacity: 1;
-    transform:translateY(-300px) translateX(-300px) rotate(-45deg);
+    transform: translateY(-300px) translateX(-300px) rotate(-45deg);
   }
   100% {
-    transform:translateY(300px) translateX(-900px) rotate(-45deg);
+    transform: translateY(300px) translateX(-900px) rotate(-45deg);
     opacity: 0;
   }
 }
@@ -97,6 +96,7 @@ $shadow: ();
   flex-direction: column;
   padding: 20px;
   align-items: center;
+  height: 100vh;
 }
 
 .login-btn {

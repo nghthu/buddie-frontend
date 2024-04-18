@@ -6,13 +6,16 @@ import { Dropdown, Space } from 'antd';
 import styles from '@/styles/components/Header.module.scss';
 import clsx from 'clsx';
 import Link from 'next/link';
-import { useState } from 'react';
+import { use, useState } from 'react';
+import { auth } from '@/lib';
+import { useAuthState } from 'react-firebase-hooks/auth';
 
 interface Props {
   activatedTab: string;
 }
 
 const Header = (props: Props) => {
+  const [user, loading, error] = useAuthState(auth);
   const [activatedTab, setActiveTab] = useState(props.activatedTab);
   const accountItems: MenuProps['items'] = [
     {
@@ -79,7 +82,7 @@ const Header = (props: Props) => {
         </Link>
         <div className={clsx(styles.avatarMenu)}>
           <img
-            src="/images/avatar.jpg"
+            src={user?.photoURL ?? undefined}
             className={clsx(styles.avatar)}
           />
           <Dropdown

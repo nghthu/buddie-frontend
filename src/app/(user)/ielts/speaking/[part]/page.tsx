@@ -8,8 +8,14 @@ import styles from '@/styles/pages/speaking/Practice.module.scss';
 import { Button } from 'antd';
 import { AudioOutlined, EllipsisOutlined } from '@ant-design/icons';
 import TextCard from '@/components/TextCard';
-import { useEffect, useRef, useState } from 'react';
+import { useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { Checkbox } from 'antd';
+import type { CheckboxProps } from 'antd';
+import { auth } from '@/lib';
+import { User } from 'firebase/auth';
+import { Spin, notification } from 'antd';
+import MicRecorder from 'mic-recorder-to-mp3';
 
 const mimeType: string = 'audio/webm';
 
@@ -25,7 +31,9 @@ const PracticeSpeaking = ({ params }: { params: { part: string } }) => {
   const [currentAnswer, setCurrentAnswer] = useState<Blob | null>(null);
   const [answers, setAnswers] = useState<Blob[]>([]);
   const [instruction, setInstruction] = useState(true);
+  const [wantToSubmit, setWantToSubmit] = useState(false);
   const router = useRouter();
+  const user = auth.currentUser;
 
   // dummy
   const question_groups = {
@@ -203,16 +211,34 @@ const PracticeSpeaking = ({ params }: { params: { part: string } }) => {
     setInstruction(true);
   };
 
-  const nextHandler = () => {
+  const nextHandler = async () => {
     if (currentQuestion === 0) {
       setCurrentQuestion(1);
       setInstruction(false);
     } else {
-      setCurrentAnswer(null);
-      setAudio(null);
-      resetTranscript();
-      if (currentAnswer) {
+      if (currentAnswer && wantToSubmit) {
+        console.log('haha', params);
         setAnswers((prevAnswers) => [...prevAnswers, currentAnswer]);
+
+        // send test api
+        const token = await user?.getIdToken();
+
+        const formData = new FormData();
+        formData.append('speaking_audio', currentAnswer, 'answer.webm');
+        formData.append('speaking_part', '1');
+        formData.append('audio_type', 'webm');
+        formData.append(
+          'question',
+          question_groups.questions[currentQuestion].question_prompt
+        );
+
+        await fetch(`/api/ai/assess-speaking`, {
+          method: 'POST',
+          headers: {
+            authorization: `Bearer ${token}`,
+          },
+          body: formData,
+        });
       }
       if (currentQuestion < question_groups.questions.length - 1) {
         setCurrentQuestion((prevQuestion) => prevQuestion + 1);
@@ -220,7 +246,15 @@ const PracticeSpeaking = ({ params }: { params: { part: string } }) => {
         // handle submit
         console.log('submit');
       }
+
+      setCurrentAnswer(null);
+      setAudio(null);
+      resetTranscript();
     }
+  };
+
+  const setSubmitHandler: CheckboxProps['onChange'] = (e) => {
+    setWantToSubmit(e.target.checked);
   };
 
   return (
@@ -250,6 +284,14 @@ const PracticeSpeaking = ({ params }: { params: { part: string } }) => {
               src="/images/logo/main.svg"
             />
             <p>{question_groups.questions[currentQuestion].question_prompt}</p>
+            {currentQuestion > 0 && (
+              <Checkbox
+                onChange={setSubmitHandler}
+                className={styles['set-submit']}
+              >
+                Nộp câu này
+              </Checkbox>
+            )}
           </div>
           <Button
             className={styles['audio-btn']}

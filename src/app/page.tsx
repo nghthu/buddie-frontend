@@ -10,7 +10,10 @@ export default function Home() {
     <div className={styles.container}>
       <div className={styles.starContainer}>
         {[...Array(300)].map((_, index) => (
-          <div className={styles[`star-${index + 1}`]}></div>  
+          <div
+            key={index}
+            className={styles[`star-${index + 1}`]}
+          ></div>
         ))}
       </div>
       {[...Array(15)].map((_, index) => (
@@ -39,7 +42,10 @@ export default function Home() {
         <button className={styles['try-now-btn']}>Thử ngay nào!</button>
 
         <div className={styles.featureList}>
-          <p>17 &emsp;Thử sức bản thân với bộ đề thi thử IELTS</p>
+          <p>
+            <CheckCircleOutlined style={{ color: '#10A956' }} />
+            &emsp;Thử sức bản thân với bộ đề thi thử IELTS
+          </p>
           <p>
             <CheckCircleOutlined style={{ color: '#10A956' }} />
             &emsp;AI hỗ trợ người học cả 4 kỹ năng! Việc gì khó, cứ để AI lo!
