@@ -2,7 +2,7 @@
 
 import SkillHeader from '@/components/SkillHeader';
 import TextCard from '@/components/TextCard';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
 import textCardStyles from '@/styles/components/TextCard.module.scss';
 import styles from '@/styles/components/WebButton.module.scss';
@@ -10,7 +10,7 @@ import styles from '@/styles/components/WebButton.module.scss';
 import clsx from 'clsx';
 import { Button, Select } from 'antd';
 import Link from 'next/link';
-
+import TestSelector from '@/components/TestSelector';
 const IeltsReading = () => {
   const [testTime, setTestTime] = useState('20:00');
 
@@ -20,6 +20,7 @@ const IeltsReading = () => {
   return (
     <>
       <SkillHeader title={'Luyện tập IELTS Reading'}></SkillHeader>
+      <TestSelector skill={'reading'} />
       <div style={{ paddingLeft: '8%', paddingRight: '8%' }}>
         <TextCard
           width="100%"
