@@ -15,7 +15,7 @@ import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 
 const Verify = () => {
-  const [user, authStateLoading, authStateError] = useAuthState(auth);
+  const [user] = useAuthState(auth);
   const [sendEmailVerification, sending, sendingEmailError] =
     useSendEmailVerification(auth);
   const [logout, logoutLoading, logoutError] = useSignOut(auth);

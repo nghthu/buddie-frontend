@@ -8,16 +8,23 @@ import {
   useSignInWithEmailAndPassword,
   useSendEmailVerification,
 } from 'react-firebase-hooks/auth';
-import { useCallback, useEffect } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import styles from '@/styles/components/SignupForm.module.scss';
 import { auth } from '@/lib';
 import { DefaultUserProfile } from '@/utils';
+import { ResponseData, ResponseStatus } from '@/common';
 
 export interface SignupProps {
   full_name?: string;
   email?: string;
   password?: string;
+}
+
+export interface UserCustomClaims {
+  admin: boolean;
+  standard_request_count: number;
+  pro_request_count: number;
 }
 
 const emailRegex = /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/;
@@ -29,51 +36,75 @@ const SignupForm = () => {
   const [createUserWithEmailAndPassword, createdUser, creating, createError] =
     useCreateUserWithEmailAndPassword(auth);
   const [updateProfile, updating, updateError] = useUpdateProfile(auth);
-  const [signInWithEmailAndPassword, signInUser, signInLoading, signInError] =
+  const [signInWithEmailAndPassword, , signInLoading, signInError] =
     useSignInWithEmailAndPassword(auth);
-  const [sendEmailVerification, sending, sendingEmailError] =
-    useSendEmailVerification(auth);
+  const [sendEmailVerification] = useSendEmailVerification(auth);
+  const [updateClaimsError, setUpdateClaimsError] = useState<Error | null>(
+    null
+  );
   const router = useRouter();
 
-  const errors = [createError, updateError, signInError];
-  const existingAuthError = createError || updateError || signInError;
+  const errors = [createError, updateError, signInError, updateClaimsError];
+  const existingError = errors.some((error) => !error);
 
-  const updateNameAndSignIn = useCallback(async () => {
-    const {
-      email,
-      password,
-      full_name: fullName,
-    } = form.getFieldsValue() as Required<SignupProps>;
+  const updateUserProfile = useCallback(
+    async (fullName: string) => {
+      await updateProfile({
+        displayName: fullName,
+        photoURL: createdUser?.user.photoURL || DefaultUserProfile.AVATAR,
+      });
 
-    const updateNameSuccessfully = await updateProfile({
-      displayName: fullName,
-      photoURL: createdUser?.user.photoURL || DefaultUserProfile.AVATAR,
-    });
+      // TODO: call update claims
+      const token = await createdUser?.user.getIdToken();
+      const updateClaimsResult = (await fetch('/api/user/claims', {
+        headers: {
+          authorization: `Bearer ${token}`,
+        },
+      }).then((res) => res.json())) as ResponseData<UserCustomClaims>;
 
-    if (updateNameSuccessfully) {
-      sendEmailVerification();
+      if (updateClaimsResult.status === ResponseStatus.SUCCESS) {
+        setUpdateClaimsError(null);
+      } else {
+        setUpdateClaimsError(new Error('Something went wrong'));
+      }
+    },
+    [updateProfile, setUpdateClaimsError, createdUser?.user]
+  );
 
-      signInWithEmailAndPassword(email, password).then((emailSignInUser) => {
-        if (emailSignInUser && !emailSignInUser.user.emailVerified) {
-          router.push('/verify');
-        } else {
-          router.push('/profile');
+  useEffect(() => {
+    if (createdUser) {
+      const {
+        email,
+        password,
+        full_name: fullName,
+      } = form.getFieldsValue() as Required<SignupProps>;
+
+      updateUserProfile(fullName).then(async () => {
+        if (!updateError && !updateClaimsError) {
+          await sendEmailVerification();
+
+          signInWithEmailAndPassword(email, password).then(
+            (emailSignInUser) => {
+              if (emailSignInUser && !emailSignInUser.user.emailVerified) {
+                router.push('/verify');
+              } else {
+                router.push('/profile');
+              }
+            }
+          );
         }
       });
     }
   }, [
-    form,
-    updateProfile,
+    createdUser,
+    updateUserProfile,
     sendEmailVerification,
+    form,
     signInWithEmailAndPassword,
     router,
+    updateClaimsError,
+    updateError,
   ]);
-
-  useEffect(() => {
-    if (createdUser) {
-      updateNameAndSignIn();
-    }
-  }, [createdUser, updateNameAndSignIn]);
 
   const onFinish: FormProps<SignupProps>['onFinish'] = (values) => {
     const { email, password } = values as Required<SignupProps>;
@@ -165,7 +196,7 @@ const SignupForm = () => {
         />
       </Form.Item>
 
-      <Form.Item hidden={!existingAuthError}>
+      <Form.Item hidden={!existingError}>
         <Space
           direction="vertical"
           className={styles['alert-space']}
