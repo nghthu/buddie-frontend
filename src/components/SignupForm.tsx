@@ -2,11 +2,13 @@
 
 import { LockOutlined, MailOutlined, UserOutlined } from '@ant-design/icons';
 import { Alert, Button, Form, FormProps, Input, Space } from 'antd';
+import { FirebaseError } from 'firebase/app';
 import {
   useCreateUserWithEmailAndPassword,
   useUpdateProfile,
   useSignInWithEmailAndPassword,
   useSendEmailVerification,
+  useSignOut,
 } from 'react-firebase-hooks/auth';
 import { useCallback, useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
@@ -42,56 +44,73 @@ const SignupForm = () => {
   const [updateClaimsError, setUpdateClaimsError] = useState<Error | null>(
     null
   );
+  const [logout, logoutLoading] = useSignOut(auth);
   const router = useRouter();
 
   const errors = [createError, updateError, signInError, updateClaimsError];
-  const existingError = errors.some((error) => !error);
+  const existingError = errors.some((error) => {
+    if (
+      !error ||
+      (error instanceof FirebaseError &&
+        error.code === 'auth/popup-closed-by-user')
+    ) {
+      return false;
+    }
+
+    return true;
+  });
 
   const updateUserProfile = useCallback(
     async (fullName: string) => {
-      await updateProfile({
+      const updateProfileResult = await updateProfile({
         displayName: fullName,
         photoURL: createdUser?.user.photoURL || DefaultUserProfile.AVATAR,
       });
 
-      // TODO: call update claims
+      if (!updateProfileResult) {
+        return false;
+      }
+
       const token = await createdUser?.user.getIdToken();
+
       const updateClaimsResult = (await fetch('/api/user/claims', {
+        method: 'POST',
         headers: {
           authorization: `Bearer ${token}`,
         },
-      }).then((res) => res.json())) as ResponseData<UserCustomClaims>;
+      })
+        .then(async (res) => {
+          return await res.json();
+        })
+        .catch((err) => {
+          setUpdateClaimsError(err);
+        })) as ResponseData<UserCustomClaims> | undefined;
 
-      if (updateClaimsResult.status === ResponseStatus.SUCCESS) {
-        setUpdateClaimsError(null);
-      } else {
-        setUpdateClaimsError(new Error('Something went wrong'));
+      if (!updateClaimsResult) {
+        return false;
       }
+
+      if (updateClaimsResult.status === ResponseStatus.ERROR) {
+        setUpdateClaimsError(new Error('Something went wrong'));
+        return false;
+      }
+
+      setUpdateClaimsError(null);
+      return true;
     },
     [updateProfile, setUpdateClaimsError, createdUser?.user]
   );
 
   useEffect(() => {
     if (createdUser) {
-      const {
-        email,
-        password,
-        full_name: fullName,
-      } = form.getFieldsValue() as Required<SignupProps>;
+      const { full_name: fullName } =
+        form.getFieldsValue() as Required<SignupProps>;
 
-      updateUserProfile(fullName).then(async () => {
-        if (!updateError && !updateClaimsError) {
+      updateUserProfile(fullName).then(async (updateResult: boolean) => {
+        if (!updateError && !updateClaimsError && updateResult) {
           await sendEmailVerification();
-
-          signInWithEmailAndPassword(email, password).then(
-            (emailSignInUser) => {
-              if (emailSignInUser && !emailSignInUser.user.emailVerified) {
-                router.push('/verify');
-              } else {
-                router.push('/profile');
-              }
-            }
-          );
+        } else {
+          await logout();
         }
       });
     }
@@ -104,6 +123,7 @@ const SignupForm = () => {
     router,
     updateClaimsError,
     updateError,
+    logout,
   ]);
 
   const onFinish: FormProps<SignupProps>['onFinish'] = (values) => {
@@ -231,7 +251,7 @@ const SignupForm = () => {
           type="primary"
           htmlType="submit"
           className={styles['signup-btn']}
-          loading={creating || updating || signInLoading}
+          loading={creating || updating || signInLoading || logoutLoading}
         >
           Đăng ký
         </Button>
