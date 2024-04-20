@@ -1,27 +1,28 @@
 'use client';
 
 import SkillHeader from '@/components/SkillHeader';
-import TextCard from '@/components/TextCard';
-import React, { useEffect, useState } from 'react';
+// import TextCard from '@/components/TextCard';
+// import React, { useEffect, useState } from 'react';
 
-import textCardStyles from '@/styles/components/TextCard.module.scss';
-import styles from '@/styles/components/WebButton.module.scss';
+// import textCardStyles from '@/styles/components/TextCard.module.scss';
+// import styles from '@/styles/components/WebButton.module.scss';
 
-import clsx from 'clsx';
-import { Button, Select } from 'antd';
-import Link from 'next/link';
+// import clsx from 'clsx';
+// import { Button, Select } from 'antd';
+// import Link from 'next/link';
 import TestSelector from '@/components/TestSelector';
+// import TestCard from '@/components/TestCard';
 const IeltsReading = () => {
-  const [testTime, setTestTime] = useState('20:00');
+  // const [testTime, setTestTime] = useState('20:00');
 
-  const handleSelectChange = (value: string) => {
-    setTestTime(value);
-  };
+  // const handleSelectChange = (value: string) => {
+  //   setTestTime(value);
+  // };
   return (
     <>
       <SkillHeader title={'Luyện tập IELTS Reading'}></SkillHeader>
-      <TestSelector skill={'reading'} />
-      <div style={{ paddingLeft: '8%', paddingRight: '8%' }}>
+      <TestSelector skill={'ielts_reading'} text={'Hãy chọn đề thi Reading IELTS bạn muốn làm'}/>
+      {/* <div style={{ paddingLeft: '8%', paddingRight: '8%' }}>
         <TextCard
           width="100%"
           height="auto"
@@ -81,7 +82,7 @@ const IeltsReading = () => {
             </Button>
           </Link>
         </TextCard>
-      </div>
+      </div> */}
     </>
   );
 };

@@ -6,7 +6,8 @@ export async function GET(request: Request, { params }: { params: { testId: stri
         const response = await fetch(
           `${process.env.API_BASE_URL}/api/v1/tests/${testId}`,
           {
-            method: 'GET'
+            method: 'GET',
+            headers: request.headers
           }
         );
         const data = await response.json();
@@ -14,5 +15,6 @@ export async function GET(request: Request, { params }: { params: { testId: stri
       } catch (error) {
         console.error(error);
         return NextResponse.json({ error });
+
       }
 }

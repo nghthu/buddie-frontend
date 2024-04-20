@@ -1,7 +1,7 @@
 'use client';
 import ReadingLayout from '@/components/ReadingLayout';
 import SkillHeader from '@/components/SkillHeader';
-import { useRouter } from 'next/navigation';
+// import { useRouter } from 'next/navigation';
 import React from 'react';
 import { useEffect, useState } from 'react';
 import { DoubleRightOutlined, DoubleLeftOutlined } from '@ant-design/icons';
@@ -37,6 +37,7 @@ interface FetchArgs {
 
 const fetcher = async ({ url, user }: FetchArgs) => {
   const token = await user?.getIdToken();
+  console.log(token);
   const response = await fetch(url, {
     headers: {
       authorization: `Bearer ${token}`,
@@ -50,7 +51,7 @@ const fetcher = async ({ url, user }: FetchArgs) => {
   return response.data;
 };
 export default function IeltsPart({ params, }: { params: { id: string; part: string }; }) {
-  const router = useRouter();
+  // const router = useRouter();
   const [answers, setAnswers] = useState({}); // {1: "A", 2: ["B","C"], 3: "False", 4:"arthitis"}
   const [testTime, setTestTime] = useState('20:00');
   const [currentPart, setCurrentPart] = useState(1);
