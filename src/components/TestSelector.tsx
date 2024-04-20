@@ -117,7 +117,7 @@ export default function TestSelector(props: { skill: string, text?: string }) {
             {contextHolder}
             <h3>{props.text}</h3>
             <div className={styles.control}>
-                <Search placeholder="Nhập từ khóa cần tìm" onChange={onChange} onSearch={onSearch} style={{ width: 300 }} />
+                <Search placeholder="Nhập từ khóa cần tìm" onSearch={onSearch} style={{ width: 300 }} />
                 <Select defaultValue='' options={[
                     {
                         value: '',
@@ -144,7 +144,7 @@ export default function TestSelector(props: { skill: string, text?: string }) {
             <div className={styles.wrapper} ref={scrollRef}>
 
                 {testComponent}
-                {testComponent.length===0 && <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description='Không tìm thấy bài thi nào'/>}
+                {testComponent.length===0 && <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description='Không tìm thấy bài thi nào' style={{width:'100%'}}/>}
                 {isLoading && <div className={styles.overlay}><Spin size='default' indicator={<LoadingOutlined style={{ fontSize: 100 }} spin />} /></div>}
 
                 {totalPage < (rawTests.pagination.total_count / 10) && <div className={styles.freeSpace}><Button onClick={handleLoad}>Xem thêm bài thi</Button></div>}
