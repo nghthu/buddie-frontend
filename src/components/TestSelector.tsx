@@ -107,6 +107,7 @@ export default function TestSelector(props: { skill: string, text?: string }) {
     if (isLoading && tests.current.length === 0) {
         return <Spin size='default' />
     }
+    console.log(rawTests);
     const testComponent = filteredTests.map((test: { _id: string, test_name: string, test_type: string, duration: number, tags: string[], test_recording?: string, parts?: object[] }) => {
         return (
             <TestCard key={test._id} testName={test.test_name} testDuration={test.duration.toString()} testTags={test.tags} testparts={test.parts ? test.parts.length : 0} testSkill={test.test_type} testId={test._id} />
@@ -115,7 +116,7 @@ export default function TestSelector(props: { skill: string, text?: string }) {
     return (
         <div className={styles.container}>
             {contextHolder}
-            <h3>{props.text}</h3>
+            <p>{props.text}</p>
             <div className={styles.control}>
                 <Search placeholder="Nhập từ khóa cần tìm" onSearch={onSearch} style={{ width: 300 }} />
                 <Select defaultValue='' options={[
@@ -146,8 +147,7 @@ export default function TestSelector(props: { skill: string, text?: string }) {
                 {testComponent}
                 {testComponent.length===0 && <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description='Không tìm thấy bài thi nào' style={{width:'100%'}}/>}
                 {isLoading && <div className={styles.overlay}><Spin size='default' indicator={<LoadingOutlined style={{ fontSize: 100 }} spin />} /></div>}
-
-                {totalPage < (rawTests.pagination.total_count / 10) && <div className={styles.freeSpace}><Button onClick={handleLoad}>Xem thêm bài thi</Button></div>}
+                {rawTests && totalPage < (rawTests.pagination.total_count / 10) && <div className={styles.freeSpace}><Button onClick={handleLoad}>Xem thêm bài thi</Button></div>}
             </div>
         </div>
     )

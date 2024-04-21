@@ -181,8 +181,7 @@ export default function ReadingLayout(props: {
         <div className={questionLayouts.buttonWrapper}>
           {currentQuestionGroup > 1 && (
             <Button
-              className={clsx(buttonStyles.webButton, 'ant-btn-red')}
-              type={'primary'}
+              className={clsx(buttonStyles.webButton)}
               onClick={() => {
                 setCurrentQuestionGroup((prev) => prev - 1);
               }}
@@ -193,7 +192,6 @@ export default function ReadingLayout(props: {
           {currentQuestionGroup < maxGroup && (
             <Button
               className={buttonStyles.webButton}
-              type={'primary'}
               onClick={() => {
                 setCurrentQuestionGroup((prev) => prev + 1);
               }}

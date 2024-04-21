@@ -1,5 +1,5 @@
 import { Input } from 'antd';
-
+import styles from '@/styles/components/questionLayouts.module.scss';
 export default function FillTheBlankLayout(props: {
     question?: string;
     answer: string;
@@ -14,7 +14,7 @@ export default function FillTheBlankLayout(props: {
         }));
     }
     return (
-        <div>
+        <div className={styles.fillTheBlankWrapper}>
             Câu {props.questionIndex}
             <h3 style={{ whiteSpace: "pre-wrap" }}>{props.question}</h3>
 

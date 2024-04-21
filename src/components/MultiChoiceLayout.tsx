@@ -40,7 +40,7 @@ export default function MultiChoiceLayout(props: {
     const multiChoiceWrapper = (
       <div className={styles.multiChoiceWrapper}>
         <h3 style={{ whiteSpace: 'pre-wrap' }}>{props.question}</h3>
-        <h3 style={{ whiteSpace: 'pre-wrap' }}>Câu {questionIndexes}</h3>
+        <h3 style={{ whiteSpace: 'pre-wrap', fontWeight:'400',fontSize:'1.7rem' }}>Câu {questionIndexes}</h3>
         {multiChoiceGroup}
       </div>
     );

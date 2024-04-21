@@ -40,7 +40,7 @@ export default function TestCard(props: { testName: string, testDuration: string
     );
     return (
         <div className={styles.cardWrapper}>
-            <h3>{props.testName}</h3>
+            <h3 className={styles.header}>{props.testName}</h3>
             <div className={styles.clock}><ClockCircleOutlined />{duration} phút</div>
             <div className={styles.testTagWrapper}>
                 {props.testTags.map((tag) => {
