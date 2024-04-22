@@ -1,21 +1,15 @@
 'use client';
 
 import { auth } from '@/lib';
-import { Spin } from 'antd';
-import { useRouter } from 'next/navigation';
-import { useAuthState } from 'react-firebase-hooks/auth';
+import { useEffect } from 'react';
 
 const Profile = () => {
-  const [user, loading, error] = useAuthState(auth);
-  const router = useRouter();
+  const user = auth.currentUser;
 
-  if (!loading && (!user || error)) {
-    router.replace('/login');
-  }
-
-  if (loading) {
-    return <Spin size="large" />;
-  }
+  useEffect(() => {
+    console.log(user?.getIdToken());
+    console.log(user?.getIdTokenResult());
+  });
 
   return (
     <div>

@@ -15,18 +15,12 @@ import { useRouter } from 'next/navigation';
 import styles from '@/styles/components/SignupForm.module.scss';
 import { auth } from '@/lib';
 import { DefaultUserProfile } from '@/utils';
-import { ResponseData, ResponseStatus } from '@/common';
+import { ResponseData, ResponseStatus, UserCustomClaims } from '@/common';
 
 export interface SignupProps {
   full_name?: string;
   email?: string;
   password?: string;
-}
-
-export interface UserCustomClaims {
-  admin: boolean;
-  standard_request_count: number;
-  pro_request_count: number;
 }
 
 const emailRegex = /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/;
@@ -91,7 +85,7 @@ const SignupForm = () => {
       }
 
       if (updateClaimsResult.status === ResponseStatus.ERROR) {
-        setUpdateClaimsError(new Error('Something went wrong'));
+        setUpdateClaimsError(new Error('Ối, đã có lỗi xảy ra!'));
         return false;
       }
 

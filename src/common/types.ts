@@ -12,3 +12,9 @@ export interface ResponseData<Data> {
     message: string;
   };
 }
+
+export interface UserCustomClaims {
+  admin: boolean;
+  standard_request_count: number;
+  pro_request_count: number;
+}
