@@ -131,17 +131,15 @@ export default function PracticePage() {
     let newSelection = '';
     if ((event.target as Element).tagName === 'TEXTAREA') {
       newSelection =
-        '"' +
-          textareaRef.current?.value.substring(
-            textareaRef.current?.selectionStart || 0,
-            textareaRef.current?.selectionEnd || 0
-          ) +
-          '"' || '';
+        textareaRef.current?.value.substring(
+          textareaRef.current?.selectionStart || 0,
+          textareaRef.current?.selectionEnd || 0
+        ) || '';
     } else if ((event.target as Element).tagName === 'DIV') {
-      newSelection = '"' + window.getSelection()?.toString() + '"' || '';
+      newSelection = window.getSelection()?.toString() || '';
     }
 
-    if (newSelection != '""') {
+    if (newSelection != '') {
       setSelection(newSelection);
       setMenuVisible(true);
       setMenuPosition({ x: event.clientX, y: event.clientY });
@@ -172,6 +170,24 @@ export default function PracticePage() {
     return data;
   };
 
+  const callSynonymsAPI = async (word: string) => {
+    const token = await user?.getIdToken();
+
+    const response = await fetch(`/api/ai/synonyms?word=${word}`, {
+      headers: {
+        'Content-Type': 'application/json',
+        authorization: `Bearer ${token}`,
+      },
+    });
+
+    console.log(response);
+
+    const data = await response.json();
+
+    console.log(data);
+    return data;
+  };
+
   const showChat = async (message: string) => {
     let apiResponse;
     let request = {
@@ -193,6 +209,11 @@ export default function PracticePage() {
         selection
       );
       request.response = apiResponse.data.paraphrased;
+    }
+
+    if (message === 'Từ đồng nghĩa') {
+      apiResponse = await callSynonymsAPI('workspace');
+      request.response = apiResponse.data;
     }
 
     setChatRequests((prevRequests) => {
