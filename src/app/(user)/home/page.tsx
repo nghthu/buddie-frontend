@@ -87,7 +87,10 @@ const Home = () => {
           <div className={styles.test}>
             <div>
               <h1>IELTS Simulation Listening Test 1</h1>
-              <p>40 phút | 2k người | 25 bình luận</p>
+              <div>
+                <p className={styles.score}>85%</p>
+                <p>48/60 phút</p>
+              </div>
             </div>
 
             <Button className={styles.detailButton}>Chi tiết</Button>
@@ -96,7 +99,10 @@ const Home = () => {
           <div className={styles.test}>
             <div>
               <h1>IELTS Simulation Listening Test 1</h1>
-              <p>40 phút | 2k người | 25 bình luận</p>
+              <div>
+                <p className={styles.score}>85%</p>
+                <p>48/60 phút</p>
+              </div>
             </div>
 
             <Button className={styles.detailButton}>Chi tiết</Button>
@@ -105,7 +111,10 @@ const Home = () => {
           <div className={styles.test}>
             <div>
               <h1>IELTS Simulation Listening Test 1</h1>
-              <p>40 phút | 2k người | 25 bình luận</p>
+              <div>
+                <p className={styles.score}>85%</p>
+                <p>48/60 phút</p>
+              </div>
             </div>
 
             <Button className={styles.detailButton}>Chi tiết</Button>
