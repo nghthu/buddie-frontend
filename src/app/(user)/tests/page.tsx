@@ -1,7 +1,7 @@
 'use client';
 
-import styles from '@/styles/pages/exams/Exams.module.scss';
-import { Button, Card, Modal, Space, Tabs, Typography } from 'antd';
+import styles from '@/styles/pages/exams/Tests.module.scss';
+import { Button, Card, Modal, Tabs, Typography } from 'antd';
 import { useState, useEffect } from 'react';
 import {
   FormOutlined,
