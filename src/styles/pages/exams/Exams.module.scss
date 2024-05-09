@@ -1,0 +1,9 @@
+@use '@/styles/variables.scss' as *;
+
+.modalTitle {
+  text-align: center;
+  font-size: 30px;
+  font-weight: 500;
+  color: $color-primary;
+  margin-bottom: 10px;
+}
