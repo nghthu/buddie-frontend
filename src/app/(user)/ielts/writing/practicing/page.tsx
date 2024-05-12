@@ -71,7 +71,7 @@ export default function PracticePage() {
   return (
     <>
       <div className={styles.container}>
-        <h2 className={styles.title}>IETLS Writing Task 1</h2>
+        <h2 className={styles.title}>IELTS Writing Task 1</h2>
 
         <div
           className={`${styles.practiceContainer} ${

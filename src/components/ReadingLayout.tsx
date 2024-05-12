@@ -75,7 +75,7 @@ export default function ReadingLayout(props: {
       );
       return (
         <TextCard
-          width={'100'}
+          width="100"
           height={'auto'}
           className={'cardFlex'}
         >
@@ -155,7 +155,7 @@ export default function ReadingLayout(props: {
       <div className={questionLayouts.questionContainer}>
         {questionGroups}
         <TextCard
-          width={'100'}
+          width="100"
           height={'auto'}
         >
           <BuddieSuport />

@@ -7,17 +7,11 @@ export const POST = async function sendAnswer(req: Request) {
 
     console.log(chalk.bgYellow('req'), formData);
 
-    const headers = new Headers();
-    const authorizationHeader = req.headers.get('authorization');
-    if (authorizationHeader) {
-      headers.append('Authorization', authorizationHeader);
-    }
-
     const response = await fetch(
       `${process.env.API_BASE_URL}/api/v1/ai/assess-speaking`,
       {
         method: 'POST',
-        headers: headers,
+        headers: req.headers,
         body: formData,
       }
     );
