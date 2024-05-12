@@ -11,7 +11,21 @@ import styles from '@/styles/components/SkillHeader.module.scss';
 import { User } from 'firebase/auth';
 import { auth } from '@/lib';
 import useSWR from 'swr';
-
+interface test_answer {
+  test_id: string,
+  parts: {
+    _id: string,
+    question_groups: {
+      _id: string,
+      questions: {
+        _id: string,
+        answer_result: {
+          user_answer: string | string[]
+        }
+      }[]
+    }[]
+  }[]
+}
 interface questiongroup {
   is_single_question?: boolean | object;
   question_groups_info?: {
@@ -23,6 +37,7 @@ interface questiongroup {
   questions?: Array<object>;
 }
 interface subpart {
+  _id: string;
   part_number: number;
   part_duration: number;
   part_recording: string;
@@ -52,12 +67,12 @@ const fetcher = async ({ url, user }: FetchArgs) => {
 };
 export default function IeltsPart({ params, }: { params: { id: string; part: string }; }) {
   // const router = useRouter();
-  const [answers, setAnswers] = useState({}); // {1: "A", 2: ["B","C"], 3: "False", 4:"arthitis"}
+  const [answers, setAnswers] = useState<test_answer>({ "test_id": "", "parts": [] });
   const [testTime, setTestTime] = useState('20:00');
   const [currentPart, setCurrentPart] = useState(1);
-  const changePart = (part: number) => {
-    setCurrentPart(part);
-  };
+  // const changePart = (part: number) => {
+  //   setCurrentPart(part);
+  // };
 
   const user = auth.currentUser;
   const {
@@ -80,13 +95,52 @@ export default function IeltsPart({ params, }: { params: { id: string; part: str
       setCurrentPart(Number(params.part));
     }
   }, [params.part])
-
+  useEffect(() => {
+    if (tests) {
+      if (params.part !== 'all') {
+        const temp_test_answer: { test_id: string, parts: { _id: string, question_groups: { _id: string, questions: { _id: string, answer_result: { user_answer: string } }[] }[] }[] } = { "test_id": params.id, "parts": [] };
+        //push in the right part
+        temp_test_answer['parts'].push({ "_id": tests['parts'][Number(params.part) - 1]['_id'], "question_groups": [] });
+  
+        // iterate through the question groups inside the part and push each question group to the temp_test_answer
+        tests['parts'][Number(params.part) - 1]['question_groups'].map((question_group: { _id: string, questions: { _id: string }[] }, index: number) => {
+          temp_test_answer['parts'][0]['question_groups'].push({ "_id": question_group._id, "questions": [] });
+  
+          // within each question group, iterate through the questions and push each question to the temp_test_answer
+          question_group.questions.map((question: { _id: string }) => {
+            temp_test_answer['parts'][0]['question_groups'][index]['questions'].push({ "_id": question._id, "answer_result": { "user_answer": "" } });
+          });
+        });
+  
+        setAnswers(temp_test_answer);
+      }
+      else {
+        const temp_test_answer: { test_id: string, parts: { _id: string, question_groups: { _id: string, questions: { _id: string, answer_result: { user_answer: string } }[] }[] }[] } = { "test_id": params.id, "parts": [] };
+        //push in all parts
+        tests['parts'].map((part: { _id: string, question_groups: { _id: string, questions: { _id: string }[] }[] }, i1: number) => {
+          temp_test_answer['parts'].push({ "_id": part._id, "question_groups": [] });
+  
+          part.question_groups.map((question_group: { _id: string, questions: { _id: string }[] }, i2: number) => {
+            temp_test_answer['parts'][i1]['question_groups'].push({ "_id": question_group._id, "questions": [] });
+            console.log('bug');
+            console.log(temp_test_answer);
+            question_group.questions.map((question: { _id: string }) => {
+              temp_test_answer['parts'][i1]['question_groups'][i2]['questions'].push({ "_id": question._id, "answer_result": { "user_answer": "" } });
+            });
+          });
+        });
+  
+        setAnswers(temp_test_answer);
+      }
+    }
+  }, [tests, params.part, params.id]);
   if (isLoading) {
     return <Spin size='large' />
   }
 
   const temp_metaData = { ...tests };
-  console.log(tests);
+  
+  console.log('answers: ', answers);
   delete temp_metaData['parts'];
   const metaData = temp_metaData;
   const jsonData = [];
@@ -106,33 +160,6 @@ export default function IeltsPart({ params, }: { params: { id: string; part: str
   }
 
 
-
-
-  // useEffect(() => {
-  //   const fetchData = async () => {
-  //     const res = await fetch(`/api/tests/${params.id}`);
-  //     const data = await res.json();
-  //     const temp_metaData = { ...data['data'] };
-  //     delete temp_metaData['parts'];
-  //     setMetaData(temp_metaData);
-  //     console.log(data['data']);
-  //     if (params.part === 'all') {
-  //       const partData = data['data']['parts'].map(
-  //         (subpart: subpart) => subpart
-  //       );
-  //       setJsonData(partData);
-  //       setActivePart('1');
-  //     } else {
-  //       setCurrentPart(Number(params.part));
-  //       const partData = data['data']['parts'].filter(
-  //         (subpart: subpart) => subpart['part_number'] === Number(params.part)
-  //       );
-  //       setJsonData(partData);
-  //       setActivePart(params.part);
-  //     }
-  //   };
-  //   fetchData();
-  // }, []);
   const passageButtons = (
     <div className={styles.partChangeWrapper}>
       <Button
@@ -153,22 +180,22 @@ export default function IeltsPart({ params, }: { params: { id: string; part: str
         disabled={currentPart === jsonData.length || params.part !== 'all'}
       />
     </div>);
+
   const parts = jsonData.map((part: subpart) => {
-    const prevPart =
-      params.part === 'all'
-        ? Math.max(part['part_number'] - 1, 1)
-        : Number(params.part);
-    const nextPart =
-      params.part === 'all'
-        ? Math.min(part['part_number'] + 1, jsonData.length)
-        : Number(params.part);
-    console.log('part: ', part['part_number']);
+    // const prevPart =
+    //   params.part === 'all'
+    //     ? Math.max(part['part_number'] - 1, 1)
+    //     : Number(params.part);
+    // const nextPart =
+    //   params.part === 'all'
+    //     ? Math.min(part['part_number'] + 1, jsonData.length)
+    //     : Number(params.part);
+    // console.log('part: ', part['part_number']);
     return (
       <React.Fragment key={part['part_number']}>
         {currentPart === part['part_number'] && (
           <ReadingLayout
-            setPrevState={() => changePart(prevPart)}
-            setNextState={() => changePart(nextPart)}
+            partNumber={part['part_number']}
             data={part}
             setAnswer={setAnswers}
             answers={answers}

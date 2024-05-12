@@ -11,11 +11,26 @@ import questionLayouts from '@/styles/components/questionLayouts.module.scss';
 import textCardStyles from '@/styles/components/TextCard.module.scss';
 import buttonStyles from '@/styles/components/WebButton.module.scss';
 import clsx from 'clsx';
-import BuddieSuport from './BuddieSupport';
+//import BuddieSuport from './BuddieSupport';
 import { useState } from 'react';
 import React from 'react';
-
+interface test_answer {
+  test_id: string,
+  parts: {
+      _id: string,
+      question_groups: {
+          _id: string,
+          questions: {
+              _id: string,
+              answer_result: {
+                  user_answer: string|string[]
+              }
+          }[]
+      }[]
+  }[]
+}
 interface data {
+  _id: string;
   part_number: number;
   part_duration: number;
   part_recording: string;
@@ -24,6 +39,7 @@ interface data {
   question_groups: Array<object>;
 }
 interface questiongroup {
+  _id: string;
   is_single_question: boolean | object;
   question_groups_info: {
     question_groups_duration: number;
@@ -34,6 +50,7 @@ interface questiongroup {
   questions: Array<question>;
 }
 interface question {
+  _id: string;
   question_number: number;
   question_type: string;
   question_prompt: string;
@@ -42,31 +59,31 @@ interface question {
   options: Array<string>;
   answer: Array<string> | string;
 }
-interface answer {
-  [key: number]: string | Array<string>;
-}
 export default function ReadingLayout(props: {
-  setPrevState: React.MouseEventHandler<HTMLDivElement>;
-  setNextState: React.MouseEventHandler<HTMLDivElement>;
+  partNumber: number;
   data: data;
-  setAnswer: React.Dispatch<React.SetStateAction<object>>;
-  answers: answer;
+  setAnswer: React.Dispatch<React.SetStateAction<test_answer>>;
+  answers: test_answer;
 }) {
   const [currentQuestionGroup, setCurrentQuestionGroup] = useState(1);
   const maxGroup = props.data['question_groups'].length;
   const questionGroups = props.data['question_groups'].map(
     (questionGroup: questiongroup, index: number) => {
-      const questions = questionGroup['questions'].map((question: question) => {
+      const questions = questionGroup['questions'].map((question: question, index2:number) => {
+        const question_use_for_answer = props.answers?.parts[props.partNumber - 1]?.question_groups[index]?.questions[index2];
         return (
           <React.Fragment key={question['question_number']}>
             {question['question_type'] === 'single_choice' && (
               <SingleChoiceLayout
                 question={question['question_prompt']}
                 options={question['options']}
-                answer={question['answer'] as string}
+                partId={props.data._id}
+                questionGroupsId={questionGroup._id}
+                questionId={question._id}
                 questionIndex={question['question_number']}
                 setAnswer={props.setAnswer}
-                userAnswer={props.answers[question['question_number']]}
+                userAnswer={question_use_for_answer?.answer_result.user_answer}
+              //userAnswer={props.answers[question['question_number']]}
               />
             )}
             {question['question_type'] === 'multiple_choices' && (
@@ -74,9 +91,12 @@ export default function ReadingLayout(props: {
                 question={question['question_prompt']}
                 options={question['options']}
                 answers={question['answer'] as string[]}
+                partId={props.data._id}
+                questionGroupsId={questionGroup._id}
+                questionId={question._id}
                 questionIndex={question['question_number']}
                 setAnswer={props.setAnswer}
-                userAnswer={props.answers[question['question_number']]}
+                userAnswer={question_use_for_answer?.answer_result.user_answer}
               />
             )}
             {question['question_type'] === 'selection' && (
@@ -84,18 +104,24 @@ export default function ReadingLayout(props: {
                 question={question['question_prompt']}
                 options={question['options']}
                 answer={question['answer'] as string}
+                partId={props.data._id}
+                questionGroupsId={questionGroup._id}
+                questionId={question._id}
                 questionIndex={question['question_number']}
                 setAnswer={props.setAnswer}
-                userAnswer={props.answers[question['question_number']]}
+                userAnswer={question_use_for_answer?.answer_result.user_answer}
               />
             )}
             {question['question_type'] === 'completion' && (
               <FillTheBlankLayout
                 question={question['question_prompt']}
                 answer={question['answer'] as string}
+                partId={props.data._id}
+                questionGroupsId={questionGroup._id}
+                questionId={question._id}
                 questionIndex={question['question_number']}
                 setAnswer={props.setAnswer}
-                userAnswer={props.answers[question['question_number']]}
+                userAnswer={question_use_for_answer?.answer_result.user_answer}
               />
             )}
           </React.Fragment>
@@ -113,14 +139,14 @@ export default function ReadingLayout(props: {
               <h3 style={{ whiteSpace: 'pre-wrap' }}>
                 {
                   questionGroup['question_groups_info'][
-                    'question_groups_prompt'
+                  'question_groups_prompt'
                   ]
                 }
               </h3>
             )}
           {questionGroup['question_groups_info'] &&
             questionGroup['question_groups_info'][
-              'question_groups_image_urls'
+            'question_groups_image_urls'
             ] &&
             questionGroup['question_groups_info']['question_groups_image_urls']
               .length > 0 && (
@@ -156,20 +182,20 @@ export default function ReadingLayout(props: {
             textCardStyles['card_overflow_scroll']
           )}
         >
-          <ReadingContextLayout context={props.data.part_prompt} images = {props.data.part_image_urls}/>
+          <ReadingContextLayout context={props.data.part_prompt} images={props.data.part_image_urls} />
         </TextCard>
         <div className={questionLayouts.buttonWrapper}>
           <Button
             className={clsx(buttonStyles.webButton, 'ant-btn-red')}
             type={'primary'}
-            onClick={() => {}}
+            onClick={() => { }}
           >
             Kết thúc
           </Button>
           <Button
             className={buttonStyles.webButton}
             type={'primary'}
-            onClick={() => {}}
+            onClick={() => { }}
           >
             Nộp bài
           </Button>

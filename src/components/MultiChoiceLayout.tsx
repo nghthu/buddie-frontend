@@ -1,12 +1,29 @@
 import { Checkbox, ConfigProvider } from 'antd';
 import styles from '@/styles/components/questionLayouts.module.scss';
-
+interface test_answer {
+  test_id: string,
+  parts: {
+      _id: string,
+      question_groups: {
+          _id: string,
+          questions: {
+              _id: string,
+              answer_result: {
+                  user_answer: string|string[]
+              }
+          }[]
+      }[]
+  }[]
+}
 export default function MultiChoiceLayout(props: {
   question?: string;
   options?: string[];
   answers: string[];
+  partId: string;
+  questionGroupsId: string;
+  questionId: string;
   questionIndex: number | string;
-  setAnswer: React.Dispatch<React.SetStateAction<object>>;
+  setAnswer: React.Dispatch<React.SetStateAction<test_answer>>;
   userAnswer: string | string[] | undefined;
 }) {
   const indexes = [];
@@ -22,10 +39,21 @@ export default function MultiChoiceLayout(props: {
     }
   }
   function handleSetAnswer(checkedValues: string[]) {
-    props.setAnswer((prev) => ({
-      ...prev,
-      [props.questionIndex]: checkedValues,
-    }));
+    // props.setAnswer((prev) => ({
+    //   ...prev,
+    //   [props.questionIndex]: checkedValues,
+    // }));
+    props.setAnswer((prev) => {
+      const temp = { ...prev };
+      // search for the right part
+      const temp_part = temp['parts'].find((part: { _id: string }) => part._id === props.partId);
+      const temp_question_group = temp_part?.question_groups.find((question_group: { _id: string }) => question_group._id === props.questionGroupsId);
+      const temp_question = temp_question_group?.questions.find((question: { _id: string }) => question._id === props.questionId);
+      if (temp_question) {
+          temp_question.answer_result.user_answer = checkedValues;
+      }
+      return temp
+  });
   }
   if (props.options) {
     const multiChoiceGroup = (

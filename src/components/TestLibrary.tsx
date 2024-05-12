@@ -32,7 +32,7 @@ const fetcher = async ({ url, user }: FetchArgs) => {
 };
 const { Search } = Input;
 
-export default function TestSelector(props: { pageLoading: boolean, setPageLoading: React.Dispatch<SetStateAction<boolean>>, skill: string, text?: string }) {
+export default function TestSelector(props: { pageLoading: boolean, setPageLoading:React.Dispatch<SetStateAction<boolean>>, text?: string }) {
     const [totalPage, setTotalPage] = useState(1);
     // const tests = useRef([]);
     const [filteredTests, setFilteredTests] = useState([]);
@@ -40,7 +40,7 @@ export default function TestSelector(props: { pageLoading: boolean, setPageLoadi
     const [selectedSkill, setSelectedSkill] = useState('');
     const scrollRef = useRef<HTMLDivElement>(null);
 
-    const apiUrl = `/api/tests?page=${totalPage}&test_type=${selectedSkill}&search=${searchValue}&isbuddie=true`;
+    const apiUrl = `/api/tests?page=${totalPage}&test_type=${selectedSkill}&search=${searchValue}&isbuddie=false`;
     const user = auth.currentUser;
     const {
         data: rawTests,
@@ -87,6 +87,10 @@ export default function TestSelector(props: { pageLoading: boolean, setPageLoadi
         if (scrollElement) {
             scrollElement.addEventListener('scroll', () => {
                 if (scrollElement.scrollHeight - scrollElement.scrollTop <= scrollElement.clientHeight) {
+                    if (totalPage >= (rawTests.pagination.total_count / 10))
+                        {
+                            return;
+                        }
                     handleLoad();
                 }
             })
@@ -115,7 +119,7 @@ export default function TestSelector(props: { pageLoading: boolean, setPageLoadi
     const testComponent = filteredTests.map((test: { _id: string, test_name: string, test_type: string, duration: number, tags: string[], test_recording?: string, parts?: { _id: string }[] }) => {
         const partIds = test.parts ? test.parts.map((part: { _id: string }) => part._id) : [];
         return (
-            <TestCard setPageLoading={props.setPageLoading} key={test._id} testName={test.test_name} testDuration={test.duration.toString()} testTags={test.tags} testSkill={test.test_type} testId={test._id} partIds={partIds} />
+            <TestCard setPageLoading={props.setPageLoading} key={test._id} testName={test.test_name} testDuration={test.duration.toString()} testTags={test.tags} testSkill={test.test_type} testId={test._id} partIds={partIds}/>
         )
     })
     return (

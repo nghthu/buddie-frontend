@@ -1,12 +1,28 @@
 'use client';
 import { ClockCircleOutlined } from '@ant-design/icons';
 import styles from '@/styles/components/TestCard.module.scss';
-import { Button, Modal, Select } from 'antd';
-import { useState } from 'react';
+import { Button, Modal, Rate, Select } from 'antd';
+import { SetStateAction, useState } from 'react';
 
 import Link from 'next/link';
-
-export default function TestCard(props: { testName: string, testDuration: string, testTags: string[], testparts: number, testSkill: string, testId: string }) {
+interface user {
+    user_id: string,
+    display_name: string,
+    photo_url: string
+}
+export default function TestCard(props: {
+    setPageLoading: React.Dispatch<SetStateAction<boolean>>,
+    submissionCount?: number,
+    rating?: number,
+    user?: user,
+    isUserTest?: boolean,
+    testName: string,
+    testDuration?: string,
+    testTags?: string[],
+    testSkill?: string,
+    testId: string,
+    partIds: string[]
+}) {
     const [isModalOpen, setIsModalOpen] = useState(false);
 
     const showModal = () => {
@@ -27,13 +43,13 @@ export default function TestCard(props: { testName: string, testDuration: string
         console.log(value);
     }
 
-    const skill = props.testSkill.split('_')[1];
+    const skill = props.testSkill?.split('_')[1];
     const duration = Number(props.testDuration) / 60;
 
     const partSelectButtons = (
         <div className={styles.partSelect}>
-            {Array.from({ length: props.testparts }, (_, i) => i + 1).map((part) => {
-                return <Link href={`${skill}/${props.testId}/${part}`} key={part}><Button key={part} type="primary">Part {part}</Button></Link>
+            {props.partIds.map((part, index) => {
+                return <Link href={`ielts/${skill}/${props.testId}/${index + 1}`} key={part}><Button key={part} type="primary" onClick ={()=>props.setPageLoading(true)}>Part {index + 1}</Button></Link>
             })}
 
         </div>
@@ -41,18 +57,29 @@ export default function TestCard(props: { testName: string, testDuration: string
     return (
         <div className={styles.cardWrapper}>
             <h3 className={styles.header}>{props.testName}</h3>
-            <div className={styles.clock}><ClockCircleOutlined />{duration} phút</div>
-            <div className={styles.testTagWrapper}>
-                {props.testTags.map((tag) => {
-                    return <span className={styles.testTag} key={tag}>{tag}</span>
-                })}
-            </div>
-            <Button onClick={handleClick} className={styles.button}>Chi tiết</Button>
+            {!props.isUserTest && <>
+                <div className={styles.clock}><ClockCircleOutlined />{duration} phút</div>
+                <div className={styles.testTagWrapper}>
+                    {props.testTags?.map((tag) => {
+                        return <span className={styles.testTag} key={tag}>{tag}</span>
+                    })}
+                </div>
+                <Button onClick={handleClick} className={styles.button}>Chi tiết</Button>
+            </>
+            }
+            {props.isUserTest && <>
+                <div>Đăng bởi {props.user?.display_name}</div>
+                <Rate disabled defaultValue={props.rating? props.rating: 0} />
+                <div>{props.submissionCount} lượt làm bài</div>
+                <Link href={`tests/${props.testId}`}>
+                    <Button className={styles.button} onClick={()=>props.setPageLoading(true)}>Chi tiết</Button>
+                </Link>
+            </>}
             <Modal open={isModalOpen} onOk={handleOk} onCancel={handleCancel} footer={null}>
                 <div className={styles.modal}>
                     <h3>{props.testName}</h3>
                     <div className={styles.testTagWrapperModal}>
-                        {props.testTags.map((tag) => {
+                        {props.testTags?.map((tag) => {
                             return <span className={styles.testTag} key={tag}>{tag}</span>
                         })}
                     </div>
@@ -61,8 +88,8 @@ export default function TestCard(props: { testName: string, testDuration: string
                         <Select defaultValue="không giới hạn" options={[{ value: "unlimied", label: "không giới hạn" }, { value: "dependent", label: "theo thời gian của đề" }]} style={{ width: '200px' }} onChange={handleSelectChange} />
                     </div>
                     {partSelectButtons}
-                    <Link href={`${skill}/${props.testId}/all`}>
-                        <Button type="primary" className={styles.purpleBtn}>Luyện tập tất cả</Button>
+                    <Link href={`ielts/${skill}/${props.testId}/all`}>
+                        <Button type="primary" className={styles.purpleBtn} onClick={()=>props.setPageLoading(true)}>Luyện tập tất cả</Button>
                     </Link>
                 </div>
             </Modal>
