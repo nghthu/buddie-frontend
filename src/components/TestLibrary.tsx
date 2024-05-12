@@ -32,7 +32,7 @@ const fetcher = async ({ url, user }: FetchArgs) => {
 };
 const { Search } = Input;
 
-export default function TestSelector(props: { pageLoading: boolean, setPageLoading:React.Dispatch<SetStateAction<boolean>>, text?: string }) {
+export default function TestLibrary(props: { pageLoading: boolean, setPageLoading:React.Dispatch<SetStateAction<boolean>>, text?: string }) {
     const [totalPage, setTotalPage] = useState(1);
     // const tests = useRef([]);
     const [filteredTests, setFilteredTests] = useState([]);
