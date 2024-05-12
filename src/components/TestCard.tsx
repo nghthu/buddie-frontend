@@ -13,7 +13,7 @@ interface user {
 export default function TestCard(props: {
     setPageLoading: React.Dispatch<SetStateAction<boolean>>,
     submissionCount?: number,
-    rating?: number,
+    review?: { star: number, count: number },
     user?: user,
     isUserTest?: boolean,
     testName: string,
@@ -49,7 +49,7 @@ export default function TestCard(props: {
     const partSelectButtons = (
         <div className={styles.partSelect}>
             {props.partIds.map((part, index) => {
-                return <Link href={`ielts/${skill}/${props.testId}/${index + 1}`} key={part}><Button key={part} type="primary" onClick ={()=>props.setPageLoading(true)}>Part {index + 1}</Button></Link>
+                return <Link href={`ielts/${skill}/${props.testId}/${index + 1}`} key={part}><Button key={part} type="primary" onClick={() => props.setPageLoading(true)}>Part {index + 1}</Button></Link>
             })}
 
         </div>
@@ -68,11 +68,11 @@ export default function TestCard(props: {
             </>
             }
             {props.isUserTest && <>
-                <div>Đăng bởi {props.user?.display_name}</div>
-                <Rate disabled defaultValue={props.rating? props.rating: 0} />
-                <div>{props.submissionCount} lượt làm bài</div>
+                <div style={{display:'flex', flexWrap:'wrap'}}>Đăng bởi: <p>{props.user?.display_name}</p></div>
+                <div><Rate disabled defaultValue={props.review ? props.review.star : 0} /> ({props.review ? props.review.count : 0})</div>
+                <div>Lượt làm bài: {props.submissionCount? props.submissionCount:0}</div>
                 <Link href={`tests/${props.testId}`}>
-                    <Button className={styles.button} onClick={()=>props.setPageLoading(true)}>Chi tiết</Button>
+                    <Button className={styles.button} onClick={() => props.setPageLoading(true)}>Chi tiết</Button>
                 </Link>
             </>}
             <Modal open={isModalOpen} onOk={handleOk} onCancel={handleCancel} footer={null}>
@@ -89,7 +89,7 @@ export default function TestCard(props: {
                     </div>
                     {partSelectButtons}
                     <Link href={`ielts/${skill}/${props.testId}/all`}>
-                        <Button type="primary" className={styles.purpleBtn} onClick={()=>props.setPageLoading(true)}>Luyện tập tất cả</Button>
+                        <Button type="primary" className={styles.purpleBtn} onClick={() => props.setPageLoading(true)}>Luyện tập tất cả</Button>
                     </Link>
                 </div>
             </Modal>

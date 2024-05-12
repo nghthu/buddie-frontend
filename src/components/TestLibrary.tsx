@@ -15,7 +15,11 @@ interface FetchArgs {
     url: string;
     user: User | null;
 }
-
+interface user {
+    user_id: string,
+    display_name: string,
+    photo_url: string
+}
 const fetcher = async ({ url, user }: FetchArgs) => {
     const token = await user?.getIdToken();
     const response = await fetch(url, {
@@ -116,10 +120,10 @@ export default function TestLibrary(props: { pageLoading: boolean, setPageLoadin
         return <Spin size='default' />
     }
     console.log(rawTests);
-    const testComponent = filteredTests.map((test: { _id: string, test_name: string, test_type: string, duration: number, tags: string[], test_recording?: string, parts?: { _id: string }[] }) => {
+    const testComponent = filteredTests.map((test: { _id: string, test_name: string, test_type: string, user:user, review:{star:number,count:number}, duration: number, tags: string[], test_recording?: string, parts?: { _id: string }[] }) => {
         const partIds = test.parts ? test.parts.map((part: { _id: string }) => part._id) : [];
         return (
-            <TestCard setPageLoading={props.setPageLoading} key={test._id} testName={test.test_name} testDuration={test.duration.toString()} testTags={test.tags} testSkill={test.test_type} testId={test._id} partIds={partIds}/>
+            <TestCard setPageLoading={props.setPageLoading} key={test._id} testName={test.test_name} testDuration={test.duration.toString()} testTags={test.tags} testSkill={test.test_type} testId={test._id} partIds={partIds} isUserTest={true} user={test.user} review={test.review}/>
         )
     })
     return (
