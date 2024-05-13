@@ -87,6 +87,9 @@ export default function TestSelector(props: { pageLoading: boolean, setPageLoadi
         if (scrollElement) {
             scrollElement.addEventListener('scroll', () => {
                 if (scrollElement.scrollHeight - scrollElement.scrollTop <= scrollElement.clientHeight) {
+                    if (totalPage >= (rawTests.pagination.total_count / 10)) {
+                        return;
+                    }
                     handleLoad();
                 }
             })

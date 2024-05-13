@@ -101,17 +101,17 @@ export default function IeltsPart({ params, }: { params: { id: string; part: str
         const temp_test_answer: { test_id: string, parts: { _id: string, question_groups: { _id: string, questions: { _id: string, answer_result: { user_answer: string } }[] }[] }[] } = { "test_id": params.id, "parts": [] };
         //push in the right part
         temp_test_answer['parts'].push({ "_id": tests['parts'][Number(params.part) - 1]['_id'], "question_groups": [] });
-  
+
         // iterate through the question groups inside the part and push each question group to the temp_test_answer
         tests['parts'][Number(params.part) - 1]['question_groups'].map((question_group: { _id: string, questions: { _id: string }[] }, index: number) => {
           temp_test_answer['parts'][0]['question_groups'].push({ "_id": question_group._id, "questions": [] });
-  
+
           // within each question group, iterate through the questions and push each question to the temp_test_answer
           question_group.questions.map((question: { _id: string }) => {
             temp_test_answer['parts'][0]['question_groups'][index]['questions'].push({ "_id": question._id, "answer_result": { "user_answer": "" } });
           });
         });
-  
+
         setAnswers(temp_test_answer);
       }
       else {
@@ -119,7 +119,7 @@ export default function IeltsPart({ params, }: { params: { id: string; part: str
         //push in all parts
         tests['parts'].map((part: { _id: string, question_groups: { _id: string, questions: { _id: string }[] }[] }, i1: number) => {
           temp_test_answer['parts'].push({ "_id": part._id, "question_groups": [] });
-  
+
           part.question_groups.map((question_group: { _id: string, questions: { _id: string }[] }, i2: number) => {
             temp_test_answer['parts'][i1]['question_groups'].push({ "_id": question_group._id, "questions": [] });
             console.log('bug');
@@ -129,7 +129,7 @@ export default function IeltsPart({ params, }: { params: { id: string; part: str
             });
           });
         });
-  
+
         setAnswers(temp_test_answer);
       }
     }
@@ -139,7 +139,7 @@ export default function IeltsPart({ params, }: { params: { id: string; part: str
   }
 
   const temp_metaData = { ...tests };
-  
+
   console.log('answers: ', answers);
   delete temp_metaData['parts'];
   const metaData = temp_metaData;

@@ -36,7 +36,7 @@ const fetcher = async ({ url, user }: FetchArgs) => {
 };
 const { Search } = Input;
 
-export default function TestLibrary(props: { pageLoading: boolean, setPageLoading:React.Dispatch<SetStateAction<boolean>>, text?: string }) {
+export default function TestLibrary(props: { pageLoading: boolean, setPageLoading: React.Dispatch<SetStateAction<boolean>>, text?: string }) {
     const [totalPage, setTotalPage] = useState(1);
     // const tests = useRef([]);
     const [filteredTests, setFilteredTests] = useState([]);
@@ -91,10 +91,9 @@ export default function TestLibrary(props: { pageLoading: boolean, setPageLoadin
         if (scrollElement) {
             scrollElement.addEventListener('scroll', () => {
                 if (scrollElement.scrollHeight - scrollElement.scrollTop <= scrollElement.clientHeight) {
-                    if (totalPage >= (rawTests.pagination.total_count / 10))
-                        {
-                            return;
-                        }
+                    if (totalPage >= (rawTests.pagination.total_count / 10)) {
+                        return;
+                    }
                     handleLoad();
                 }
             })
@@ -120,10 +119,10 @@ export default function TestLibrary(props: { pageLoading: boolean, setPageLoadin
         return <Spin size='default' />
     }
     console.log(rawTests);
-    const testComponent = filteredTests.map((test: { _id: string, test_name: string, test_type: string, user:user, review:{star:number,count:number}, duration: number, tags: string[], test_recording?: string, parts?: { _id: string }[] }) => {
+    const testComponent = filteredTests.map((test: { _id: string, test_name: string, test_type: string, user: user, review: { star: number, count: number }, duration: number, tags: string[], test_recording?: string, parts?: { _id: string }[] }) => {
         const partIds = test.parts ? test.parts.map((part: { _id: string }) => part._id) : [];
         return (
-            <TestCard setPageLoading={props.setPageLoading} key={test._id} testName={test.test_name} testDuration={test.duration.toString()} testTags={test.tags} testSkill={test.test_type} testId={test._id} partIds={partIds} isUserTest={true} user={test.user} review={test.review}/>
+            <TestCard setPageLoading={props.setPageLoading} key={test._id} testName={test.test_name} testDuration={test.duration.toString()} testTags={test.tags} testSkill={test.test_type} testId={test._id} partIds={partIds} isUserTest={true} user={test.user} review={test.review} />
         )
     })
     return (
