@@ -1,14 +1,17 @@
 'use client';
 
-import styles from '@/styles/pages/exams/Tests.module.scss';
-import { Button, Card, Modal, Tabs, Typography } from 'antd';
+import styles from '@/styles/pages/tests/Tests.module.scss';
+import { Button, Card, Checkbox, Modal, Space, Tabs, Typography } from 'antd';
 import { useState, useEffect } from 'react';
 import {
   FormOutlined,
   OrderedListOutlined,
   CloseOutlined,
+  MinusCircleOutlined,
+  PlusOutlined,
 } from '@ant-design/icons';
 import { Form, Input, Select, AutoComplete } from 'antd';
+import { auth } from '@/lib';
 
 const { TabPane } = Tabs;
 const { Option } = Select;
@@ -17,8 +20,10 @@ const Exams = () => {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [currentTab, setCurrentTab] = useState('1');
   const [form] = Form.useForm();
+  const token = auth.currentUser?.getIdToken();
 
   const showModal = () => {
+    console.log(token);
     setIsModalVisible(true);
   };
 
@@ -87,8 +92,14 @@ const Exams = () => {
               </Form.Item>
 
               <Form.Item
+                name="test_type"
+                initialValue="custom"
+                hidden
+              ></Form.Item>
+
+              <Form.Item
                 name="access"
-                label="Truy cập"
+                label="Quyền truy cập"
                 rules={[
                   { required: true, message: 'Vui lòng chọn quyền truy cập!' },
                 ]}
@@ -107,10 +118,10 @@ const Exams = () => {
                 ]}
               >
                 <Select>
-                  <Option value="30">30</Option>
-                  <Option value="60">60</Option>
-                  <Option value="90">90</Option>
-                  <Option value="120">120</Option>
+                  <Option value={30}>30</Option>
+                  <Option value={60}>60</Option>
+                  <Option value={90}>90</Option>
+                  <Option value={120}>120</Option>
                 </Select>
               </Form.Item>
 
@@ -134,15 +145,29 @@ const Exams = () => {
               initialValues={{
                 parts: [
                   {
+                    part_number: 1,
+                    part_duration: null,
+                    part_recording: null,
                     part_prompt: '',
+                    part_image_urls: null,
                     question_groups: [
                       {
+                        is_single_question: true,
                         question_groups_info: {
+                          question_groups_duration: null,
                           question_groups_prompt: '',
+                          question_groups_recording: null,
+                          question_groups_image_urls: null,
                         },
                         questions: [
                           {
+                            question_number: 1,
+                            question_type: '',
                             question_prompt: '',
+                            question_image_urls: null,
+                            question_duration: null,
+                            question_preparation_time: null,
+                            question_recording: null,
                           },
                         ],
                       },
@@ -154,24 +179,54 @@ const Exams = () => {
               <Form.List name="parts">
                 {(fields, { add, remove }) => (
                   <div>
-                    {fields.map((field) => (
+                    {fields.map((field, index) => (
                       <Card
                         size="small"
-                        title={`Part ${field.name + 1}`}
+                        title={`Part ${index + 1}`}
                         key={field.key}
                         extra={
                           <CloseOutlined
                             onClick={() => {
                               remove(field.name);
+                              fields.splice(index, 1);
+                              fields.forEach((field, i) => {
+                                form.setFieldsValue({
+                                  parts: {
+                                    ...form.getFieldsValue().parts,
+                                    [i]: {
+                                      ...form.getFieldsValue().parts[i],
+                                      part_number: i + 1,
+                                    },
+                                  },
+                                });
+                              });
                             }}
                           />
                         }
                       >
                         <Form.Item
+                          name={[field.name, 'part_number']}
+                          initialValue={index + 1}
+                          hidden
+                        ></Form.Item>
+
+                        <Form.Item
                           label="Part Prompt"
                           name={[field.name, 'part_prompt']}
                         >
                           <Input placeholder="Part Prompt" />
+                        </Form.Item>
+
+                        <Form.Item
+                          label="Part Duration"
+                          name={[field.name, 'part_duration']}
+                        >
+                          <Select>
+                            <Option value={30}>30</Option>
+                            <Option value={60}>60</Option>
+                            <Option value={90}>90</Option>
+                            <Option value={120}>120</Option>
+                          </Select>
                         </Form.Item>
 
                         <Form.List name={[field.name, 'question_groups']}>
@@ -191,6 +246,12 @@ const Exams = () => {
                                   }
                                 >
                                   <Form.Item
+                                    name={[subField.name, 'is_single_question']}
+                                    initialValue={true}
+                                    hidden
+                                  ></Form.Item>
+
+                                  <Form.Item
                                     label="Question Group Prompt"
                                     name={[
                                       subField.name,
@@ -199,6 +260,24 @@ const Exams = () => {
                                     ]}
                                   >
                                     <Input placeholder="Question Group Prompt" />
+                                  </Form.Item>
+
+                                  <Form.Item
+                                    label="Question Group Duration"
+                                    name={[
+                                      subField.name,
+                                      'question_groups_info',
+                                      'question_groups_duration',
+                                    ]}
+                                  >
+                                    <Select>
+                                      <Option value={5}>5</Option>
+                                      <Option value={10}>10</Option>
+                                      <Option value={15}>15</Option>
+                                      <Option value={30}>30</Option>
+                                      <Option value={45}>45</Option>
+                                      <Option value={60}>60</Option>
+                                    </Select>
                                   </Form.Item>
 
                                   <Form.List
@@ -219,6 +298,82 @@ const Exams = () => {
                                                   questionOpt.remove(
                                                     questionField.name
                                                   );
+                                                  setTimeout(() => {
+                                                    const updatedQuestions =
+                                                      form.getFieldValue([
+                                                        'parts',
+                                                        field.name,
+                                                        'question_groups',
+                                                        subField.name,
+                                                        'questions',
+                                                      ]) as Array<any>;
+                                                    updatedQuestions.forEach(
+                                                      (_, index) => {
+                                                        form.setFieldsValue({
+                                                          parts: {
+                                                            ...form.getFieldsValue()
+                                                              .parts,
+                                                            [field.name]: {
+                                                              ...form.getFieldsValue()
+                                                                .parts[
+                                                                field.name
+                                                              ],
+                                                              question_groups: {
+                                                                ...form.getFieldsValue()
+                                                                  .parts[
+                                                                  field.name
+                                                                ]
+                                                                  .question_groups,
+                                                                [subField.name]:
+                                                                  {
+                                                                    ...form.getFieldsValue()
+                                                                      .parts[
+                                                                      field.name
+                                                                    ]
+                                                                      .question_groups[
+                                                                      subField
+                                                                        .name
+                                                                    ],
+                                                                    questions: {
+                                                                      ...form.getFieldsValue()
+                                                                        .parts[
+                                                                        field
+                                                                          .name
+                                                                      ]
+                                                                        .question_groups[
+                                                                        subField
+                                                                          .name
+                                                                      ]
+                                                                        .questions,
+                                                                      [index]: {
+                                                                        ...form.getFieldsValue()
+                                                                          .parts[
+                                                                          field
+                                                                            .name
+                                                                        ]
+                                                                          .question_groups[
+                                                                          subField
+                                                                            .name
+                                                                        ]
+                                                                          .questions[
+                                                                          index
+                                                                        ],
+                                                                        question_number:
+                                                                          index +
+                                                                          1,
+                                                                      },
+                                                                    },
+                                                                    is_single_question:
+                                                                      updatedQuestions.length ===
+                                                                      1,
+                                                                  },
+                                                              },
+                                                            },
+                                                          },
+                                                        });
+                                                      }
+                                                    );
+                                                  }, 0);
                                                 }}
                                               />
                                             }
@@ -232,11 +387,283 @@ const Exams = () => {
                                             >
                                               <Input placeholder="Question Prompt" />
                                             </Form.Item>
+
+                                            <Form.Item
+                                              label="Question Type"
+                                              name={[
+                                                questionField.name,
+                                                'question_type',
+                                              ]}
+                                            >
+                                              <Select>
+                                                <Option value="selection">
+                                                  Selection
+                                                </Option>
+                                                <Option value="single_choice">
+                                                  Single Choice
+                                                </Option>
+                                                <Option value="multiple_choices">
+                                                  Multiple Choice
+                                                </Option>
+                                                <Option value="speaking">
+                                                  Speaking
+                                                </Option>
+                                                <Option value="writing">
+                                                  Writing
+                                                </Option>
+                                              </Select>
+                                            </Form.Item>
+
+                                            <div className={styles.timeInput}>
+                                              <Form.Item
+                                                label="Preparation Time"
+                                                name={[
+                                                  questionField.name,
+                                                  'question_preparation_time',
+                                                ]}
+                                              >
+                                                <Select>
+                                                  <Option value={1}>1</Option>
+                                                  <Option value={3}>3</Option>
+                                                  <Option value={5}>5</Option>
+                                                  <Option value={10}>10</Option>
+                                                </Select>
+                                              </Form.Item>
+
+                                              <Form.Item
+                                                label="Duration"
+                                                name={[
+                                                  questionField.name,
+                                                  'question_duration',
+                                                ]}
+                                              >
+                                                <Select>
+                                                  <Option value={5}>5</Option>
+                                                  <Option value={10}>10</Option>
+                                                  <Option value={15}>15</Option>
+                                                  <Option value={30}>30</Option>
+                                                  <Option value={45}>45</Option>
+                                                  <Option value={60}>60</Option>
+                                                </Select>
+                                              </Form.Item>
+                                            </div>
+
+                                            <Form.List
+                                              name={[
+                                                questionField.name,
+                                                'options',
+                                              ]}
+                                            >
+                                              {(fields, { add, remove }) => (
+                                                <div className={styles.optionsContainer}>
+                                                  {fields.map(
+                                                    (optionField, index) => (
+                                                      <Space
+                                                        key={optionField.key}
+                                                        align="baseline"
+                                                      >
+                                                        <Form.Item>
+                                                          <Checkbox
+                                                            onChange={(e) => {
+                                                              const questionType =
+                                                                form.getFieldValue(
+                                                                  [
+                                                                    'parts',
+                                                                    field.name,
+                                                                    'question_groups',
+                                                                    subField.name,
+                                                                    'questions',
+                                                                    questionField.name,
+                                                                    'question_type',
+                                                                  ]
+                                                                );
+                                                              let answer =
+                                                                form.getFieldValue(
+                                                                  [
+                                                                    'parts',
+                                                                    field.name,
+                                                                    'question_groups',
+                                                                    subField.name,
+                                                                    'questions',
+                                                                    questionField.name,
+                                                                    'answer',
+                                                                  ]
+                                                                ) || [];
+
+                                                              if (
+                                                                questionType ===
+                                                                'multiple_choices'
+                                                              ) {
+                                                                if (
+                                                                  e.target
+                                                                    .checked
+                                                                ) {
+                                                                  answer.push(
+                                                                    String(
+                                                                      index + 1
+                                                                    )
+                                                                  );
+                                                                } else {
+                                                                  answer =
+                                                                    answer.filter(
+                                                                      (
+                                                                        a: string
+                                                                      ) =>
+                                                                        a !==
+                                                                        String(
+                                                                          index +
+                                                                            1
+                                                                        )
+                                                                    );
+                                                                }
+                                                              } else {
+                                                                answer = e
+                                                                  .target
+                                                                  .checked
+                                                                  ? [
+                                                                      String(
+                                                                        index +
+                                                                          1
+                                                                      ),
+                                                                    ]
+                                                                  : [];
+                                                              }
+
+                                                              form.setFieldsValue(
+                                                                {
+                                                                  parts: {
+                                                                    [field.name]:
+                                                                      {
+                                                                        question_groups:
+                                                                          {
+                                                                            [subField.name]:
+                                                                              {
+                                                                                questions:
+                                                                                  {
+                                                                                    [questionField.name]:
+                                                                                      {
+                                                                                        answer,
+                                                                                      },
+                                                                                  },
+                                                                              },
+                                                                          },
+                                                                      },
+                                                                  },
+                                                                }
+                                                              );
+                                                            }}
+                                                          ></Checkbox>
+                                                        </Form.Item>
+
+                                                        <Form.Item
+                                                          {...optionField}
+                                                          validateTrigger={[
+                                                            'onChange',
+                                                            'onBlur',
+                                                          ]}
+                                                          rules={[
+                                                            {
+                                                              required: true,
+                                                              whitespace: true,
+                                                              message:
+                                                                "Please input option's text or delete this field.",
+                                                            },
+                                                          ]}
+                                                          noStyle
+                                                        >
+                                                          <Input placeholder="Option text" />
+                                                        </Form.Item>
+
+                                                        <MinusCircleOutlined
+                                                          onClick={() =>
+                                                            remove(
+                                                              optionField.name
+                                                            )
+                                                          }
+                                                        />
+                                                      </Space>
+                                                    )
+                                                  )}
+                                                  <Form.Item>
+                                                    <Button
+                                                      type="dashed"
+                                                      onClick={() => add()}
+                                                      block
+                                                      icon={<PlusOutlined />}
+                                                    >
+                                                      Add option
+                                                    </Button>
+                                                  </Form.Item>
+                                                </div>
+                                              )}
+                                            </Form.List>
                                           </Card>
                                         ))}
                                         <Button
                                           type="dashed"
-                                          onClick={() => questionOpt.add()}
+                                          onClick={() => {
+                                            questionOpt.add();
+                                            setTimeout(() => {
+                                              const updatedQuestions =
+                                                form.getFieldValue([
+                                                  'parts',
+                                                  field.name,
+                                                  'question_groups',
+                                                  subField.name,
+                                                  'questions',
+                                                ]) as Array<any>;
+                                              updatedQuestions.forEach(
+                                                (_, index) => {
+                                                  form.setFieldsValue({
+                                                    parts: {
+                                                      ...form.getFieldsValue()
+                                                        .parts,
+                                                      [field.name]: {
+                                                        ...form.getFieldsValue()
+                                                          .parts[field.name],
+                                                        question_groups: {
+                                                          ...form.getFieldsValue()
+                                                            .parts[field.name]
+                                                            .question_groups,
+                                                          [subField.name]: {
+                                                            ...form.getFieldsValue()
+                                                              .parts[field.name]
+                                                              .question_groups[
+                                                              subField.name
+                                                            ],
+                                                            questions: {
+                                                              ...form.getFieldsValue()
+                                                                .parts[
+                                                                field.name
+                                                              ].question_groups[
+                                                                subField.name
+                                                              ].questions,
+                                                              [index]: {
+                                                                ...form.getFieldsValue()
+                                                                  .parts[
+                                                                  field.name
+                                                                ]
+                                                                  .question_groups[
+                                                                  subField.name
+                                                                ].questions[
+                                                                  index
+                                                                ],
+                                                                question_number:
+                                                                  index + 1,
+                                                              },
+                                                            },
+                                                            is_single_question:
+                                                              updatedQuestions.length ===
+                                                              1,
+                                                          },
+                                                        },
+                                                      },
+                                                    },
+                                                  });
+                                                }
+                                              );
+                                            }, 0);
+                                          }}
                                           block
                                         >
                                           + Add Question

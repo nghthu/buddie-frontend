@@ -7,3 +7,14 @@
   color: $color-primary;
   margin-bottom: 10px;
 }
+
+.timeInput {
+  display: flex;
+  flex-direction: row;
+  gap: 20px;
+}
+
+.optionsContainer {
+  display: flex;
+  flex-direction: column;
+}
