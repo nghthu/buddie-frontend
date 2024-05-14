@@ -122,7 +122,6 @@ export default function PracticePage() {
         },
       ]);
     }
-    console.log(resultData);
   };
 
   const showMenu = (event: React.MouseEvent) => {
@@ -175,16 +174,11 @@ export default function PracticePage() {
 
     const response = await fetch(`/api/ai/synonyms?word=${word}`, {
       headers: {
-        'Content-Type': 'application/json',
         authorization: `Bearer ${token}`,
       },
     });
 
-    console.log(response);
-
     const data = await response.json();
-
-    console.log(data);
     return data;
   };
 
@@ -213,7 +207,7 @@ export default function PracticePage() {
 
     if (message === 'Từ đồng nghĩa') {
       apiResponse = await callSynonymsAPI('workspace');
-      request.response = apiResponse.data;
+      request.response = apiResponse.data.synonyms;
     }
 
     setChatRequests((prevRequests) => {
