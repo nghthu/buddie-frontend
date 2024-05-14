@@ -1,0 +1,15 @@
+.pageWrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+    align-items: center;
+}
+
+.commentWrapper {
+    border-radius: 15px;
+    border: 1px solid rgba(107, 93, 134, 0.16);
+    background-color: #F5F6FA;
+    display: flex;
+    position: relative;
+    overflow-y: scroll;
+}

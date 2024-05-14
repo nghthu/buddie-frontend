@@ -60,7 +60,6 @@ export default function TestSelector(props: { pageLoading: boolean, setPageLoadi
     useEffect(() => {
         if (rawTests) {
             //tests.current = [...new Set([...tests.current, ...rawTests.tests])];
-            console.log(rawTests);
             setFilteredTests(rawTests.tests);
             // handleFilterTests();
             // setTests((prev) => [...prev, ...rawTests.tests]);

@@ -16,7 +16,9 @@ export default function PartSelector({ parts, testId }: { parts: { index: string
                     </Link>
                 ))}
             </div>
-            <Button type="primary">Làm tất cả</Button>
+            <Link href={`tests/${testId}/all`}>
+                <Button type="primary">Làm tất cả</Button>
+            </Link>
         </div>
     );
 }

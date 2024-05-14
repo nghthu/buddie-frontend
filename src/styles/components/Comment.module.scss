@@ -1,0 +1,28 @@
+.wrapper {
+    display:flex;
+    align-items: center;
+    width:100%;
+    padding:1rem;
+    padding-left:2rem;
+    padding-right:2rem;
+}
+.contentWrapper {
+    display: flex;
+    flex-direction: column;
+    position:relative;
+}
+.upper {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    justify-content: space-between;
+    width:100%;
+}
+.avatar {
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+}
+.userName {
+    font-weight: 600;
+}
