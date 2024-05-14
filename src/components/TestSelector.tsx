@@ -81,22 +81,23 @@ export default function TestSelector(props: { pageLoading: boolean, setPageLoadi
     //     handleFilterTests();
     // }, [selectedSkill, searchValue]);
 
-    useEffect(() => {
-        const scrollElement = scrollRef.current;
-        if (scrollElement) {
-            scrollElement.addEventListener('scroll', () => {
-                if (scrollElement.scrollHeight - scrollElement.scrollTop <= scrollElement.clientHeight) {
-                    if (totalPage >= (rawTests.pagination.total_count / 10)) {
-                        return;
-                    }
-                    handleLoad();
-                }
-            })
-        }
-        return () => {
-            scrollElement?.removeEventListener('scroll', () => { });
-        }
-    }, [])
+    // TODO: use react inf scroll
+    // useEffect(() => {
+    //     const scrollElement = scrollRef.current;
+    //     if (scrollElement) {
+    //         scrollElement.addEventListener('scroll', () => {
+    //             if (scrollElement.scrollHeight - scrollElement.scrollTop <= scrollElement.clientHeight) {
+    //                 if (totalPage >= (rawTests.pagination.total_count / 10)) {
+    //                     return;
+    //                 }
+    //                 handleLoad();
+    //             }
+    //         })
+    //     }
+    //     return () => {
+    //         scrollElement?.removeEventListener('scroll', () => { });
+    //     }
+    // }, [])
     const onSearch: SearchProps['onSearch'] = (value) => {
         // split the search value into an array of words, delimiter is space
         const searchWords = encodeURIComponent(value.trim());

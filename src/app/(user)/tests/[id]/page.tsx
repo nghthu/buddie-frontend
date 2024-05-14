@@ -73,22 +73,23 @@ export default function TestLanding({ params, }: { params: { id: string }; }) {
     const handleLoad = () => {
         setTotalPage((prev) => prev + 1);
     }
-    useEffect(() => {
-        const scrollElement = scrollRef.current;
-        if (scrollElement) {
-            scrollElement.addEventListener('scroll', () => {
-                if (scrollElement.scrollHeight - scrollElement.scrollTop <= scrollElement.clientHeight) {
-                    if (totalPage >= (comments.pagination.total_count / 20)) {
-                        return;
-                    }
-                    handleLoad();
-                }
-            });
-        }
-        return () => {
-            scrollElement?.removeEventListener('scroll', () => { });
-        }
-    });
+    // TODO: use react inf scroll
+    // useEffect(() => {
+    //     const scrollElement = scrollRef.current;
+    //     if (scrollElement) {
+    //         scrollElement.addEventListener('scroll', () => {
+    //             if (scrollElement.scrollHeight - scrollElement.scrollTop <= scrollElement.clientHeight) {
+    //                 if (totalPage >= (comments.pagination.total_count / 20)) {
+    //                     return;
+    //                 }
+    //                 handleLoad();
+    //             }
+    //         });
+    //     }
+    //     return () => {
+    //         scrollElement?.removeEventListener('scroll', () => { });
+    //     }
+    // });
     useEffect(() => {
         if (comments) {
             setComments((prev) => {
