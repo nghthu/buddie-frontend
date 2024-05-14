@@ -58,8 +58,8 @@ export default function TestLanding({ params, }: { params: { id: string }; }) {
     } = useSWR({ url: `/api/tests/${params.id}`, user }, fetcher);
     const {
         data: comments,
-        errorComment,
-        isLoadingComment,
+        error:errorComment,
+        isLoading:isLoadingComment,
     } = useSWR({ url: `/api/comment/${params.id}?page=${totalPage}`, user }, fetcher);
     const [notificationApi, contextHolder] = notification.useNotification();
     useEffect(() => {
