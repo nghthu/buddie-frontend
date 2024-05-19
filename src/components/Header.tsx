@@ -1,7 +1,7 @@
 'use client';
 
 import { CaretDownOutlined, LogoutOutlined } from '@ant-design/icons';
-import { useSignOut } from 'react-firebase-hooks/auth';
+import { useAuthState, useSignOut } from 'react-firebase-hooks/auth';
 import type { MenuProps } from 'antd';
 import { Button, Dropdown, Space, notification } from 'antd';
 import clsx from 'clsx';
