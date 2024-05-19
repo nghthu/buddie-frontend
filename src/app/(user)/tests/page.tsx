@@ -3,18 +3,18 @@
 import { useAuthState } from 'react-firebase-hooks/auth';
 import { auth } from '@/lib';
 import SkillHeader from '@/components/SkillHeader';
-import TestSelector from '@/components/TestSelector';
+import TestLibrary from '@/components/TestLibrary';
 import { useState } from 'react';
 
-const IELTS = () => {
+const UserTestLibrary = () => {
   const [user, loading, error] = useAuthState(auth);
   const [pageLoading, setPageLoading] = useState(false);
   return (
     <>
-      <SkillHeader title={'Luyện tập IELTS cùng Buddie'}></SkillHeader>
-      <TestSelector pageLoading ={pageLoading} setPageLoading={setPageLoading} skill={'ielts_reading'} />
+      <SkillHeader title={'Đề thi IELTS'}></SkillHeader>
+      <TestLibrary pageLoading ={pageLoading} setPageLoading={setPageLoading} />
     </>
   );
 };
 
-export default IELTS;
+export default UserTestLibrary;

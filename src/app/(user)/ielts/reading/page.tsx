@@ -1,15 +1,3 @@
-'use client';
-import jsonDummyData from './reading.json';
-
-import SkillHeader from '@/components/SkillHeader';
-import TextCard from '@/components/TextCard';
-import React, { useState } from 'react';
-import ReadingLayout from '@/components/ReadingLayout';
-import textCardStyles from '@/styles/components/TextCard.module.scss';
-import styles from '@/styles/components/WebButton.module.scss';
-import clsx from 'clsx';
-import { Button } from 'antd';
-
 const IeltsReading = () => {
   const [activePart, setActivePart] = useState('landing');
   const [testTime, setTestTime] = useState('20:00');
@@ -97,7 +85,6 @@ const IeltsReading = () => {
         {activePart === String(part['part_number']) && (
           <>
             <ReadingLayout
-              key={part['part_number']}
               paddingLeft={'2%'}
               paddingRight={'2%'}
               setPrevState={() => changePart(String(prevPart))}
@@ -110,15 +97,6 @@ const IeltsReading = () => {
       </>
     );
   });
-  return (
-    <>
-      <SkillHeader
-        title={'Luyện tập IELTS Reading'}
-        countdownTime={testTime}
-      />
-      {parts}
-    </>
-  );
+  return <></>;
 };
-
 export default IeltsReading;
