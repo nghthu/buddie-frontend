@@ -3,6 +3,8 @@
 import styles from '@/styles/components/Card.module.scss';
 import clsx from 'clsx';
 import { useState } from 'react';
+import React from 'react';
+import { CloseChatContext } from './CloseChatContext';
 
 const Card = (props: {
   children: React.ReactNode;
@@ -11,12 +13,12 @@ const Card = (props: {
   backgroundColor?: string;
   showCloseButton?: boolean;
   className?: string;
-  onClose?: () => void;
 }) => {
+  const hideChat = React.useContext(CloseChatContext);
   const [isCollapsed, setIsCollapsed] = useState(false);
   const closeCardHandler = () => {
     setIsCollapsed(true);
-    props.onClose && props.onClose();
+    hideChat && hideChat();
   };
 
   return (

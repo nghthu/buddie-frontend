@@ -1,8 +1,7 @@
 import Card from '@/components/Card';
-import styles from '@/styles/components/BuddieSuport.module.scss';
+import styles from '@/styles/components/BuddieSupport.module.scss';
 
-const BuddieSuport = (props: {
-  onClose: () => void;
+const BuddieSupport = (props: {
   requests?: Array<{ request: string; avatar: string; response: string }>;
 }) => {
   const translateHandler = () => {};
@@ -14,7 +13,6 @@ const BuddieSuport = (props: {
       showCloseButton
       backgroundColor="#ECEEF9"
       className={styles['chat-box']}
-      onClose={props.onClose}
     >
       <div className={styles.container}>
         {props.requests?.map((chat, index) => (
@@ -29,7 +27,7 @@ const BuddieSuport = (props: {
             <div className={styles.chat}>
               <div className={styles.buddie}>
                 <div className={styles['buddie-avatar']}>
-                  <img src="images/logo/main.svg" />
+                  <img src="/images/logo/main.svg" />
                 </div>
                 <p>Buddie</p>
               </div>
@@ -48,4 +46,4 @@ const BuddieSuport = (props: {
   );
 };
 
-export default BuddieSuport;
+export default BuddieSupport;
