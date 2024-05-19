@@ -1,6 +1,13 @@
+.readingLayout {
+  padding-left: 2%;
+  padding-right: 2%;
+  display: flex;
+  gap: 1rem;
+}
+
 .questionContainer {
   width: 40%;
-  height: calc(99vh - 140px);
+  height: calc(100vh - 120px);
   overflow-y: scroll;
   display: flex;
   flex-direction: column;
@@ -9,7 +16,7 @@
 
 .contextWrapper {
   width: 60%;
-  height: calc(99vh - 140px);
+  height: calc(100vh - 120px);
   display: flex;
   flex-direction: column;
   position: relative;
@@ -31,7 +38,10 @@
   align-items: center;
   justify-content: flex-start;
 }
-
+.fillTheBlankWrapper {
+  margin-top:1rem;
+  margin-bottom:1rem;
+}
 .singleChoiceGroup,
 .multiChoiceGroup {
   display: flex;
@@ -46,13 +56,26 @@
 }
 
 .singleChoiceWrapper,
-.multiChoiceWrapper.dropdownWrapper {
+.multiChoiceWrapper {
   display: flex;
   gap: 1rem;
   flex-direction: column;
+  margin-top:1rem;
+  margin-bottom:1rem;
 }
-
+.dropdownWrapper {
+  display:flex;
+  flex-direction: column;
+  margin-top:1rem;
+  margin-bottom:1rem;
+}
 .radio {
   display: flex;
   align-items: center;
+}
+
+.buttonWrapper {
+  width: 100%;
+  display: flex;
+  justify-content: space-around;
 }

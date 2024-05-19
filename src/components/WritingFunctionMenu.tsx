@@ -24,10 +24,9 @@ const WritingFunctionMenu: React.FC<MenuProps> = ({
         left: position.x,
       }}
     >
-      <p onClick={() => onMenuItemClick('Dịch')}>Dịch</p>
+      <p onClick={() => onMenuItemClick('Dịch')}>//Dịch</p>
       <p onClick={() => onMenuItemClick('Viết lại')}>Viết lại</p>
       <p onClick={() => onMenuItemClick('Từ đồng nghĩa')}>Từ đồng nghĩa</p>
-      <p onClick={() => onMenuItemClick('Tóm tắt')}>Tóm tắt</p>
     </div>
   );
 };

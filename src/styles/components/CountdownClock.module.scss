@@ -1,11 +1,12 @@
 .oclock {
   display: flex;
-  flex-direction: column;
-  align-items: flex-end;
+  flex-direction: row;
+  align-items: center;
   width: auto;
+  gap: 1rem;
 }
 
 .timer {
   color: red;
-  font-size: 3rem;
+  font-size: 2.5rem;
 }

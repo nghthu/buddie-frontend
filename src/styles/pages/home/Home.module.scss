@@ -1,0 +1,156 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  background-color: white;
+  gap: 30px;
+  transform: scale(0.9);
+}
+
+.ieltsContainer {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  background-color: #dbf5f1;
+  width: 100%;
+  padding: 35px;
+  gap: 35px;
+  border-radius: 25px;
+
+  & p {
+    color: black;
+    font-size: 25px;
+    font-weight: 400;
+  }
+}
+
+.banner {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  background-color: white;
+  width: 55%;
+  height: 185px;
+  border-radius: 25px;
+  padding: 35px;
+
+  & h1 {
+    font-size: 30px;
+    font-weight: 500;
+  }
+
+  & img {
+    width: 100px;
+  }
+}
+
+.skillContainer {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: 1fr 1fr;
+  gap: 35px;
+  width: 45%;
+}
+
+.skill {
+  background-color: white;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-radius: 25px;
+  height: 65px;
+  padding: 10px;
+  padding-left: 20px;
+
+  .icon {
+    color: black;
+    height: 40px;
+    width: 40px;
+    padding: 5px;
+    border-radius: 50%;
+    background-color: #ffd7d9;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .arrow {
+    color: #ccc;
+    font-size: 30px;
+  }
+}
+
+.historyContainer {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  background-color: #f5f6fa;
+  width: 100%;
+  border-radius: 25px;
+  padding: 30px;
+  gap: 15px;
+
+  & h1 {
+    font-size: 30px;
+    font-weight: 500;
+  }
+}
+
+.resultContainer {
+  display: flex;
+  flex-direction: row;
+  gap: 150px;
+
+  & h1 {
+    font-size: 40px;
+    color: #675980;
+  }
+
+  & p {
+    font-size: 25px;
+    font-weight: 400;
+  }
+}
+
+.testContainer {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.test {
+  padding: 20px;
+  border: 1px solid black;
+  border-radius: 15px;
+  background-color: white;
+
+  & h1 {
+    font-size: 20px;
+    font-weight: 500;
+  }
+
+  .score {
+    font-size: 38px;
+    color: #ed1b35;
+  }
+}
+
+.detailButton {
+  width: 100%;
+  margin-top: 20px;
+}
+
+.iconHead {
+  height: 2.5em;
+  width: auto;
+  padding: 5px;
+  border-radius: 50%;
+  background-color: #ffd7d9;
+}
+.iconTail {
+  height: 2em;
+  width: auto;
+}
