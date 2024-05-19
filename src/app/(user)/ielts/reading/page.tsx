@@ -97,6 +97,7 @@ const IeltsReading = () => {
         {activePart === String(part['part_number']) && (
           <>
             <ReadingLayout
+              key={part['part_number']}
               paddingLeft={'2%'}
               paddingRight={'2%'}
               setPrevState={() => changePart(String(prevPart))}

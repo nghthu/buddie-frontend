@@ -9,11 +9,14 @@ const CountdownClock = (props: { countdownTime?: string }) => {
   useEffect(() => {
     if (!props.countdownTime) {
       setTime('unlimited');
-    }
+    } else setTime(props.countdownTime);
 
     if (time === 'unlimited') {
       return;
     }
+  }, []);
+
+  useEffect(() => {
     const interval = setInterval(() => {
       setTime((prevTime: string | null) => {
         if (prevTime === null) {

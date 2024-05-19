@@ -18,6 +18,7 @@ interface Props {
 }
 
 const Header = (props: Props) => {
+  const [user, loading, error] = useAuthState(auth);
   const [activatedTab, setActiveTab] = useState(props.activatedTab);
   const [logout, logoutLoading, logoutError] = useSignOut(auth);
   const [notificationApi, contextHolder] = notification.useNotification();

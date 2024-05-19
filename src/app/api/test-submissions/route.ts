@@ -1,23 +1,20 @@
 import { NextResponse } from 'next/server';
 import chalk from 'chalk';
 
-export const POST = async function sendAnswer(req: Request) {
+export const POST = async function createTestSubmission(req: Request) {
   try {
-    const formData = await req.formData();
-
-    console.log(chalk.bgYellow('req'), formData);
+    const reqData = await req.json();
 
     const response = await fetch(
-      `${process.env.API_BASE_URL}/api/v1/ai/assess-speaking`,
+      `${process.env.API_BASE_URL}/api/v1/test-submissions`,
       {
         method: 'POST',
         headers: req.headers,
-        body: formData,
+        body: reqData,
       }
     );
-
     const data = await response.json();
-    console.log(chalk.bgCyan('res'), data);
+    console.log(chalk.bgCyan('Create Test Submission Response:'), data);
     return NextResponse.json(data);
   } catch (error) {
     console.error(error);

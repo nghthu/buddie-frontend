@@ -5,7 +5,7 @@ export default function WritingPage() {
   return (
     <>
       <div className={styles.container}>
-        <h2 className={styles.title}>Luyện tập IETLS Writing</h2>
+        <h2 className={styles.title}>Luyện tập IELTS Writing</h2>
 
         <div className={styles.landingContainer}>
           <p className={styles.textLanding}>
