@@ -7,6 +7,7 @@
     width: 40px;
     height: 40px;
   }
+  align-items: flex-start;
 }
 
 .audio-btn {
@@ -38,4 +39,8 @@
 .set-submit {
   margin-left: auto;
   align-items: center;
+}
+
+.question-prompt {
+  white-space: pre-line;
 }
