@@ -18,11 +18,11 @@ const Speaking = () => {
           <Button>IELTS Speaking part 1</Button>
         </Link>
         <Link href="speaking/part-2">
-          <Button>IELTS Speaking part 1</Button>
+          <Button>IELTS Speaking part 2</Button>
         </Link>
         <Link href="speaking/part-3">
-          <Button>IELTS Speaking part 1</Button>
-        </Link>{' '}
+          <Button>IELTS Speaking part 3</Button>
+        </Link>
       </div>
       <p>Hoặc</p>
       <Link href="speaking/practice-all">

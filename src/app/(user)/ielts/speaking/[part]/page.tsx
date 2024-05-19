@@ -8,10 +8,20 @@ import styles from '@/styles/pages/speaking/Practice.module.scss';
 import { Button } from 'antd';
 import { AudioOutlined, EllipsisOutlined } from '@ant-design/icons';
 import TextCard from '@/components/TextCard';
-import { useEffect, useRef, useState } from 'react';
+import { useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { Checkbox } from 'antd';
+import type { CheckboxProps } from 'antd';
+import { auth } from '@/lib';
+import { User } from 'firebase/auth';
+import { Spin, notification } from 'antd';
+import * as FFmpeg from '@ffmpeg/ffmpeg';
+import { createFFmpeg } from '@ffmpeg/ffmpeg';
+// import { createFFmpeg, fetchFile } from '@ffmpeg/ffmpeg';
 
 const mimeType: string = 'audio/webm';
+// const mimeType: string = 'audio/mpeg';
+// const ffmpeg = createFFmpeg({ log: true });
 
 const PracticeSpeaking = ({ params }: { params: { part: string } }) => {
   const [permission, setPermission] = useState(false);
@@ -25,7 +35,10 @@ const PracticeSpeaking = ({ params }: { params: { part: string } }) => {
   const [currentAnswer, setCurrentAnswer] = useState<Blob | null>(null);
   const [answers, setAnswers] = useState<Blob[]>([]);
   const [instruction, setInstruction] = useState(true);
+  const [wantToSubmit, setWantToSubmit] = useState(false);
+  // const [mp3audio, setMp3Audio] = useState<string | null>(null);
   const router = useRouter();
+  const user = auth.currentUser;
 
   // dummy
   const question_groups = {
@@ -115,26 +128,24 @@ const PracticeSpeaking = ({ params }: { params: { part: string } }) => {
     question_recording: '',
   });
 
-  const getMicrophonePermission = async () => {
-    if ('MediaRecorder' in window) {
-      try {
-        const streamData = await navigator.mediaDevices.getUserMedia({
-          audio: true,
-          video: false,
-        });
+  async function convertWebmToMp3(webmBlob: Blob): Promise<Blob> {
+    const ffmpeg = createFFmpeg({ log: false });
+    await ffmpeg.load();
 
-        setPermission(true);
-        setStream(streamData);
-        startRecording(streamData);
-        listenContinuously();
-        resetTranscript();
-      } catch (err) {
-        alert((err as Error).message);
-      }
-    } else {
-      alert('API MediaRecorder không được hỗ trợ trong trình duyệt của bạn.');
-    }
-  };
+    const inputName = 'input.webm';
+    const outputName = 'output.mp3';
+
+    const arrayBuffer = await new Response(webmBlob).arrayBuffer();
+
+    ffmpeg.FS('writeFile', inputName, new Uint8Array(arrayBuffer));
+
+    await ffmpeg.run('-i', inputName, outputName);
+
+    const outputData = ffmpeg.FS('readFile', outputName);
+    const outputBlob = new Blob([outputData.buffer], { type: 'audio/mp3' });
+
+    return outputBlob;
+  }
 
   const startRecording = async (streamData: MediaStream) => {
     setRecordingStatus('recording');
@@ -163,6 +174,27 @@ const PracticeSpeaking = ({ params }: { params: { part: string } }) => {
         setAudioChunks([]);
         setCurrentAnswer(audioBlob);
       };
+    }
+  };
+
+  const getMicrophonePermission = async () => {
+    if ('MediaRecorder' in window) {
+      try {
+        const streamData = await navigator.mediaDevices.getUserMedia({
+          audio: true,
+          video: false,
+        });
+
+        setPermission(true);
+        setStream(streamData);
+        startRecording(streamData);
+        listenContinuously();
+        resetTranscript();
+      } catch (err) {
+        alert((err as Error).message);
+      }
+    } else {
+      alert('API MediaRecorder không được hỗ trợ trong trình duyệt của bạn.');
     }
   };
 
@@ -203,16 +235,37 @@ const PracticeSpeaking = ({ params }: { params: { part: string } }) => {
     setInstruction(true);
   };
 
-  const nextHandler = () => {
+  const nextHandler = async () => {
     if (currentQuestion === 0) {
       setCurrentQuestion(1);
       setInstruction(false);
     } else {
-      setCurrentAnswer(null);
-      setAudio(null);
-      resetTranscript();
-      if (currentAnswer) {
+      if (currentAnswer && wantToSubmit) {
         setAnswers((prevAnswers) => [...prevAnswers, currentAnswer]);
+
+        console.log('haha');
+        // send test api
+        const token = await user?.getIdToken();
+
+        const mp3Blob = await convertWebmToMp3(currentAnswer);
+
+        const formData = new FormData();
+
+        formData.append('speaking_audio', mp3Blob, 'answer.mp3');
+        formData.append('speaking_part', '1');
+        formData.append('audio_type', 'mp3');
+        formData.append(
+          'question',
+          question_groups.questions[currentQuestion].question_prompt
+        );
+
+        await fetch(`/api/ai/assess-speaking`, {
+          method: 'POST',
+          headers: {
+            authorization: `Bearer ${token}`,
+          },
+          body: formData,
+        });
       }
       if (currentQuestion < question_groups.questions.length - 1) {
         setCurrentQuestion((prevQuestion) => prevQuestion + 1);
@@ -220,7 +273,15 @@ const PracticeSpeaking = ({ params }: { params: { part: string } }) => {
         // handle submit
         console.log('submit');
       }
+
+      setCurrentAnswer(null);
+      setAudio(null);
+      resetTranscript();
     }
+  };
+
+  const setSubmitHandler: CheckboxProps['onChange'] = (e) => {
+    setWantToSubmit(e.target.checked);
   };
 
   return (
@@ -250,6 +311,14 @@ const PracticeSpeaking = ({ params }: { params: { part: string } }) => {
               src="/images/logo/main.svg"
             />
             <p>{question_groups.questions[currentQuestion].question_prompt}</p>
+            {currentQuestion > 0 && (
+              <Checkbox
+                onChange={setSubmitHandler}
+                className={styles['set-submit']}
+              >
+                Nộp câu này
+              </Checkbox>
+            )}
           </div>
           <Button
             className={styles['audio-btn']}

@@ -1,22 +1,23 @@
 import { NextResponse } from 'next/server';
+import chalk from 'chalk';
 
-export const POST = async function sendAnswers(req: Request) {
+export const POST = async function sendAnswer(req: Request) {
   try {
-    const reqData = await req.json();
+    const formData = await req.formData();
+
+    console.log(chalk.bgYellow('req'), formData);
+
     const response = await fetch(
       `${process.env.API_BASE_URL}/api/v1/ai/assess-speaking`,
       {
         method: 'POST',
-        body: JSON.stringify({
-          speaking_part: 1,
-          audio_type: 'mp3',
-          question: reqData.question,
-          speaking_audio: reqData.speakingAudio,
-        }),
+        headers: req.headers,
+        body: formData,
       }
     );
 
     const data = await response.json();
+    console.log(chalk.bgCyan('res'), data);
     return NextResponse.json(data);
   } catch (error) {
     console.error(error);

@@ -1,7 +1,7 @@
 'use client';
 
 import { CaretDownOutlined, LogoutOutlined } from '@ant-design/icons';
-import { useSignOut } from 'react-firebase-hooks/auth';
+import { useAuthState, useSignOut } from 'react-firebase-hooks/auth';
 import type { MenuProps } from 'antd';
 import { Button, Dropdown, Space, notification } from 'antd';
 import clsx from 'clsx';
@@ -18,6 +18,7 @@ interface Props {
 }
 
 const Header = (props: Props) => {
+  const [user, loading, error] = useAuthState(auth);
   const [activatedTab, setActiveTab] = useState(props.activatedTab);
   const [logout, logoutLoading, logoutError] = useSignOut(auth);
   const [notificationApi, contextHolder] = notification.useNotification();
