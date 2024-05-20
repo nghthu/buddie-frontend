@@ -153,7 +153,7 @@ const PracticeSpeaking = ({ params }: { params: { part: string } }) => {
       const media = new MediaRecorder(streamData, { mimeType });
       mediaRecorder.current = media;
       mediaRecorder.current.start();
-      let localAudioChunks: Blob[] = [];
+      const localAudioChunks: Blob[] = [];
       mediaRecorder.current.ondataavailable = (event) => {
         if (typeof event.data === 'undefined') return;
         if (event.data.size === 0) return;

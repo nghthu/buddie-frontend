@@ -13,7 +13,9 @@
     background-clip: padding-box;
     border-radius: 7px;
     background-color: #00000050;
-    box-shadow: inset -1px -1px 0px #0000000d, inset 1px 1px 0px #0000000d;
+    box-shadow:
+      inset -1px -1px 0px #0000000d,
+      inset 1px 1px 0px #0000000d;
   }
   &::-webkit-scrollbar-button {
     width: 0;

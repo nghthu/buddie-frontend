@@ -12,7 +12,11 @@ const IELTS = () => {
   return (
     <>
       <SkillHeader title={'Luyện tập IELTS cùng Buddie'}></SkillHeader>
-      <TestSelector pageLoading ={pageLoading} setPageLoading={setPageLoading} skill={'ielts_reading'} />
+      <TestSelector
+        pageLoading={pageLoading}
+        setPageLoading={setPageLoading}
+        skill={'ielts_reading'}
+      />
     </>
   );
 };

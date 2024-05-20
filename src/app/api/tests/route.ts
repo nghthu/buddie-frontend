@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest, NextResponse } from 'next/server';
 
 export async function GET(request: NextRequest) {
   const searchParams = request.nextUrl.searchParams;
@@ -7,7 +7,7 @@ export async function GET(request: NextRequest) {
   const search = searchParams.get('search');
   const isbuddie = searchParams.get('isbuddie');
   //const queryString = `${process.env.API_BASE_URL}/api/v1/ai/synonyms?word=speed`;
-  const offset = page ? (Number(page) - 1) : 0;
+  const offset = page ? Number(page) - 1 : 0;
   let queryString = `${process.env.API_BASE_URL}/api/v1/tests?limit=10&offset=${offset}&access=public&is_buddie_test=${isbuddie}`;
   if (test_type) {
     queryString += `&test_type=${test_type}`;
@@ -20,13 +20,10 @@ export async function GET(request: NextRequest) {
   //console.log(queryString);
 
   try {
-    const response = await fetch(
-      queryString,
-      {
-        method: 'GET',
-        headers: request.headers
-      }
-    );
+    const response = await fetch(queryString, {
+      method: 'GET',
+      headers: request.headers,
+    });
     const data = await response.json();
     return NextResponse.json(data);
   } catch (error) {

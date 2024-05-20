@@ -21,7 +21,12 @@ body {
   background-color: $color-background;
 }
 
-h1, h2, h3, h4, h5, h6 {
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
   font-family: $font-family-default;
 }
 
@@ -70,7 +75,7 @@ span {
 .ant-btn-red {
   color: $color-btn-red-text;
   background-color: $color-btn-red-bg;
-  
+
   &:not(:disabled):not(.ant-btn-disabled):hover {
     background-color: $color-btn-red-bg-hover;
   }

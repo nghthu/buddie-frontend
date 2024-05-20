@@ -1035,7 +1035,7 @@ const Result = ({ test, testSubmission }) => {
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const testResultData = merge({}, test, testSubmission);
 
-  let resultInfo = { right: 0, wrong: 0, skipped: 0 };
+  const resultInfo = { right: 0, wrong: 0, skipped: 0 };
 
   const showModal = (questionNumber: number) => {
     setCurrentQuestion(questionNumber);
@@ -1093,11 +1093,11 @@ const Result = ({ test, testSubmission }) => {
                             ? styles['green']
                             : ''
                           : (index + 1).toString() ===
-                            question.answer_result.user_answer
-                          ? styles['red']
-                          : (index + 1).toString() === question.answer
-                          ? styles['green']
-                          : ''
+                              question.answer_result.user_answer
+                            ? styles['red']
+                            : (index + 1).toString() === question.answer
+                              ? styles['green']
+                              : ''
                       }`}
                     ></div>
                   </div>
@@ -1130,10 +1130,10 @@ const Result = ({ test, testSubmission }) => {
                         question.answer.includes(String(index + 1))
                           ? styles['green']
                           : question.answer_result.user_answer.includes(
-                              String(index + 1)
-                            )
-                          ? styles['red']
-                          : ''
+                                String(index + 1)
+                              )
+                            ? styles['red']
+                            : ''
                       }
                     }`}
                     >
@@ -1260,11 +1260,11 @@ const Result = ({ test, testSubmission }) => {
                                   ? styles['green']
                                   : ''
                                 : (index + 1).toString() ===
-                                  question.answer_result.user_answer
-                                ? styles['red']
-                                : (index + 1).toString() === question.answer
-                                ? styles['green']
-                                : ''
+                                    question.answer_result.user_answer
+                                  ? styles['red']
+                                  : (index + 1).toString() === question.answer
+                                    ? styles['green']
+                                    : ''
                             }`}
                           ></div>
                           <span>{option}</span>
@@ -1313,10 +1313,10 @@ const Result = ({ test, testSubmission }) => {
                               question.answer.includes(String(index + 1))
                                 ? styles['green']
                                 : question.answer_result.user_answer.includes(
-                                    String(index + 1)
-                                  )
-                                ? styles['red']
-                                : ''
+                                      String(index + 1)
+                                    )
+                                  ? styles['red']
+                                  : ''
                             }
                     }`}
                           >
