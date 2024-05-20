@@ -2,9 +2,25 @@
   "extends": [
     "next/core-web-vitals",
     "eslint:recommended",
-    "plugin:@typescript-eslint/recommended"
+    "plugin:@typescript-eslint/recommended",
+    "plugin:react-hooks/recommended",
+    "plugin:react/recommended",
+    "prettier"
+  ],
+  "ignorePatterns": [
+    "dist",
+    ".eslintrc.cjs",
+    "node_modules",
+    "*.config.ts",
+    "*.d.ts"
   ],
   "parser": "@typescript-eslint/parser",
-  "plugins": ["@typescript-eslint"],
+  "plugins": ["@typescript-eslint", "react", "prettier", "react-refresh"],
+  "rules": {
+    "react/jsx-no-target-blank": "off",
+    "react/react-in-jsx-scope": "off",
+    "prettier/prettier": ["error"],
+    "require-jsdoc": "off"
+  },
   "root": true
 }
