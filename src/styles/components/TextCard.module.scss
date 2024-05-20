@@ -6,8 +6,8 @@
 }
 
 $card-background-color: (
-  "white": white,
-  "very-light-grey": #f5f6fa
+  'white': white,
+  'very-light-grey': #f5f6fa,
 );
 
 @each $color, $value in $card-background-color {

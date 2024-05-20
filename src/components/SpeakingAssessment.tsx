@@ -279,8 +279,8 @@ const SpeakingAssessment = () => {
                 word.pronunciation > 80
                   ? styles.green
                   : word.pronunciation >= 50
-                  ? styles.yellow
-                  : styles.red;
+                    ? styles.yellow
+                    : styles.red;
 
               return (
                 <span

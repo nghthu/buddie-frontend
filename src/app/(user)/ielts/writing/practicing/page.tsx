@@ -184,7 +184,7 @@ export default function PracticePage() {
 
   const showChat = async (message: string) => {
     let apiResponse;
-    let request = {
+    const request = {
       avatar: '/images/avatar.jpg',
       request: message + ' ' + selection,
       response: 'Đang xử lý... đợi Buddie chút nhé!',
@@ -211,7 +211,7 @@ export default function PracticePage() {
     }
 
     setChatRequests((prevRequests) => {
-      let newRequests = [...prevRequests];
+      const newRequests = [...prevRequests];
       newRequests[newRequests.length - 1] = request;
       return newRequests;
     });

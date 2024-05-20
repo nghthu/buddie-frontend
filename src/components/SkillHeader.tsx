@@ -2,7 +2,11 @@ import styles from '@/styles/components/SkillHeader.module.scss';
 import CountdownClock from '@/components/CountdownClock';
 import clsx from 'clsx';
 
-const SkillHeader = (props: { title: string; countdownTime?: string, children?:React.ReactNode }) => {
+const SkillHeader = (props: {
+  title: string;
+  countdownTime?: string;
+  children?: React.ReactNode;
+}) => {
   return (
     <div
       className={clsx(

@@ -12,7 +12,6 @@
   "bracketSameLine": false,
   "endOfLine": "lf",
   "singleAttributePerLine": true,
-  "prettier.cssEnable": ["css", "less", "scss", "sass"],
   "htmlWhitespaceSensitivity": "css",
   "embeddedLanguageFormatting": "auto",
   "insertPragma": false,

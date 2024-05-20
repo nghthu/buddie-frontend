@@ -12,19 +12,19 @@ import { User } from 'firebase/auth';
 import { auth } from '@/lib';
 import useSWR from 'swr';
 interface test_answer {
-  test_id: string,
+  test_id: string;
   parts: {
-    _id: string,
+    _id: string;
     question_groups: {
-      _id: string,
+      _id: string;
       questions: {
-        _id: string,
+        _id: string;
         answer_result: {
-          user_answer: string | string[]
-        }
-      }[]
-    }[]
-  }[]
+          user_answer: string | string[];
+        };
+      }[];
+    }[];
+  }[];
 }
 interface questiongroup {
   is_single_question?: boolean | object;
@@ -65,9 +65,16 @@ const fetcher = async ({ url, user }: FetchArgs) => {
 
   return response.data;
 };
-export default function IeltsPart({ params, }: { params: { id: string; part: string }; }) {
+export default function IeltsPart({
+  params,
+}: {
+  params: { id: string; part: string };
+}) {
   // const router = useRouter();
-  const [answers, setAnswers] = useState<test_answer>({ "test_id": "", "parts": [] });
+  const [answers, setAnswers] = useState<test_answer>({
+    test_id: '',
+    parts: [],
+  });
   const [testTime, setTestTime] = useState('20:00');
   const [currentPart, setCurrentPart] = useState(1);
   // const changePart = (part: number) => {
@@ -94,48 +101,108 @@ export default function IeltsPart({ params, }: { params: { id: string; part: str
     if (params.part !== 'all') {
       setCurrentPart(Number(params.part));
     }
-  }, [params.part])
+  }, [params.part]);
   useEffect(() => {
     if (tests) {
       if (params.part !== 'all') {
-        const temp_test_answer: { test_id: string, parts: { _id: string, question_groups: { _id: string, questions: { _id: string, answer_result: { user_answer: string } }[] }[] }[] } = { "test_id": params.id, "parts": [] };
+        const temp_test_answer: {
+          test_id: string;
+          parts: {
+            _id: string;
+            question_groups: {
+              _id: string;
+              questions: {
+                _id: string;
+                answer_result: { user_answer: string };
+              }[];
+            }[];
+          }[];
+        } = { test_id: params.id, parts: [] };
         //push in the right part
-        temp_test_answer['parts'].push({ "_id": tests['parts'][Number(params.part) - 1]['_id'], "question_groups": [] });
+        temp_test_answer['parts'].push({
+          _id: tests['parts'][Number(params.part) - 1]['_id'],
+          question_groups: [],
+        });
 
         // iterate through the question groups inside the part and push each question group to the temp_test_answer
-        tests['parts'][Number(params.part) - 1]['question_groups'].map((question_group: { _id: string, questions: { _id: string }[] }, index: number) => {
-          temp_test_answer['parts'][0]['question_groups'].push({ "_id": question_group._id, "questions": [] });
+        tests['parts'][Number(params.part) - 1]['question_groups'].map(
+          (
+            question_group: { _id: string; questions: { _id: string }[] },
+            index: number
+          ) => {
+            temp_test_answer['parts'][0]['question_groups'].push({
+              _id: question_group._id,
+              questions: [],
+            });
 
-          // within each question group, iterate through the questions and push each question to the temp_test_answer
-          question_group.questions.map((question: { _id: string }) => {
-            temp_test_answer['parts'][0]['question_groups'][index]['questions'].push({ "_id": question._id, "answer_result": { "user_answer": "" } });
-          });
-        });
+            // within each question group, iterate through the questions and push each question to the temp_test_answer
+            question_group.questions.map((question: { _id: string }) => {
+              temp_test_answer['parts'][0]['question_groups'][index][
+                'questions'
+              ].push({ _id: question._id, answer_result: { user_answer: '' } });
+            });
+          }
+        );
 
         setAnswers(temp_test_answer);
-      }
-      else {
-        const temp_test_answer: { test_id: string, parts: { _id: string, question_groups: { _id: string, questions: { _id: string, answer_result: { user_answer: string } }[] }[] }[] } = { "test_id": params.id, "parts": [] };
+      } else {
+        const temp_test_answer: {
+          test_id: string;
+          parts: {
+            _id: string;
+            question_groups: {
+              _id: string;
+              questions: {
+                _id: string;
+                answer_result: { user_answer: string };
+              }[];
+            }[];
+          }[];
+        } = { test_id: params.id, parts: [] };
         //push in all parts
-        tests['parts'].map((part: { _id: string, question_groups: { _id: string, questions: { _id: string }[] }[] }, i1: number) => {
-          temp_test_answer['parts'].push({ "_id": part._id, "question_groups": [] });
-
-          part.question_groups.map((question_group: { _id: string, questions: { _id: string }[] }, i2: number) => {
-            temp_test_answer['parts'][i1]['question_groups'].push({ "_id": question_group._id, "questions": [] });
-            console.log('bug');
-            console.log(temp_test_answer);
-            question_group.questions.map((question: { _id: string }) => {
-              temp_test_answer['parts'][i1]['question_groups'][i2]['questions'].push({ "_id": question._id, "answer_result": { "user_answer": "" } });
+        tests['parts'].map(
+          (
+            part: {
+              _id: string;
+              question_groups: { _id: string; questions: { _id: string }[] }[];
+            },
+            i1: number
+          ) => {
+            temp_test_answer['parts'].push({
+              _id: part._id,
+              question_groups: [],
             });
-          });
-        });
+
+            part.question_groups.map(
+              (
+                question_group: { _id: string; questions: { _id: string }[] },
+                i2: number
+              ) => {
+                temp_test_answer['parts'][i1]['question_groups'].push({
+                  _id: question_group._id,
+                  questions: [],
+                });
+                console.log('bug');
+                console.log(temp_test_answer);
+                question_group.questions.map((question: { _id: string }) => {
+                  temp_test_answer['parts'][i1]['question_groups'][i2][
+                    'questions'
+                  ].push({
+                    _id: question._id,
+                    answer_result: { user_answer: '' },
+                  });
+                });
+              }
+            );
+          }
+        );
 
         setAnswers(temp_test_answer);
       }
     }
   }, [tests, params.part, params.id]);
   if (isLoading) {
-    return <Spin size='large' />
+    return <Spin size="large" />;
   }
 
   const temp_metaData = { ...tests };
@@ -145,9 +212,7 @@ export default function IeltsPart({ params, }: { params: { id: string; part: str
   const metaData = temp_metaData;
   const jsonData = [];
   if (params.part === 'all') {
-    const partData = tests['parts'].map(
-      (subpart: subpart) => subpart
-    );
+    const partData = tests['parts'].map((subpart: subpart) => subpart);
     jsonData.push(...partData);
     //setActivePart('1');
   } else {
@@ -159,13 +224,12 @@ export default function IeltsPart({ params, }: { params: { id: string; part: str
     //setActivePart(params.part);
   }
 
-
   const passageButtons = (
     <div className={styles.partChangeWrapper}>
       <Button
         icon={<DoubleLeftOutlined />}
         onClick={() => {
-          const prevPassage = (currentPart - 1);
+          const prevPassage = currentPart - 1;
           setCurrentPart(prevPassage);
         }}
         disabled={currentPart === 1 || params.part !== 'all'}
@@ -174,12 +238,13 @@ export default function IeltsPart({ params, }: { params: { id: string; part: str
       <Button
         icon={<DoubleRightOutlined />}
         onClick={() => {
-          const nextPassage = (currentPart + 1);
+          const nextPassage = currentPart + 1;
           setCurrentPart(nextPassage);
         }}
         disabled={currentPart === jsonData.length || params.part !== 'all'}
       />
-    </div>);
+    </div>
+  );
 
   const parts = jsonData.map((part: subpart) => {
     // const prevPart =
@@ -207,7 +272,10 @@ export default function IeltsPart({ params, }: { params: { id: string; part: str
   return (
     <>
       {contextHolder}
-      <SkillHeader title={metaData['test_name']} countdownTime={testTime}>
+      <SkillHeader
+        title={metaData['test_name']}
+        countdownTime={testTime}
+      >
         {passageButtons}
       </SkillHeader>
       {parts}

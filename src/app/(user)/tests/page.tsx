@@ -12,7 +12,10 @@ const UserTestLibrary = () => {
   return (
     <>
       <SkillHeader title={'Đề thi IELTS'}></SkillHeader>
-      <TestLibrary pageLoading ={pageLoading} setPageLoading={setPageLoading} />
+      <TestLibrary
+        pageLoading={pageLoading}
+        setPageLoading={setPageLoading}
+      />
     </>
   );
 };
