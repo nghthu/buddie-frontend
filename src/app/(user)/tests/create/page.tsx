@@ -27,10 +27,7 @@ const CreateTest = () => {
   const user = auth.currentUser;
 
   const callCreateTestAPI = async () => {
-    console.log(user?.getIdToken());
     const token = await user?.getIdToken();
-
-    console.log(JSON.stringify(form.getFieldsValue()));
 
     const response = await fetch(`/api/tests/create`, {
       method: 'POST',
@@ -46,7 +43,6 @@ const CreateTest = () => {
     }
 
     const result = await response.json();
-    console.log(result);
     return result;
   };
 
