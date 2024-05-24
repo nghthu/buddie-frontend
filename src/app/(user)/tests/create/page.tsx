@@ -1,16 +1,7 @@
 'use client';
 
 import styles from '@/styles/pages/tests/create/Create.module.scss';
-import {
-  Button,
-  Card,
-  Checkbox,
-  InputNumber,
-  Radio,
-  Space,
-  Tabs,
-  Typography,
-} from 'antd';
+import { Button, Card, Checkbox, InputNumber, Radio, Space, Tabs } from 'antd';
 import { useState } from 'react';
 import {
   FormOutlined,
@@ -22,29 +13,52 @@ import {
   SoundOutlined,
 } from '@ant-design/icons';
 import { Form, Input, Select } from 'antd';
+import { useRouter } from 'next/navigation';
 import { auth } from '@/lib';
 
-const { TabPane } = Tabs;
 const { Option } = Select;
 
-const Exams = () => {
+const CreateTest = () => {
   const [currentTab, setCurrentTab] = useState('1');
   const [form] = Form.useForm();
   const [haveOptions, setHaveOptions] = useState(false);
   const [haveChoices, setHaveChoices] = useState(false);
+  const router = useRouter();
+  const user = auth.currentUser;
+
+  const callCreateTestAPI = async () => {
+    console.log(user?.getIdToken());
+    const token = await user?.getIdToken();
+
+    console.log(JSON.stringify(form.getFieldsValue()));
+
+    const response = await fetch(`/api/tests/create`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify(form.getFieldsValue()),
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to create test');
+    }
+
+    const result = await response.json();
+    console.log(result);
+    return result;
+  };
 
   const handleOk = async () => {
     if (currentTab === '1') {
-      try {
-        await form.validateFields();
-        const values = form.getFieldsValue();
-        form.setFieldsValue({ tags: values.tags.split(' ') });
-        setCurrentTab('2');
-      } catch (error) {
-        // Handle form validation error
-      }
+      await form.validateFields();
+      const values = form.getFieldsValue();
+      form.setFieldsValue({ tags: values.tags.split(' ') });
+      setCurrentTab('2');
     } else {
-      // Handle the OK action for tab 2
+      await form.validateFields();
+      callCreateTestAPI();
     }
   };
 
@@ -52,7 +66,7 @@ const Exams = () => {
     if (currentTab === '2') {
       setCurrentTab('1');
     } else {
-      // Handle the Cancel action for tab 1
+      router.push('/tests');
     }
   };
 
@@ -109,10 +123,26 @@ const Exams = () => {
           </Form.Item>
 
           <Form.Item
+            name="is_buddie_test"
+            initialValue={false}
+            hidden
+          >
+            <Input type="hidden" />
+          </Form.Item>
+
+          <Form.Item
             name="tags"
             label="Tags"
           >
             <Input />
+          </Form.Item>
+
+          <Form.Item
+            name="test_recording"
+            initialValue={null}
+            hidden
+          >
+            <Input type="hidden" />
           </Form.Item>
         </Form>
       ),
@@ -167,7 +197,7 @@ const Exams = () => {
                   <Card
                     className={styles.oddCard}
                     size="small"
-                    title={`Part ${index + 1}`}
+                    title={`Phần thi ${index + 1}`}
                     key={field.key}
                     extra={
                       <CloseOutlined
@@ -198,10 +228,10 @@ const Exams = () => {
 
                     <Form.Item
                       className={styles.prompt}
-                      label="Part Prompt"
+                      label="Tiêu đề Phần thi"
                       name={[field.name, 'part_prompt']}
                     >
-                      <Input.TextArea placeholder="Part Prompt" />
+                      <Input.TextArea placeholder="Tiêu đề Phần thi" />
                     </Form.Item>
 
                     <div className={styles.buttonsContainer}>
@@ -214,7 +244,7 @@ const Exams = () => {
                     </div>
 
                     <Form.Item
-                      label="Part Duration"
+                      label="Thời gian làm bài (phút)"
                       name={[field.name, 'part_duration']}
                     >
                       <InputNumber min={1} />
@@ -226,7 +256,7 @@ const Exams = () => {
                           {subFields.map((subField) => (
                             <Card
                               size="small"
-                              title={`Question Group ${subField.name + 1}`}
+                              title={`Nhóm câu hỏi ${subField.name + 1}`}
                               key={subField.key}
                               extra={
                                 <CloseOutlined
@@ -245,14 +275,14 @@ const Exams = () => {
 
                               <Form.Item
                                 className={styles.prompt}
-                                label="Question Group Prompt"
+                                label="Tiêu đề Nhóm câu hỏi"
                                 name={[
                                   subField.name,
                                   'question_groups_info',
                                   'question_groups_prompt',
                                 ]}
                               >
-                                <Input.TextArea placeholder="Question Group Prompt" />
+                                <Input.TextArea placeholder="Tiêu đề Nhóm câu hỏi..." />
                               </Form.Item>
                               <div className={styles.buttonsContainer}>
                                 <Form.Item
@@ -268,7 +298,7 @@ const Exams = () => {
                               </div>
 
                               <Form.Item
-                                label="Question Group Duration"
+                                label="Thời gian làm bài (phút)"
                                 name={[
                                   subField.name,
                                   'question_groups_info',
@@ -284,7 +314,7 @@ const Exams = () => {
                                     {questionFields.map((questionField) => (
                                       <Card
                                         size="small"
-                                        title={`Question ${
+                                        title={`Câu hỏi ${
                                           questionField.name + 1
                                         }`}
                                         key={questionField.key}
@@ -302,7 +332,7 @@ const Exams = () => {
                                                     'question_groups',
                                                     subField.name,
                                                     'questions',
-                                                  ]) as Array<any>;
+                                                  ]) as Array<unknown>;
                                                 updatedQuestions.forEach(
                                                   (_, index) => {
                                                     form.setFieldsValue({
@@ -363,13 +393,13 @@ const Exams = () => {
                                       >
                                         <Form.Item
                                           className={styles.prompt}
-                                          label="Question Prompt"
+                                          label="Nội dung Câu hỏi"
                                           name={[
                                             questionField.name,
                                             'question_prompt',
                                           ]}
                                         >
-                                          <Input.TextArea placeholder="Question Prompt" />
+                                          <Input.TextArea placeholder="Nội dung Câu hỏi..." />
                                         </Form.Item>
                                         <div
                                           className={styles.buttonsContainer}
@@ -397,7 +427,7 @@ const Exams = () => {
                                         </div>
 
                                         <Form.Item
-                                          label="Question Type"
+                                          label="Loại Câu hỏi"
                                           name={[
                                             questionField.name,
                                             'question_type',
@@ -424,13 +454,13 @@ const Exams = () => {
                                             }}
                                           >
                                             <Option value="selection">
-                                              Selection
+                                              Lựa chọn
                                             </Option>
                                             <Option value="single_choice">
-                                              Single Choice
+                                              Chọn một
                                             </Option>
                                             <Option value="multiple_choices">
-                                              Multiple Choice
+                                              Chọn nhiều
                                             </Option>
                                             <Option value="speaking">
                                               Speaking
@@ -443,7 +473,7 @@ const Exams = () => {
 
                                         <div className={styles.timeInput}>
                                           <Form.Item
-                                            label="Preparation"
+                                            label="Thời gian Chuẩn bị"
                                             name={[
                                               questionField.name,
                                               'question_preparation_time',
@@ -453,7 +483,7 @@ const Exams = () => {
                                           </Form.Item>
 
                                           <Form.Item
-                                            label="Duration"
+                                            label="Thời gian Làm bài"
                                             name={[
                                               questionField.name,
                                               'question_duration',
@@ -485,18 +515,6 @@ const Exams = () => {
                                                       <Form.Item>
                                                         <Checkbox
                                                           onChange={(e) => {
-                                                            const questionType =
-                                                              form.getFieldValue(
-                                                                [
-                                                                  'parts',
-                                                                  field.name,
-                                                                  'question_groups',
-                                                                  subField.name,
-                                                                  'questions',
-                                                                  questionField.name,
-                                                                  'question_type',
-                                                                ]
-                                                              );
                                                             let answer =
                                                               form.getFieldValue(
                                                                 [
@@ -566,12 +584,12 @@ const Exams = () => {
                                                             required: true,
                                                             whitespace: true,
                                                             message:
-                                                              "Please input option's text or delete this field.",
+                                                              'Vui lòng nhập hoặc xóa đáp án này.',
                                                           },
                                                         ]}
                                                         noStyle
                                                       >
-                                                        <Input placeholder="Option text" />
+                                                        <Input placeholder="Đáp án" />
                                                       </Form.Item>
 
                                                       <MinusCircleOutlined
@@ -592,7 +610,7 @@ const Exams = () => {
                                                     block
                                                     icon={<PlusOutlined />}
                                                   >
-                                                    Add option
+                                                    Thêm Đáp án
                                                   </Button>
                                                 </Form.Item>
                                               </div>
@@ -661,7 +679,7 @@ const Exams = () => {
                                                                 whitespace:
                                                                   true,
                                                                 message:
-                                                                  "Please input option's text or delete this field.",
+                                                                  'Vui lòng nhập hoặc xóa đáp án này.',
                                                               },
                                                             ]}
                                                             noStyle
@@ -691,7 +709,7 @@ const Exams = () => {
                                                     block
                                                     icon={<PlusOutlined />}
                                                   >
-                                                    Add option
+                                                    Thêm Đáp án
                                                   </Button>
                                                 </Form.Item>
                                               </div>
@@ -713,7 +731,7 @@ const Exams = () => {
                                               'question_groups',
                                               subField.name,
                                               'questions',
-                                            ]) as Array<any>;
+                                            ]) as Array<unknown>;
                                           updatedQuestions.forEach(
                                             (_, index) => {
                                               form.setFieldsValue({
@@ -763,7 +781,7 @@ const Exams = () => {
                                       }}
                                       block
                                     >
-                                      Add Question
+                                      Thêm Câu hỏi
                                     </Button>
                                   </div>
                                 )}
@@ -776,7 +794,7 @@ const Exams = () => {
                             onClick={() => subOpt.add()}
                             block
                           >
-                            Add Question Group
+                            Thêm Nhóm câu hỏi
                           </Button>
                         </div>
                       )}
@@ -791,7 +809,7 @@ const Exams = () => {
                     setTimeout(() => {
                       const updatedParts = form.getFieldValue(
                         'parts'
-                      ) as Array<any>;
+                      ) as Array<unknown>;
                       updatedParts.forEach((_, index) => {
                         form.setFieldsValue({
                           parts: {
@@ -807,22 +825,11 @@ const Exams = () => {
                   }}
                   block
                 >
-                  Add Part
+                  Thêm Phần thi
                 </Button>
               </div>
             )}
           </Form.List>
-
-          <Form.Item
-            noStyle
-            shouldUpdate
-          >
-            {() => (
-              <Typography>
-                <pre>{JSON.stringify(form.getFieldsValue(), null, 2)}</pre>
-              </Typography>
-            )}
-          </Form.Item>
         </Form>
       ),
     },
@@ -842,6 +849,7 @@ const Exams = () => {
         type="card"
         items={items}
       ></Tabs>
+
       <div className={styles.buttonsContainer}>
         <Button
           danger
@@ -858,4 +866,4 @@ const Exams = () => {
   );
 };
 
-export default Exams;
+export default CreateTest;
