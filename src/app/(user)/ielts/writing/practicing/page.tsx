@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, use } from 'react';
 import CountdownClock from '@/components/CountdownClock';
 import styles from '@/styles/pages/writing/Writing.module.scss';
 import WritingFunctionMenu from '@/components/WritingFunctionMenu';
@@ -9,6 +9,7 @@ import { useSearchParams } from 'next/navigation';
 import BuddieSupport from '@/components/BuddieSupport';
 import { CloseChatContext } from '@/components/CloseChatContext';
 import { auth } from '@/lib';
+import { set } from 'lodash';
 
 type PartData =
   | {
@@ -36,6 +37,7 @@ export default function PracticePage() {
   const [resultData, setResultData] = useState<
     Array<{ topic: string; content: string }>
   >([]);
+  const [isChatProcessing, setIsChatProcessing] = useState(false);
   const user = auth.currentUser;
 
   //Dummy data
@@ -149,6 +151,25 @@ export default function PracticePage() {
     setMenuVisible(false);
   };
 
+  const callTranslateAPI = async () => {
+    const token = await user?.getIdToken();
+
+    const response = await fetch('/api/ai/translate/', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({
+        target_lang: 'vi',
+        content: selection,
+      }),
+    });
+
+    const data = await response.json();
+    return data;
+  }
+
   const callParaphraseAPI = async (topic: string, content: string) => {
     const token = await user?.getIdToken();
 
@@ -179,13 +200,16 @@ export default function PracticePage() {
     });
 
     const data = await response.json();
+    console.log(data);
     return data;
   };
 
   const showChat = async (message: string) => {
+    setIsChatProcessing(true);
+
     let apiResponse;
     const request = {
-      avatar: '/images/avatar.jpg',
+      avatar: user?.photoURL || '',
       request: message + ' ' + selection,
       response: 'Đang xử lý... đợi Buddie chút nhé!',
     };
@@ -194,7 +218,9 @@ export default function PracticePage() {
     setChatVisible(true);
 
     if (message === 'Dịch') {
-      request.response = 'Đang dịch...';
+      apiResponse = await callTranslateAPI();
+      request.response = apiResponse.data.translated;
+      setIsChatProcessing(false);
     }
 
     if (message === 'Viết lại') {
@@ -203,11 +229,13 @@ export default function PracticePage() {
         selection
       );
       request.response = apiResponse.data.paraphrased;
+      setIsChatProcessing(false);
     }
 
     if (message === 'Từ đồng nghĩa') {
-      apiResponse = await callSynonymsAPI('workspace');
-      request.response = apiResponse.data.synonyms;
+      apiResponse = await callSynonymsAPI(selection);
+      request.response = apiResponse.data.synonyms.join(', ');
+      setIsChatProcessing(false);
     }
 
     setChatRequests((prevRequests) => {
@@ -314,7 +342,7 @@ export default function PracticePage() {
           {chatVisible && (
             <div>
               <CloseChatContext.Provider value={hideChat}>
-                <BuddieSupport requests={chatRequests} />
+                <BuddieSupport requests={chatRequests} setRequests={setChatRequests} isProcessing={isChatProcessing} setIsProcessing={setIsChatProcessing}/>
               </CloseChatContext.Provider>
             </div>
           )}
