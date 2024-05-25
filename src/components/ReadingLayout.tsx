@@ -67,7 +67,7 @@ export default function ReadingLayout(props: {
 }) {
   const [currentQuestionGroup, setCurrentQuestionGroup] = useState(1);
   const maxGroup = props.data['question_groups'].length;
-  const questionGroups = props.data['question_groups'].map(
+  const questionGroups = (props.data['question_groups'] as questiongroup[]).map(
     (questionGroup: questiongroup, index: number) => {
       const questions = questionGroup['questions'].map(
         (question: question, index2: number) => {

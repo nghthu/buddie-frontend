@@ -1,7 +1,11 @@
 .container {
   padding: 20px;
 }
-
+.wrapper {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
 .create-question-btn {
   background-color: #6b5d86;
   border: none;

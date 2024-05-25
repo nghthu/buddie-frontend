@@ -18,10 +18,13 @@ const Home = () => {
             <h1>Luyện tập IELTS</h1>
             <p>Với sự trợ giúp của AI thông minh</p>
           </div>
-          <img
-            src="/images/logo/hello.svg"
-            alt="hello"
-          />
+          {
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              src="/images/logo/hello.svg"
+              alt="hello"
+            />
+          }
         </div>
 
         <div className={styles.skillContainer}>

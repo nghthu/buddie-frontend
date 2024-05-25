@@ -52,7 +52,6 @@ interface FetchArgs {
 
 const fetcher = async ({ url, user }: FetchArgs) => {
   const token = await user?.getIdToken();
-  console.log(token);
   const response = await fetch(url, {
     headers: {
       authorization: `Bearer ${token}`,
@@ -75,7 +74,8 @@ export default function IeltsPart({
     test_id: '',
     parts: [],
   });
-  const [testTime, setTestTime] = useState('20:00');
+  // TODO: use timer and setTestTime
+  const [testTime] = useState('20:00');
   const [currentPart, setCurrentPart] = useState(1);
   // const changePart = (part: number) => {
   //   setCurrentPart(part);
@@ -182,8 +182,6 @@ export default function IeltsPart({
                   _id: question_group._id,
                   questions: [],
                 });
-                console.log('bug');
-                console.log(temp_test_answer);
                 question_group.questions.map((question: { _id: string }) => {
                   temp_test_answer['parts'][i1]['question_groups'][i2][
                     'questions'

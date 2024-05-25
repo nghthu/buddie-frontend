@@ -7,7 +7,6 @@ export async function GET(
   const searchParams = request.nextUrl.searchParams;
   const page = Number(searchParams.get('page'));
   const testId = params.id;
-  console.log(page, testId);
   try {
     const response = await fetch(
       `${process.env.API_BASE_URL}/api/v1/test-comments?test_id=${testId}&offset=${(page - 1) * 20}&limit=20`,

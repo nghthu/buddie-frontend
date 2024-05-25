@@ -41,7 +41,8 @@ export default function TestLibrary(props: {
   setPageLoading: React.Dispatch<SetStateAction<boolean>>;
   text?: string;
 }) {
-  const [totalPage, setTotalPage] = useState(1);
+  // TODO: Implement infinite scroll and fetch more data and use setTotalPage
+  const [totalPage] = useState(1);
   // const tests = useRef([]);
   const [filteredTests, setFilteredTests] = useState([]);
   const [searchValue, setSearchValue] = useState('');
@@ -82,9 +83,9 @@ export default function TestLibrary(props: {
     }
   }, [isLoading]);
 
-  const handleLoad = () => {
-    setTotalPage((prev) => prev + 1);
-  };
+  // const handleLoad = () => {
+  //   setTotalPage((prev) => prev + 1);
+  // };
   // useEffect(() => {
   //     handleFilterTests();
   // }, [selectedSkill, searchValue]);

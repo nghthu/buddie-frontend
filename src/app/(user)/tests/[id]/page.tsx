@@ -11,20 +11,27 @@ import TestDetails from '@/components/TestDetails';
 import PartSelector from '@/components/PartSelector';
 import Comment from '@/components/Comment';
 import { SendOutlined } from '@ant-design/icons';
-interface test_answer {
+// interface test_answer {
+//   test_id: string;
+//   parts: {
+//     _id: string;
+//     question_groups: {
+//       _id: string;
+//       questions: {
+//         _id: string;
+//         answer_result: {
+//           user_answer: string | string[];
+//         };
+//       }[];
+//     }[];
+//   }[];
+// }
+interface comment {
+  _id: string;
   test_id: string;
-  parts: {
-    _id: string;
-    question_groups: {
-      _id: string;
-      questions: {
-        _id: string;
-        answer_result: {
-          user_answer: string | string[];
-        };
-      }[];
-    }[];
-  }[];
+  user_id: string;
+  comment: string;
+  created_at: string;
 }
 interface FetchArgs {
   url: string;
@@ -33,7 +40,6 @@ interface FetchArgs {
 
 const fetcher = async ({ url, user }: FetchArgs) => {
   const token = await user?.getIdToken();
-  console.log(token);
   const response = await fetch(url, {
     headers: {
       authorization: `Bearer ${token}`,
@@ -50,8 +56,9 @@ const fetcher = async ({ url, user }: FetchArgs) => {
 const { TextArea } = Input;
 
 export default function TestLanding({ params }: { params: { id: string } }) {
-  const [totalPage, setTotalPage] = useState(1);
-  const [totalComments, setComments] = useState([] as any[]);
+  // TODO: Implement infinite scroll and fetch more data and use setTotalPage
+  const [totalPage] = useState(1);
+  const [totalComments, setComments] = useState([] as comment[]);
   const scrollRef = useRef<HTMLDivElement>(null);
   const user = auth.currentUser;
   const {
@@ -75,10 +82,16 @@ export default function TestLanding({ params }: { params: { id: string } }) {
         description: error?.message,
       });
     }
-  }, [error, notificationApi]);
-  const handleLoad = () => {
-    setTotalPage((prev) => prev + 1);
-  };
+    if (errorComment) {
+      notificationApi.error({
+        message: 'Error',
+        description: errorComment?.message,
+      });
+    }
+  }, [error, errorComment, notificationApi]);
+  // const handleLoad = () => {
+  //   setTotalPage((prev) => prev + 1);
+  // };
   // TODO: use react inf scroll
   // useEffect(() => {
   //     const scrollElement = scrollRef.current;
@@ -98,6 +111,8 @@ export default function TestLanding({ params }: { params: { id: string } }) {
   // });
   useEffect(() => {
     if (comments) {
+      console.log('comment pagination data=======>', comments.pagination);
+      console.log('comments ==========>', comments.test_comments);
       setComments((prev) => {
         const tempSet = new Set([...prev, ...comments.test_comments]);
         return Array.from(tempSet);
@@ -133,7 +148,7 @@ export default function TestLanding({ params }: { params: { id: string } }) {
   );
   commentSection.push(
     <Comment
-      key={'acssasdsad'}
+      key={'acssasdsad2'}
       id={'as'}
       userName={'lorem Ipsum'}
       userPhotoURL="https://fastly.picsum.photos/id/1/200/300.jpg?hmac=jH5bDkLr6Tgy3oAg5khKCHeunZMHq0ehBZr6vGifPLY"

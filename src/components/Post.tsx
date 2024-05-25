@@ -7,20 +7,16 @@ import clsx from 'clsx';
 
 interface Post {
   name: string;
-  avater: string;
+  avatar: string;
   date: string;
   text: string;
   audio: string;
   postImg: string;
 }
 
-interface Comments {
-  commentNumber: number;
-}
-
 interface Props {
   postData: Post;
-  comments: Comments;
+  comments: number;
   onClick?: (event: React.MouseEvent<HTMLDivElement>) => void;
   showComments?: boolean;
 }
@@ -36,7 +32,7 @@ const Post = ({ postData, comments, onClick, showComments }: Props) => {
         <div className={styles['post-info']}>
           <div className={styles['post-info-user']}>
             <p>{postData.name}</p>
-            <p>{postData.date}</p>
+            <p>{new Date(postData.date).toUTCString()}</p>
           </div>
           <TextCard
             width="100%"
@@ -56,12 +52,9 @@ const Post = ({ postData, comments, onClick, showComments }: Props) => {
             )}
             {showComments && (
               <div
-                className={clsx(
-                  comments.commentNumber !== 0 && styles.green,
-                  styles.answer
-                )}
+                className={clsx(comments !== 0 && styles.green, styles.answer)}
               >
-                {comments.commentNumber}
+                {comments}
               </div>
             )}
           </TextCard>

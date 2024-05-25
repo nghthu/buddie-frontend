@@ -1,7 +1,7 @@
 'use client';
 
 import { CaretDownOutlined, LogoutOutlined } from '@ant-design/icons';
-import { useAuthState, useSignOut } from 'react-firebase-hooks/auth';
+import { useSignOut } from 'react-firebase-hooks/auth';
 import type { MenuProps } from 'antd';
 import { Button, Dropdown, Space, notification } from 'antd';
 import clsx from 'clsx';
@@ -18,7 +18,7 @@ interface Props {
 }
 
 const Header = (props: Props) => {
-  const [user, loading, error] = useAuthState(auth);
+  //const [user, loading, error] = useAuthState(auth);
   const [activatedTab, setActiveTab] = useState(props.activatedTab);
   const [logout, logoutLoading, logoutError] = useSignOut(auth);
   const [notificationApi, contextHolder] = notification.useNotification();
@@ -93,13 +93,21 @@ const Header = (props: Props) => {
               Trang chủ
             </p>
           </Link>
-          <Link href="/">
+          <Link
+            href="/tests"
+            onClick={() => tabClickHandler('exams')}
+          >
             <p className={clsx(activatedTab === 'exams' && styles.activate)}>
               Đề thi
             </p>
           </Link>
-          <Link href="/">
-            <p className={clsx(activatedTab === 'comunity' && styles.activate)}>
+          <Link
+            href="/community"
+            onClick={() => tabClickHandler('community')}
+          >
+            <p
+              className={clsx(activatedTab === 'community' && styles.activate)}
+            >
               Cộng đồng
             </p>
           </Link>
@@ -119,7 +127,7 @@ const Header = (props: Props) => {
             overlayStyle={{ marginTop: '10px' }}
           >
             <a onClick={(e) => e.preventDefault()}>
-              <Space>
+              <Space align={'center'}>
                 <img
                   height={40}
                   width={40}
