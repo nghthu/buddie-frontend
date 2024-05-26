@@ -3,10 +3,7 @@
 import TextCard from './TextCard';
 import { SoundOutlined } from '@ant-design/icons';
 import styles from '@/styles/components/Post.module.scss';
-import { useState } from 'react';
-import clsx from 'clsx';
-import { Modal } from 'antd';
-import PostDetail from './PostDetail';
+import PostAnswer from './PostAnswer';
 interface User {
   user_id: string;
   display_name: string;
@@ -33,21 +30,16 @@ interface Post {
 
 interface Props {
   postData: Post;
-  comments: number;
-  onClick?: (event: React.MouseEvent<HTMLDivElement>) => void;
-  showComments?: boolean;
 }
 
-const Post = ({ postData, comments }: Props) => {
-  const [openPostDetail, setOpenPostDetail] = useState(false);
+const PostDetail = ({ postData }: Props) => {
+  const postAnswers = postData.answers.map((answer) => (
+    <PostAnswer
+      key={answer._id}
+      answer={answer}
+    />
+  ));
 
-  const showPostDetail = () => {
-    setOpenPostDetail(true);
-  };
-
-  const hidePostDetail = () => {
-    setOpenPostDetail(false);
-  };
   return (
     <>
       <div className={styles.post}>
@@ -55,7 +47,7 @@ const Post = ({ postData, comments }: Props) => {
           className={styles.avatar}
           src={postData.user.photo_url}
         />
-        <div className={styles['post-info']}>
+        <div className={styles['post-info-modal-version']}>
           <div className={styles['post-info-user']}>
             <p>{postData.user.display_name}</p>
             <p>{new Date(postData.created_at).toUTCString()}</p>
@@ -64,7 +56,6 @@ const Post = ({ postData, comments }: Props) => {
             width="100%"
             height="fit-content"
             className={styles['post-text-card']}
-            onClick={() => showPostDetail()}
           >
             <div className={styles['post-text']}>
               <p>{postData.text}</p>
@@ -76,26 +67,12 @@ const Post = ({ postData, comments }: Props) => {
                 src={postData.image_url}
               />
             )}
-            <div
-              className={clsx(comments !== 0 && styles.green, styles.answer)}
-            >
-              {comments}
-            </div>
           </TextCard>
+          {postAnswers}
         </div>
       </div>
-
-      <Modal
-        open={openPostDetail}
-        title=""
-        onCancel={hidePostDetail}
-        footer={[]}
-        width={800}
-      >
-        <PostDetail postData={postData} />
-      </Modal>
     </>
   );
 };
 
-export default Post;
+export default PostDetail;

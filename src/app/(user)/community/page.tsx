@@ -15,13 +15,28 @@ interface FetchArgs {
   url: string;
   user: User | null;
 }
+interface questionUser {
+  user_id: string;
+  display_name: string;
+  photo_url: string;
+}
+interface PostAnswer {
+  content: string;
+  is_excellent: boolean;
+  _id: string;
+  created_at: string;
+  user: questionUser;
+}
 interface question {
-  name: string;
-  avatar: string;
-  date: string;
+  _id: string;
   text: string;
-  audio: string;
-  postImg: string;
+  created_at: string;
+  updated_at: string;
+  __v: string;
+  answers: PostAnswer[];
+  user: questionUser;
+  audio_url: string;
+  image_url: string;
 }
 const fetcher = async ({ url, user }: FetchArgs) => {
   const token = await user?.getIdToken();
@@ -39,15 +54,11 @@ const fetcher = async ({ url, user }: FetchArgs) => {
 };
 const LIMIT = 10;
 const Community = () => {
-  const [openPostDetail, setOpenPostDetail] = useState(false);
   const [openCreatePost, setOpenCreatePost] = useState(false);
   const [loadingCreate, setLoadingCreate] = useState(false);
   const [newPostValue, setNewPostValue] = useState('');
   // TODO: Implement infinite scroll and fetch more data and use setOffset
   const [offset] = useState(0);
-  const [questionDetail, setQuestionDetail] = useState({} as question);
-  // TODO: use answerDetail later
-  const [answerDetail, setAnswerDetail] = useState({});
   const user = auth.currentUser;
   const {
     data: questions,
@@ -66,24 +77,6 @@ const Community = () => {
       });
     }
   }, [error, notificationApi]);
-  // const postData = {
-  //   name: 'Phạm Hoài An',
-  //   avatar: 'images/avatar.jpg',
-  //   date: '13 tháng 3',
-  //   text: 'Hãy giúp mình sửa phát âm với!',
-  //   audio: 'someAudio.webm',
-  //   postImg: 'images/post.jpg',
-  // };
-
-  const showPostDetail = (data: question, answer: object) => {
-    setAnswerDetail(answer);
-    setQuestionDetail(data);
-    setOpenPostDetail(true);
-  };
-
-  const hidePostDetail = () => {
-    setOpenPostDetail(false);
-  };
 
   const showCreateModal = () => {
     setOpenCreatePost(true);
@@ -125,38 +118,17 @@ const Community = () => {
     return <Spin size="default" />;
   }
 
-  const postData = questions.questions.map(
-    (question: {
-      _id: string | null | undefined;
-      answers: [];
-      user: { display_name: string; photo_url: string };
-      created_at: string;
-      text: string;
-      audio_url: string;
-      image_url: string;
-    }) => {
-      const data = {
-        name: question.user.display_name,
-        avatar: question.user.photo_url,
-        date: question.created_at,
-        text: question.text,
-        audio: question.audio_url,
-        postImg: question.image_url,
-      };
-      return (
-        <Post
-          key={question._id}
-          postData={data}
-          comments={question.answers.length}
-          onClick={() => showPostDetail(data, question.answers)}
-          showComments
-        />
-      );
-    }
-  );
+  const postData = questions.questions.map((question: question) => {
+    return (
+      <Post
+        key={question._id}
+        postData={question}
+        comments={question.answers.length}
+      />
+    );
+  });
   return (
     <>
-      {console.log(answerDetail)}
       {contextHolder}
       <div className={styles.wrapper}>
         <Card
@@ -170,21 +142,10 @@ const Community = () => {
           >
             Tạo câu hỏi
           </button>
+
           {postData}
         </Card>
       </div>
-
-      <Modal
-        open={openPostDetail}
-        title=""
-        onCancel={hidePostDetail}
-        footer={[]}
-      >
-        <Post
-          postData={questionDetail}
-          comments={1}
-        />
-      </Modal>
 
       <Modal
         open={openCreatePost}
