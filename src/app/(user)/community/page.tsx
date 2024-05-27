@@ -10,6 +10,7 @@ import { AudioOutlined, PictureOutlined } from '@ant-design/icons';
 import useSWR from 'swr';
 import { User } from 'firebase/auth';
 import { auth } from '@/lib';
+//import InfiniteScroll from 'react-infinite-scroll-component';
 const { TextArea } = Input;
 interface FetchArgs {
   url: string;
@@ -92,11 +93,12 @@ const Community = () => {
     // create a post
     const data = new FormData();
     data.append('text', newPostValue);
+    console.log(data);
     await fetch(`/api/community`, {
       method: 'POST',
       headers: {
         authorization: `Bearer ${token}`,
-        contentType: 'multipart/form-data',
+        'Content-Type': 'multipart/form-data',
       },
       body: data,
     });
@@ -127,6 +129,7 @@ const Community = () => {
       />
     );
   });
+  // TODO: Inf scroll
   return (
     <>
       {contextHolder}
@@ -146,7 +149,6 @@ const Community = () => {
           {postData}
         </Card>
       </div>
-
       <Modal
         open={openCreatePost}
         title="Tạo câu hỏi"

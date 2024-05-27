@@ -23,14 +23,21 @@ interface Props {
 export default function PostAnswer({ answer }: Props) {
   const [clamp, setClamp] = useState(true);
   return (
-    <div className={styles['post-answer']}>
+    <div
+      className={clsx(
+        styles['post-answer'],
+        answer.is_excellent && styles.checked
+      )}
+    >
       <div className={styles['post-answer-metadata']}>
         <img
           className={styles.avatar}
           src={answer.user.photo_url}
         />
-        <p>{answer.user.display_name}</p>
-        <p>{new Date(answer.created_at).toUTCString()}</p>
+        <div className={styles['post-answer-name-date']}>
+          <p>{answer.user.display_name}</p>
+          <p>{new Date(answer.created_at).toUTCString()}</p>
+        </div>
       </div>
       <div
         className={clsx(styles['post-answer-info'], clamp && styles.clamping)}

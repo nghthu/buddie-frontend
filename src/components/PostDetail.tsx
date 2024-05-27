@@ -4,6 +4,7 @@ import TextCard from './TextCard';
 import { SoundOutlined } from '@ant-design/icons';
 import styles from '@/styles/components/Post.module.scss';
 import PostAnswer from './PostAnswer';
+import clsx from 'clsx';
 interface User {
   user_id: string;
   display_name: string;
@@ -55,7 +56,10 @@ const PostDetail = ({ postData }: Props) => {
           <TextCard
             width="100%"
             height="fit-content"
-            className={styles['post-text-card']}
+            className={clsx(
+              styles['post-text-card'],
+              styles['post-text-card-modal']
+            )}
           >
             <div className={styles['post-text']}>
               <p>{postData.text}</p>
