@@ -9,7 +9,6 @@ import BuddieSupport from '@/components/BuddieSupport';
 import { CloseChatContext } from '@/components/CloseChatContext';
 import { auth } from '@/lib';
 import { Spin } from 'antd';
-import { set } from 'lodash';
 
 type PartData =
   | {
@@ -315,8 +314,24 @@ export default function PracticePage({
 
             {chatVisible && (
               <div>
+                {/* 
+                  - hideChat(){setChatVisible(false);} 
+                  - requests: Array<{ avatar: user?.photoURL; request: 'Người dùng nhắn'; response: 'Buddie trả lời' }>
+                  - Thêm request vào chatRequests: 
+                  1. Tạo request
+                  2. Call API để lấy response
+                  3. setChatRequests để thêm request vào chatRequests
+                  - setRequests: props này để setChatRequests của nút dịch câu trả lời
+                  - isProcessing: props này để tắt nút dịch câu trả lời khi đang xử lý
+                  - setIsProcessing: props này để setIsChatProcessing(false) khi xử lý xong
+                 */}
                 <CloseChatContext.Provider value={hideChat}>
-                  <BuddieSupport requests={chatRequests} setRequests={setChatRequests} isProcessing={isChatProcessing} setIsProcessing={setIsChatProcessing}/>
+                  <BuddieSupport 
+                    requests={chatRequests} 
+                    setRequests={setChatRequests} 
+                    isProcessing={isChatProcessing} 
+                    setIsProcessing={setIsChatProcessing}>
+                  </BuddieSupport>
                 </CloseChatContext.Provider>
               </div>
             )}
