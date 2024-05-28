@@ -30,7 +30,9 @@ export async function POST(req: NextRequest) {
       `${process.env.API_BASE_URL}/api/v1/questions`,
       {
         method: 'POST',
-        headers: req.headers,
+        headers: {
+          authorization: req.headers.get('authorization') ?? '',
+        },
         body: formData,
       }
     );

@@ -98,7 +98,6 @@ const Community = () => {
       method: 'POST',
       headers: {
         authorization: `Bearer ${token}`,
-        'Content-Type': 'multipart/form-data',
       },
       body: data,
     });
