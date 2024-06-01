@@ -14,11 +14,10 @@ import { Checkbox } from 'antd';
 import type { CheckboxProps } from 'antd';
 import { auth } from '@/lib';
 import { User } from 'firebase/auth';
-import { Spin, notification } from 'antd';
-import * as FFmpeg from '@ffmpeg/ffmpeg';
-import { createFFmpeg } from '@ffmpeg/ffmpeg';
+import { Spin } from 'antd';
 import useSWR from 'swr';
 // import { createFFmpeg, fetchFile } from '@ffmpeg/ffmpeg';
+import { DoubleRightOutlined } from '@ant-design/icons';
 
 const mimeType: string = 'audio/webm';
 // const mimeType: string = 'audio/mpeg';
@@ -67,6 +66,7 @@ const PracticeSpeaking = ({
 }: {
   params: { id: string; part: string };
 }) => {
+  const [currentPart, setCurrentPart] = useState(0);
   const [permission, setPermission] = useState(false);
   const [stream, setStream] = useState<MediaStream | null>(null);
   const mediaRecorder = useRef<MediaRecorder | null>(null);
@@ -83,14 +83,23 @@ const PracticeSpeaking = ({
   // const [mp3audio, setMp3Audio] = useState<string | null>(null);
   const router = useRouter();
   const user = auth.currentUser;
+  let finalPart = 0;
 
-  const { data, isLoading, error } = useSWR(
+  const { data, isLoading } = useSWR(
     { url: `/api/tests/${params.id}`, user },
     fetcher
   );
 
+  finalPart = data?.parts.length - 1;
+
   if (data && testData === null) {
-    let dataOfTest = data.parts[Number(params.part) - 1].question_groups[0];
+    console.log(data);
+    let dataOfTest = data.parts[0].question_groups[0];
+    if (params.part !== 'all') {
+      dataOfTest = data.parts[Number(params.part) - 1].question_groups[0];
+    } else {
+      setCurrentPart(0);
+    }
     dataOfTest.questions.unshift({
       question_number: 0,
       question_type: 'mic test',
@@ -104,24 +113,24 @@ const PracticeSpeaking = ({
     setTestData(dataOfTest);
   }
 
-  async function convertWebmToMp3(webmBlob: Blob): Promise<Blob> {
-    const ffmpeg = createFFmpeg({ log: false });
-    await ffmpeg.load();
+  // async function convertWebmToMp3(webmBlob: Blob): Promise<Blob> {
+  //   const ffmpeg = createFFmpeg({ log: false });
+  //   await ffmpeg.load();
 
-    const inputName = 'input.webm';
-    const outputName = 'output.mp3';
+  //   const inputName = 'input.webm';
+  //   const outputName = 'output.mp3';
 
-    const arrayBuffer = await new Response(webmBlob).arrayBuffer();
+  //   const arrayBuffer = await new Response(webmBlob).arrayBuffer();
 
-    ffmpeg.FS('writeFile', inputName, new Uint8Array(arrayBuffer));
+  //   ffmpeg.FS('writeFile', inputName, new Uint8Array(arrayBuffer));
 
-    await ffmpeg.run('-i', inputName, outputName);
+  //   await ffmpeg.run('-i', inputName, outputName);
 
-    const outputData = ffmpeg.FS('readFile', outputName);
-    const outputBlob = new Blob([outputData.buffer], { type: 'audio/mp3' });
+  //   const outputData = ffmpeg.FS('readFile', outputName);
+  //   const outputBlob = new Blob([outputData.buffer], { type: 'audio/mp3' });
 
-    return outputBlob;
-  }
+  //   return outputBlob;
+  // }
 
   const startRecording = async (streamData: MediaStream) => {
     setRecordingStatus('recording');
@@ -217,23 +226,25 @@ const PracticeSpeaking = ({
       setInstruction(false);
     } else {
       if (currentAnswer && wantToSubmit) {
+        console.log('logcheck2');
         setAnswers((prevAnswers) => [...prevAnswers, currentAnswer]);
 
-        console.log('haha');
         // send test api
         const token = await user?.getIdToken();
 
-        const mp3Blob = await convertWebmToMp3(currentAnswer);
+        // const mp3Blob = await convertWebmToMp3(currentAnswer);
 
         const formData = new FormData();
 
-        formData.append('speaking_audio', mp3Blob, 'answer.mp3');
-        formData.append('speaking_part', '1');
-        formData.append('audio_type', 'mp3');
-        formData.append(
-          'question',
-          testData.questions[currentQuestion].question_prompt
-        );
+        // --------- start uncomment the following-------------------------------
+        // formData.append('speaking_audio', currentAnswer, 'answer.webm');
+        // formData.append('speaking_part', '1');
+        // formData.append('audio_type', 'mp3');
+        // formData.append(
+        //   'question',
+        //   testData.questions[currentQuestion].question_prompt
+        // );
+        //------------------end uncomment-------------------------------------------
 
         await fetch(`/api/ai/assess-speaking`, {
           method: 'POST',
@@ -243,12 +254,15 @@ const PracticeSpeaking = ({
           body: formData,
         });
       }
-      if (currentQuestion < testData.questions.length - 1) {
-        setCurrentQuestion((prevQuestion) => prevQuestion + 1);
-      } else if (currentQuestion === testData.questions.length - 1) {
-        // handle submit
-        console.log('submit');
-      }
+      // --------- start uncomment the following-------------------------------
+      // if (currentQuestion < testData.questions.length - 1) {
+      //   console.log('logcheck', currentQuestion);
+      //   setCurrentQuestion((prevQuestion) => prevQuestion + 1);
+      // } else if (currentQuestion === testData.questions.length - 1) {
+      //   // handle submit
+      //   console.log('submit');
+      // }
+      //------------------end uncomment-------------------------------------------
 
       setCurrentAnswer(null);
       setAudio(null);
@@ -256,11 +270,27 @@ const PracticeSpeaking = ({
     }
   };
 
+  const nextPartHandler = () => {
+    const nextPart = currentPart + 1;
+    setCurrentPart((prevPart) => prevPart + 1);
+    setTestData(data.parts[nextPart].question_groups[0]);
+    setCurrentQuestion(0);
+  };
+
   const setSubmitHandler: CheckboxProps['onChange'] = (e) => {
     setWantToSubmit(e.target.checked);
   };
 
+  const submitHandler = () => {
+    console.log(answers);
+  };
+
   if (isLoading) return <Spin size="large" />;
+
+  const isAllPart = params.part === 'all';
+  const isLastQuestionOfPart =
+    currentQuestion === (testData?.questions && testData.questions.length - 1);
+  const isFinalPart = currentPart === finalPart;
 
   return (
     <>
@@ -318,18 +348,32 @@ const PracticeSpeaking = ({
           <TextCard
             width="50%"
             height="170px"
+            className={styles.transcription}
           >
             {transcript}
           </TextCard>
           <div className={styles['action-btn']}>
             <Button onClick={() => router.push('/ielts')}>Thoát</Button>
-            <Button onClick={nextHandler}>
-              {currentQuestion !== 0 &&
-                currentQuestion !== testData?.questions.length - 1 &&
-                'Tiếp theo'}
-              {currentQuestion === 0 && 'Bắt đầu'}
-              {currentQuestion === testData?.questions.length - 1 && 'Kết thúc'}
-            </Button>
+
+            {currentQuestion === 0 &&
+              (!isAllPart || (isAllPart && currentPart === 0)) && (
+                <Button onClick={nextHandler}>Bắt đầu</Button>
+              )}
+
+            {currentQuestion !== 0 && !isLastQuestionOfPart && (
+              <Button onClick={nextHandler}>
+                <DoubleRightOutlined />
+              </Button>
+            )}
+
+            {isLastQuestionOfPart && isAllPart && (
+              <Button onClick={nextPartHandler}>Phần thi tiếp theo</Button>
+            )}
+
+            {isLastQuestionOfPart &&
+              (!isAllPart || (isAllPart && isFinalPart)) && (
+                <Button onClick={submitHandler}>Nộp bài</Button>
+              )}
           </div>
         </>
       )}
