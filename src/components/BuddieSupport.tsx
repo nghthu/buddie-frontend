@@ -4,20 +4,24 @@ import { auth } from '@/lib';
 
 const BuddieSupport = (props: {
   requests?: Array<{ request: string; avatar: string; response: string }>;
-  setRequests: (requests: Array<{ request: string; avatar: string; response: string }>) => void;
+  setRequests: (
+    requests: Array<{ request: string; avatar: string; response: string }>
+  ) => void;
   isProcessing?: boolean;
   setIsProcessing?: (isProcessing: boolean) => void;
+  width?: string;
+  height?: string;
 }) => {
   const user = auth.currentUser;
   const translateHandler = async (chatResponse: string) => {
     props.setIsProcessing && props.setIsProcessing(true);
-    let request = {
+    const request = {
       avatar: user?.photoURL || '',
       request: `Dịch câu trả lời trên`,
-      response: "Đang dịch... Đợi Buddie chút nhé!",
+      response: 'Đang dịch... Đợi Buddie chút nhé!',
     };
 
-    let newRequests = [...(props.requests || []), request];
+    const newRequests = [...(props.requests || []), request];
     props.setRequests(newRequests);
 
     const token = await user?.getIdToken();
@@ -44,8 +48,8 @@ const BuddieSupport = (props: {
 
   return (
     <Card
-      width="300px"
-      height="80vh"
+      width={props.width ?? '300px'}
+      height={props.height ?? '80vh'}
       showCloseButton
       backgroundColor="#ECEEF9"
       className={styles['chat-box']}
