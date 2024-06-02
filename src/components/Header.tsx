@@ -6,11 +6,12 @@ import type { MenuProps } from 'antd';
 import { Button, Dropdown, Space, notification } from 'antd';
 import clsx from 'clsx';
 import Link from 'next/link';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import type { User } from 'firebase/auth';
 import styles from '@/styles/components/Header.module.scss';
 import { auth } from '@/lib';
 import Image from 'next/image';
+import { usePathname } from 'next/navigation';
 
 interface Props {
   activatedTab: string;
@@ -22,6 +23,7 @@ const Header = (props: Props) => {
   const [activatedTab, setActiveTab] = useState(props.activatedTab);
   const [logout, logoutLoading, logoutError] = useSignOut(auth);
   const [notificationApi, contextHolder] = notification.useNotification();
+  const pathname = usePathname();
 
   const accountItems: MenuProps['items'] = [
     {
@@ -59,6 +61,18 @@ const Header = (props: Props) => {
     });
   }
 
+  useEffect(() => {
+    if (pathname.includes('/home')) {
+      setActiveTab('home');
+    } else if (pathname.includes('/tests')) {
+      setActiveTab('exams');
+    } else if (pathname.includes('/community')) {
+      setActiveTab('community');
+    } else if (pathname.includes('/ielts')) {
+      setActiveTab('ielts');
+    }
+  }, [pathname]);
+
   return (
     <>
       {contextHolder}
@@ -89,12 +103,18 @@ const Header = (props: Props) => {
               Trang chủ
             </p>
           </Link>
-          <Link href="/tests">
+          <Link
+            href="/tests"
+            onClick={() => tabClickHandler('exams')}
+          >
             <p className={clsx(activatedTab === 'exams' && styles.activate)}>
               Đề thi
             </p>
           </Link>
-          <Link href="/community">
+          <Link
+            href="/community"
+            onClick={() => tabClickHandler('community')}
+          >
             <p
               className={clsx(activatedTab === 'community' && styles.activate)}
             >

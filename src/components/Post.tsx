@@ -7,7 +7,7 @@ import clsx from 'clsx';
 
 interface Post {
   name: string;
-  avater: string;
+  avatar: string;
   date: string;
   text: string;
   audio: string;
