@@ -3,7 +3,7 @@
 // import { useAuthState } from 'react-firebase-hooks/auth';
 // import { auth } from '@/lib';
 import SkillHeader from '@/components/SkillHeader';
-import TestLibrary from '@/components/TestLibrary';
+import TestHistory from '@/components/TestHistory';
 import { useState } from 'react';
 
 const UserTestHistory = () => {
@@ -11,8 +11,8 @@ const UserTestHistory = () => {
   const [pageLoading, setPageLoading] = useState(false);
   return (
     <>
-      <SkillHeader title={'Đề thi IELTS'}></SkillHeader>
-      <TestLibrary
+      <SkillHeader title={'Đề Thi Đã Làm'}></SkillHeader>
+      <TestHistory
         pageLoading={pageLoading}
         setPageLoading={setPageLoading}
       />
