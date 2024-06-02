@@ -8,7 +8,7 @@ export const POST = async function sendAnswer(req: Request) {
     console.log(chalk.bgYellow('req'), formData.get('speaking_audio'));
 
     const response = await fetch(
-      `${process.env.API_BASE_URL}/api/v1/ai/assess-speaking`,
+      `${process.env.API_BASE_URL}/api/v1/ai/fake-assess-speaking`,
       {
         method: 'POST',
         headers: {

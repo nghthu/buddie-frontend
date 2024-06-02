@@ -8,11 +8,11 @@ import { Button, Modal } from 'antd';
 import { useEffect, useRef, useState } from 'react';
 import { AudioOutlined, PictureOutlined } from '@ant-design/icons';
 import { auth } from '@/lib';
-
+// import Link from 'next/link';
 const { TextArea } = Input;
 
 const Community = () => {
-  const [openPostDetail, setOpenPostDetail] = useState(false);
+  // const [openPostDetail, setOpenPostDetail] = useState(false);
   const [openCreatePost, setOpenCreatePost] = useState(false);
   const [loadingCreate, setLoadingCreate] = useState(false);
   const [canSubmit, setCanSubmit] = useState(false);
@@ -66,13 +66,13 @@ const Community = () => {
     }
   };
 
-  const showPostDetail = () => {
-    setOpenPostDetail(true);
-  };
+  // const showPostDetail = () => {
+  //   setOpenPostDetail(true);
+  // };
 
-  const hidePostDetail = () => {
-    setOpenPostDetail(false);
-  };
+  // const hidePostDetail = () => {
+  //   setOpenPostDetail(false);
+  // };
 
   const showCreateModal = () => {
     setOpenCreatePost(true);
@@ -83,16 +83,58 @@ const Community = () => {
   };
 
   const postData = {
-    name: 'Phạm Hoài An',
-    avatar: 'images/avatar.jpg',
-    date: '13 tháng 3',
-    text: 'Hãy giúp mình sửa phát âm với!',
-    audio: 'someAudio.webm',
-    postImg: 'images/post.jpg',
-  };
-
-  const comments = {
-    commentNumber: 2,
+    _id: '6647ab24dfa6bec4eda507e3',
+    user_id: 'gVIadC2MMucZ21qLJX4cY6rwCSc2',
+    text: 'Mọi người có mẹo nào để cải thiện phát âm tiếng Anh không?',
+    audio_path:
+      'question/question-6647ab24dfa6bec4eda507e3/audio-092b726a-8bcf-4f24-9c46-58f75b3e86ae.mp3',
+    image_path:
+      'question/question-6647ab24dfa6bec4eda507e3/image-13bf0661-c395-42f2-99b9-3bbc578caaa2.jpg',
+    created_at: '2024-05-17T19:08:23.072Z',
+    updated_at: '2024-05-19T07:19:27.400Z',
+    __v: 12,
+    answers: [
+      {
+        user_id: 'GQkcm8SDaIayaLjTUn5BX7KJbY33',
+        content: 'Noi dung 1',
+        is_excellent: false,
+        _id: '6649a7cd182a91d89115c3ff',
+        created_at: '2024-05-19T07:18:37.171Z',
+        updated_at: '2024-05-19T07:18:37.171Z',
+        __v: 0,
+        user: {
+          user_id: 'GQkcm8SDaIayaLjTUn5BX7KJbY33',
+          display_name: 'Cuoc song',
+          photo_url:
+            'https://firebasestorage.googleapis.com/v0/b/english-buddie.appspot.com/o/user-avatar%2Fdefault-avatar.png?alt=media&token=34656993-5083-4b8f-bf30-85f8b6ced9c3',
+        },
+      },
+      {
+        user_id: 'GQkcm8SDaIayaLjTUn5BX7KJbY33',
+        content: 'Noi dung 1',
+        is_excellent: true,
+        _id: '6649a7fe3571007d47100c12',
+        created_at: '2024-05-19T07:19:26.777Z',
+        updated_at: '2024-05-19T07:19:26.777Z',
+        __v: 0,
+        user: {
+          user_id: 'GQkcm8SDaIayaLjTUn5BX7KJbY33',
+          display_name: 'Cuoc song',
+          photo_url:
+            'https://firebasestorage.googleapis.com/v0/b/english-buddie.appspot.com/o/user-avatar%2Fdefault-avatar.png?alt=media&token=34656993-5083-4b8f-bf30-85f8b6ced9c3',
+        },
+      },
+    ],
+    user: {
+      user_id: 'gVIadC2MMucZ21qLJX4cY6rwCSc2',
+      display_name: 'Thùy Nguyễn Ngọc',
+      photo_url:
+        'https://lh3.googleusercontent.com/a/ACg8ocJxb1DnluqtQ6QdSoWFcoCVRegfYintRPqUJrdxVbSHSc5pNg=s96-c',
+    },
+    audio_url:
+      'https://firebasestorage.googleapis.com/v0/b/english-buddie.appspot.com/o/question%2Fquestion-6647ab24dfa6bec4eda507e3%2Faudio-092b726a-8bcf-4f24-9c46-58f75b3e86ae.mp3?alt=media&token=f4acdc8d-5ff4-41d8-944e-e26c83a76151',
+    image_url:
+      'https://firebasestorage.googleapis.com/v0/b/english-buddie.appspot.com/o/question%2Fquestion-6647ab24dfa6bec4eda507e3%2Fimage-13bf0661-c395-42f2-99b9-3bbc578caaa2.jpg?alt=media&token=e0f302f1-a28f-48c1-874a-ea6c431c6e75',
   };
 
   useEffect(() => {
@@ -113,25 +155,13 @@ const Community = () => {
         >
           Tạo câu hỏi
         </button>
+        {/* <Link href={`/community/6647ab24dfa6bec4eda507e3`}> */}
         <Post
           postData={postData}
-          comments={comments}
-          onClick={showPostDetail}
-          showComments
+          showDetail
         />
+        {/* </Link> */}
       </Card>
-      <Modal
-        open={openPostDetail}
-        title=""
-        onCancel={hidePostDetail}
-        footer={[]}
-      >
-        <Post
-          postData={postData}
-          comments={comments}
-          onClick={showPostDetail}
-        />
-      </Modal>
       <Modal
         open={openCreatePost}
         title="Tạo câu hỏi"

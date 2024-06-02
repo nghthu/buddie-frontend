@@ -194,7 +194,10 @@ const ListeningPractice = ({
 
   return (
     <>
-      <AudioPlayer audioUrl={data?.test_recording} />
+      <AudioPlayer
+        audioUrl={data?.test_recording}
+        disableStopButton
+      />
 
       <TextCard
         width="100%"

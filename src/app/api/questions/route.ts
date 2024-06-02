@@ -15,7 +15,6 @@ export const POST = async function createQuestion(req: Request) {
         body: formData,
       }
     );
-    console.log(chalk.bgRed('error'), response);
     const data = await response.json();
     console.log(chalk.bgCyan('Create Question Response:'), data.data);
     return NextResponse.json(data.data);

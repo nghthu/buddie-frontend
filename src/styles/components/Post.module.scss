@@ -10,6 +10,7 @@
     font-size: 13px;
   }
   margin-bottom: 30px;
+  color: black;
 }
 
 .avatar {
@@ -45,6 +46,14 @@
   width: 100px;
   height: 100px;
   object-fit: cover;
+}
+
+.detail-img {
+  margin: auto;
+  width: 200px;
+  height: 200px;
+  object-fit: cover;
+  display: block;
 }
 
 .answer {
