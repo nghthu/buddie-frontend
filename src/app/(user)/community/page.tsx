@@ -2,7 +2,7 @@
 
 import Card from '@/components/Card';
 import Post from '@/components/Post';
-import { Input, Spin, notification } from 'antd';
+import { Empty, Input, Spin, notification } from 'antd';
 import styles from '@/styles/pages/Community.module.scss';
 import { Button, Modal } from 'antd';
 import { useEffect, useState } from 'react';
@@ -10,6 +10,7 @@ import { AudioOutlined, PictureOutlined } from '@ant-design/icons';
 import useSWR from 'swr';
 import { User } from 'firebase/auth';
 import { auth } from '@/lib';
+import InfiniteScroll from 'react-infinite-scroll-component';
 //import InfiniteScroll from 'react-infinite-scroll-component';
 const { TextArea } = Input;
 interface FetchArgs {
@@ -53,13 +54,15 @@ const fetcher = async ({ url, user }: FetchArgs) => {
 
   return response.data;
 };
-const LIMIT = 10;
+const LIMIT = 6;
 const Community = () => {
   const [openCreatePost, setOpenCreatePost] = useState(false);
   const [loadingCreate, setLoadingCreate] = useState(false);
   const [newPostValue, setNewPostValue] = useState('');
+  const [offset, setOffset] = useState(0);
+  const [totalQuestions, setTotalQuestions] = useState([] as question[]);
+  const [hasMoreQuestions, setHasMoreQuestions] = useState(true);
   // TODO: Implement infinite scroll and fetch more data and use setOffset
-  const [offset] = useState(0);
   const user = auth.currentUser;
   const {
     data: questions,
@@ -70,6 +73,7 @@ const Community = () => {
     fetcher
   );
   const [notificationApi, contextHolder] = notification.useNotification();
+
   useEffect(() => {
     if (error) {
       notificationApi.error({
@@ -78,7 +82,24 @@ const Community = () => {
       });
     }
   }, [error, notificationApi]);
-
+  useEffect(() => {
+    if (questions) {
+      if (offset + LIMIT >= questions.pagination.total_count) {
+        setHasMoreQuestions(false);
+      } else {
+        setHasMoreQuestions(true);
+      }
+    }
+  }, [offset, questions]);
+  useEffect(() => {
+    if (questions) {
+      setTotalQuestions((prev) => [...prev, ...questions.questions]);
+    }
+  }, [questions]);
+  const handleLoadMoreComments = () => {
+    if (!questions) return;
+    setOffset((prev) => prev + LIMIT);
+  };
   const showCreateModal = () => {
     setOpenCreatePost(true);
   };
@@ -101,11 +122,6 @@ const Community = () => {
       },
       body: data,
     });
-    // reset fields
-    // setTimeout(() => {
-    //   setLoadingCreate(false);
-    //   setOpenCreatePost(false);
-    // }, 3000);
     setLoadingCreate(false);
     setNewPostValue('');
   };
@@ -119,7 +135,7 @@ const Community = () => {
     return <Spin size="default" />;
   }
 
-  const postData = questions.questions.map((question: question) => {
+  const postData = totalQuestions.map((question: question) => {
     return (
       <Post
         key={question._id}
@@ -128,6 +144,12 @@ const Community = () => {
       />
     );
   });
+  postData.push(
+    <Empty
+      description={<></>}
+      key="empty"
+    />
+  );
   // TODO: Inf scroll
   return (
     <>
@@ -144,8 +166,17 @@ const Community = () => {
           >
             Tạo câu hỏi
           </button>
-
-          {postData}
+          <InfiniteScroll
+            dataLength={postData.length}
+            next={() => {
+              handleLoadMoreComments();
+            }}
+            hasMore={hasMoreQuestions}
+            loader={<h4>Loading...</h4>}
+            scrollThreshold={1}
+          >
+            {postData}
+          </InfiniteScroll>
         </Card>
       </div>
       <Modal

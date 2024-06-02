@@ -106,7 +106,6 @@ export default function TestSelector(props: {
   const onSearch: SearchProps['onSearch'] = (value) => {
     // split the search value into an array of words, delimiter is space
     const searchWords = encodeURIComponent(value.trim());
-    console.log(searchWords);
     setSearchValue(searchWords);
   };
   const handleChange = (value: string) => {
@@ -119,7 +118,6 @@ export default function TestSelector(props: {
   if ((isLoading && filteredTests.length === 0) || props.pageLoading) {
     return <Spin size="default" />;
   }
-  console.log(rawTests);
   const testComponent = filteredTests.map(
     (test: {
       _id: string;

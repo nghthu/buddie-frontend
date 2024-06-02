@@ -16,8 +16,6 @@ export async function GET(request: NextRequest) {
     const encodedSearch = encodeURIComponent(search);
     queryString += `&keyword=${encodedSearch}`;
   }
-  //const queryString = `${process.env.API_BASE_URL}/api/v1/tests/661b5d4b0d4e11e6b2817f1b`;
-  //console.log(queryString);
 
   try {
     const response = await fetch(queryString, {

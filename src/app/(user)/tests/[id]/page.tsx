@@ -111,8 +111,6 @@ export default function TestLanding({ params }: { params: { id: string } }) {
   // });
   useEffect(() => {
     if (comments) {
-      console.log('comment pagination data=======>', comments.pagination);
-      console.log('comments ==========>', comments.test_comments);
       setComments((prev) => {
         const tempSet = new Set([...prev, ...comments.test_comments]);
         return Array.from(tempSet);
@@ -194,11 +192,9 @@ export default function TestLanding({ params }: { params: { id: string } }) {
         <div className={styles.commentInputWrapper}>
           <div className={styles.commentInput}>
             <img
-              src={
-                'https://fastly.picsum.photos/id/1/200/300.jpg?hmac=jH5bDkLr6Tgy3oAg5khKCHeunZMHq0ehBZr6vGifPLY'
-              }
+              src={user?.photoURL ?? ''}
               className={styles.avatar}
-              alt="avatar"
+              alt="Your avatar"
             />
             <div className={styles.inputAndSendBtn}>
               <TextArea

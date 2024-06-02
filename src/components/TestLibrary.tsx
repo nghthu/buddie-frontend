@@ -1,6 +1,6 @@
 'use client';
 
-import { Empty, Select, Spin, notification } from 'antd';
+import { Empty, Spin, notification } from 'antd';
 
 import { User } from 'firebase/auth';
 import { auth } from '@/lib';
@@ -46,10 +46,9 @@ export default function TestLibrary(props: {
   // const tests = useRef([]);
   const [filteredTests, setFilteredTests] = useState([]);
   const [searchValue, setSearchValue] = useState('');
-  const [selectedSkill, setSelectedSkill] = useState('');
   const scrollRef = useRef<HTMLDivElement>(null);
 
-  const apiUrl = `/api/tests?page=${totalPage}&test_type=${selectedSkill}&search=${searchValue}&isbuddie=false`;
+  const apiUrl = `/api/tests?page=${totalPage}&search=${searchValue}&isbuddie=false`;
   const user = auth.currentUser;
   const {
     data: rawTests,
@@ -69,7 +68,6 @@ export default function TestLibrary(props: {
   useEffect(() => {
     if (rawTests) {
       //tests.current = [...new Set([...tests.current, ...rawTests.tests])];
-      console.log(rawTests);
       setFilteredTests(rawTests.tests);
       // handleFilterTests();
       // setTests((prev) => [...prev, ...rawTests.tests]);
@@ -110,11 +108,7 @@ export default function TestLibrary(props: {
   const onSearch: SearchProps['onSearch'] = (value) => {
     // split the search value into an array of words, delimiter is space
     const searchWords = encodeURIComponent(value.trim());
-    console.log(searchWords);
     setSearchValue(searchWords);
-  };
-  const handleChange = (value: string) => {
-    setSelectedSkill(value);
   };
   // const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
   //     console.log([e.target.value]);
@@ -123,7 +117,6 @@ export default function TestLibrary(props: {
   if ((isLoading && filteredTests.length === 0) || props.pageLoading) {
     return <Spin size="default" />;
   }
-  console.log(rawTests);
   const testComponent = filteredTests.map(
     (test: {
       _id: string;
@@ -165,33 +158,6 @@ export default function TestLibrary(props: {
           placeholder="Nhập từ khóa cần tìm"
           onSearch={onSearch}
           style={{ width: 300 }}
-        />
-        <Select
-          defaultValue=""
-          options={[
-            {
-              value: '',
-              label: 'Tất cả bài thi',
-            },
-            {
-              value: 'ielts_listening',
-              label: 'Listening',
-            },
-            {
-              value: 'ielts_reading',
-              label: 'Reading',
-            },
-            {
-              value: 'ielts_writing',
-              label: 'Writing',
-            },
-            {
-              value: 'ielts_speaking',
-              label: 'Speaking',
-            },
-          ]}
-          style={{ width: 200 }}
-          onChange={handleChange}
         />
       </div>
       <div

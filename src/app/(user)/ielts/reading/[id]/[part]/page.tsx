@@ -343,8 +343,6 @@ export default function IeltsPart({
   };
 
   const temp_metaData = { ...tests };
-
-  console.log('answers: ', answers);
   delete temp_metaData['parts'];
   const metaData = temp_metaData;
   const jsonData = [];

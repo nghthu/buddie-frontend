@@ -1,4 +1,3 @@
-import chalk from 'chalk';
 import { NextRequest, NextResponse } from 'next/server';
 
 export async function GET(request: NextRequest) {
@@ -24,8 +23,6 @@ export async function GET(request: NextRequest) {
 export async function POST(req: NextRequest) {
   try {
     const formData = await req.formData();
-    // formdata.append('audio', fileInput.files[0], '[PROXY]');
-    // formdata.append('image', fileInput.files[0], '[PROXY]');
     const response = await fetch(
       `${process.env.API_BASE_URL}/api/v1/questions`,
       {
@@ -37,7 +34,6 @@ export async function POST(req: NextRequest) {
       }
     );
     const dataRes = await response.json();
-    console.log(chalk.bgCyan('Question submission response:'), dataRes);
     return NextResponse.json(dataRes);
   } catch (error) {
     console.error(error);
