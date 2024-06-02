@@ -10,17 +10,23 @@
   width: 100%;
   display: flex;
   justify-content: space-evenly;
-  & button:first-child {
-    background-color: #ed1b35;
+}
+
+.exit-btn {
+  background-color: #ed1b35;
+  border-color: #ed1b35 !important;
+  color: white;
+  &:hover {
+    background-color: #ed1b33b5 !important;
     border-color: #ed1b35 !important;
-    color: white;
-    &:hover {
-      background-color: #ed1b33b5 !important;
-      border-color: #ed1b35 !important;
-    }
   }
 }
 
 .question-prompt {
   white-space: pre-line;
+}
+
+.next-back-btn {
+  display: flex;
+  gap: 10px;
 }

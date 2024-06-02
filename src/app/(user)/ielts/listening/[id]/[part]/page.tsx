@@ -3,12 +3,23 @@
 import TextCard from '@/components/TextCard';
 import { Input, Radio, Button, Spin } from 'antd';
 import styles from '@/styles/pages/listening/Practice.module.scss';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import AudioPlayer from '@/components/AudioPlayer';
 import useSWR from 'swr';
 import { auth } from '@/lib';
 import { User } from 'firebase/auth';
+import { DoubleLeftOutlined, DoubleRightOutlined } from '@ant-design/icons';
+
+interface Part {
+  part_duration: number;
+  part_image_urls: string[];
+  part_number: number;
+  part_prompt: string;
+  part_recording: string;
+  _id: string;
+  question_groups: QuestionGroup[];
+}
 
 interface QuestionInfo {
   question_number: number;
@@ -18,6 +29,7 @@ interface QuestionInfo {
   question_duration: number;
   options: string[];
   answer: string;
+  _id: string;
 }
 
 interface QuestionGroupInfo {
@@ -31,6 +43,16 @@ interface QuestionGroup {
   is_single_question: boolean;
   question_groups_info: QuestionGroupInfo;
   questions: QuestionInfo[];
+  _id: string;
+}
+
+interface AnswerResult {
+  user_answer: string;
+}
+
+interface Answer {
+  _id: string;
+  answer_result: AnswerResult;
 }
 
 const fetcher = async ({ url, user }: { url: string; user: User | null }) => {
@@ -53,43 +75,119 @@ const ListeningPractice = ({
 }: {
   params: { id: string; part: string };
 }) => {
-  const [testData, setTestData] = useState<QuestionGroup | null>(null);
-  const [currentQuestion, setCurrentQuestion] = useState(0);
-  const [answers, setAnswers] = useState<string[] | null>(null);
+  const [testData, setTestData] = useState<QuestionGroup[] | null>(null);
+  const [answers, setAnswers] = useState<Answer[]>([]);
+  const [currentPart, setCurrentPart] = useState(0);
   const router = useRouter();
   const user = auth.currentUser;
 
-  const { data, isLoading, error } = useSWR(
+  let finalPart = 0;
+
+  const { data, isLoading } = useSWR(
     { url: `/api/tests/${params.id}`, user },
     fetcher
   );
+  finalPart = data?.parts.length - 1;
 
-  if (data && testData === null) {
-    setTestData(data.parts[Number(params.part) - 1].question_groups);
-    const questionGroups = data.parts[Number(params.part) - 1].question_groups;
+  useEffect(() => {
+    if (data && testData === null) {
+      if (params.part !== 'all') {
+        setTestData(data.parts[Number(params.part) - 1].question_groups);
+      } else {
+        setCurrentPart(0);
+        setTestData(data.parts[0].question_groups);
+      }
+    }
+  }, [data, testData, params.part]);
 
-    let initialAnswers: string[] = [];
+  const answerChangehandler = (questionId: string, userAnswer: string) => {
+    let answerFound = false;
 
-    questionGroups.forEach((questionGroup: QuestionGroup) => {
-      questionGroup.questions.forEach((question) => {
-        const index = question.question_number - 21;
-        initialAnswers[index] = '';
-      });
+    const updatedAnswers = answers.map((answer) => {
+      if (answer._id === questionId) {
+        answerFound = true;
+        return { ...answer, answer_result: { user_answer: userAnswer } };
+      }
+      return answer;
     });
 
-    // Set the initial answers
-    setAnswers(initialAnswers);
-  }
-
-  const aswerChangehandler = (questionNumber: number, userAnswer: string) => {
-    const newAnswers = answers ? [...answers] : [];
-    newAnswers[questionNumber - 1] = userAnswer;
-    setAnswers(newAnswers);
-    console.log(newAnswers);
+    if (!answerFound) {
+      updatedAnswers.push({
+        _id: questionId,
+        answer_result: { user_answer: userAnswer },
+      });
+    }
+    setAnswers(updatedAnswers);
   };
 
-  const submitHandler = () => {
-    console.log(answers);
+  const findAnswerById = (id: string) => {
+    const answer = answers.find((answer) => answer._id === id);
+    return answer ? answer.answer_result.user_answer : '';
+  };
+
+  const submitHandler = async () => {
+    const structuredAnswers = {
+      test_id: data._id,
+      parts: data.parts.map((part: Part) => ({
+        _id: part._id,
+        question_groups: part.question_groups.map(
+          (questionGroup: QuestionGroup) => ({
+            _id: questionGroup._id,
+            questions: questionGroup.questions.map((question) => {
+              const userAnswer = answers.find(
+                (answer) => answer._id === question._id
+              );
+              return {
+                _id: question._id,
+                answer_result: {
+                  user_answer: userAnswer
+                    ? userAnswer.answer_result.user_answer
+                    : '',
+                },
+              };
+            }),
+          })
+        ),
+      })),
+    };
+    let submittedAnswers;
+    if (params.part === 'all') {
+      submittedAnswers = structuredAnswers;
+    } else {
+      submittedAnswers = {
+        test_id: structuredAnswers.test_id,
+        parts: [structuredAnswers.parts[Number(params.part) - 1]],
+      };
+    }
+
+    const token = await user?.getIdToken();
+    console.log(submittedAnswers);
+
+    const response: Response = await fetch(`/api/test-submissions`, {
+      method: 'POST',
+      headers: {
+        authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(submittedAnswers),
+    });
+
+    const responseData = await response.json();
+    router.push(
+      `/result?testId=${params.id}&testSubmissionId=${responseData._id}&part=${params.part}`
+    );
+  };
+
+  const nextHandler = () => {
+    const nextPart = currentPart + 1;
+    setCurrentPart((prevPart) => prevPart + 1);
+    setTestData(data.parts[nextPart].question_groups);
+  };
+
+  const backHandler = () => {
+    const previousPart = currentPart - 1;
+    setCurrentPart((prevPart) => prevPart - 1);
+    setTestData(data.parts[previousPart].question_groups);
   };
 
   if (isLoading) return <Spin size="large" />;
@@ -132,21 +230,15 @@ const ListeningPractice = ({
                   <Input
                     placeholder="Nhập câu trả lời"
                     onChange={(e) =>
-                      aswerChangehandler(
-                        question.question_number,
-                        e.target.value
-                      )
+                      answerChangehandler(question._id, e.target.value)
                     }
                   />
                 ) : (
                   <Radio.Group
                     className={styles.answers}
-                    value={answers[question.question_number - 1]}
+                    value={findAnswerById(question._id)}
                     onChange={(e) =>
-                      aswerChangehandler(
-                        question.question_number,
-                        e.target.value
-                      )
+                      answerChangehandler(question._id, e.target.value)
                     }
                   >
                     {question.options.map((option, optionIndex) => (
@@ -166,8 +258,28 @@ const ListeningPractice = ({
       </TextCard>
 
       <div className={styles['action-btn']}>
-        <Button onClick={() => router.push('/ielts')}>Thoát</Button>
-        <Button onClick={submitHandler}>Kết thúc</Button>
+        <Button
+          className={styles['exit-btn']}
+          onClick={() => router.push('/ielts')}
+        >
+          Thoát
+        </Button>
+        <div className={styles['next-back-btn']}>
+          {currentPart !== 0 && params.part === 'all' && (
+            <Button onClick={backHandler}>
+              <DoubleLeftOutlined />
+            </Button>
+          )}
+          {currentPart !== finalPart && params.part === 'all' && (
+            <Button onClick={nextHandler}>
+              <DoubleRightOutlined />
+            </Button>
+          )}
+          {((currentPart === finalPart && params.part === 'all') ||
+            params.part !== 'all') && (
+            <Button onClick={submitHandler}>Nộp bài</Button>
+          )}
+        </div>
       </div>
     </>
   );
