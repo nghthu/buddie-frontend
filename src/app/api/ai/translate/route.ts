@@ -4,13 +4,12 @@ export const POST = async function paraphrase(req: Request) {
   try {
     const reqData = await req.json();
     const response = await fetch(
-      `${process.env.API_BASE_URL}/api/v1/ai/paraphrase-writing`,
+      `${process.env.API_BASE_URL}/api/v1/ai/translate`,
       {
         method: 'POST',
         headers: req.headers,
         body: JSON.stringify({
-          type: 'essay',
-          topic: reqData.topic,
+          target_lang: reqData.target_lang,
           content: reqData.content,
         }),
       }

@@ -68,7 +68,13 @@ const Home = () => {
       </div>
 
       <div className={styles.historyContainer}>
+        <div className={styles.headerContainer}>
         <h1> Kết quả luyện thi gần đây</h1>
+        <Link href={'/tests/history'}>
+          <p>Xem tất cả</p>
+        </Link>
+        </div>
+
         <div className={styles.resultContainer}>
           <div className={styles.result}>
             <h1>7h21p</h1>
