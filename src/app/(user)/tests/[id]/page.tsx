@@ -59,6 +59,7 @@ export default function TestLanding({ params }: { params: { id: string } }) {
   // TODO: Implement infinite scroll and fetch more data and use setTotalPage
   const [totalPage] = useState(1);
   const [totalComments, setComments] = useState([] as comment[]);
+  const [comment, setComment] = useState('');
   const scrollRef = useRef<HTMLDivElement>(null);
   const user = auth.currentUser;
   const {
@@ -120,6 +121,7 @@ export default function TestLanding({ params }: { params: { id: string } }) {
   if (isLoading) {
     return <Spin size="large" />;
   }
+
   const commentSection = totalComments.map((comment) => (
     <Comment
       key={comment._id}
@@ -132,6 +134,7 @@ export default function TestLanding({ params }: { params: { id: string } }) {
       content={comment.comment}
     />
   ));
+
   commentSection.push(
     <Comment
       key={'acssasdsad'}
@@ -144,6 +147,7 @@ export default function TestLanding({ params }: { params: { id: string } }) {
       }
     />
   );
+
   commentSection.push(
     <Comment
       key={'acssasdsad2'}
@@ -156,10 +160,31 @@ export default function TestLanding({ params }: { params: { id: string } }) {
       }
     />
   );
+
   const parts =
     test?.parts.map((part: { part_duration: number }, index: number) => {
       return { index: index + 1, time: part.part_duration };
     }) || [];
+
+  const handleInput = async () => {
+    const token = await user?.getIdToken();
+
+    const response = await fetch(`/api/comment/${params.id}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({
+        test_id: params.id,
+        comment: comment,
+      }),
+    });
+    setComment('');
+    const data = await response.json();
+    return data;
+  };
+
   return (
     <div className={styles.pageWrapper}>
       {contextHolder}
@@ -201,6 +226,13 @@ export default function TestLanding({ params }: { params: { id: string } }) {
                 placeholder="Viết comment"
                 className={styles.inputComment}
                 autoSize
+                onChange={(e) => {
+                  setComment(e.currentTarget.value);
+                }}
+                onPressEnter={() => {
+                  handleInput();
+                }}
+                defaultValue={comment}
               />
               <Button
                 type="primary"

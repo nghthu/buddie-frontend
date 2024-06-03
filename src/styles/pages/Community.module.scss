@@ -14,7 +14,7 @@
   border-radius: 7px;
   color: white;
   font-weight: bold;
-  margin-left: auto;
+  margin-left:auto;
   display: block;
   &:hover {
     cursor: pointer;
@@ -25,4 +25,13 @@
   display: flex;
   margin-left: auto;
   width: fit-content;
+}
+
+.searchAndCreate {
+  display:flex;
+  align-items: center;
+  margin-bottom:2rem;
+}
+.search {
+  width: 50%;
 }

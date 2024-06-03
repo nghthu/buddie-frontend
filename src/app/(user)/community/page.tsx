@@ -11,6 +11,8 @@ import useSWR from 'swr';
 import { User } from 'firebase/auth';
 import { auth } from '@/lib';
 import InfiniteScroll from 'react-infinite-scroll-component';
+import type { SearchProps } from 'antd/es/input/Search';
+
 //import InfiniteScroll from 'react-infinite-scroll-component';
 const { TextArea } = Input;
 interface FetchArgs {
@@ -55,6 +57,7 @@ const fetcher = async ({ url, user }: FetchArgs) => {
   return response.data;
 };
 const LIMIT = 6;
+const { Search } = Input;
 const Community = () => {
   const [openCreatePost, setOpenCreatePost] = useState(false);
   const [loadingCreate, setLoadingCreate] = useState(false);
@@ -62,6 +65,7 @@ const Community = () => {
   const [offset, setOffset] = useState(0);
   const [totalQuestions, setTotalQuestions] = useState([] as question[]);
   const [hasMoreQuestions, setHasMoreQuestions] = useState(true);
+  const [search, setSearch] = useState('');
   // TODO: Implement infinite scroll and fetch more data and use setOffset
   const user = auth.currentUser;
   const {
@@ -69,7 +73,10 @@ const Community = () => {
     error,
     isLoading,
   } = useSWR(
-    { url: `/api/community?offset=${offset}&limit=${LIMIT}`, user },
+    {
+      url: `/api/community?offset=${offset}&limit=${LIMIT}&text=${search}`,
+      user,
+    },
     fetcher
   );
   const [notificationApi, contextHolder] = notification.useNotification();
@@ -135,6 +142,13 @@ const Community = () => {
     return <Spin size="default" />;
   }
 
+  const onSearch: SearchProps['onSearch'] = (value) => {
+    // split the search value into an array of words, delimiter is space
+    const searchWords = encodeURIComponent(value.trim());
+    setSearch(searchWords);
+    setTotalQuestions([]);
+  };
+
   const postData = totalQuestions.map((question: question) => {
     return (
       <Post
@@ -144,12 +158,15 @@ const Community = () => {
       />
     );
   });
-  postData.push(
-    <Empty
-      description={<></>}
-      key="empty"
-    />
-  );
+  hasMoreQuestions
+    ? postData.push(
+        <Empty
+          description={<></>}
+          key="empty"
+          style={{ height: '200px' }}
+        />
+      )
+    : null;
   // TODO: Inf scroll
   return (
     <>
@@ -160,12 +177,21 @@ const Community = () => {
           height="fit-content"
           className={styles.container}
         >
-          <button
-            className={styles['create-question-btn']}
-            onClick={showCreateModal}
-          >
-            Tạo câu hỏi
-          </button>
+          <div className={styles.searchAndCreate}>
+            <div className={styles.search}>
+              <Search
+                placeholder="Nhập từ khóa cần tìm"
+                onSearch={onSearch}
+                style={{ width: 300 }}
+              />
+            </div>
+            <button
+              className={styles['create-question-btn']}
+              onClick={showCreateModal}
+            >
+              Tạo câu hỏi
+            </button>
+          </div>
           <InfiniteScroll
             dataLength={postData.length}
             next={() => {

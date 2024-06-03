@@ -22,3 +22,28 @@ export async function GET(
     return NextResponse.json({ error });
   }
 }
+
+export async function POST(req: NextRequest) {
+  try {
+    const reqBody = await req.json();
+    console.log(reqBody);
+    const response = await fetch(
+      `${process.env.API_BASE_URL}/api/v1/test-comments`,
+      {
+        method: 'POST',
+        headers: {
+          authorization: req.headers.get('authorization') ?? '',
+        },
+        body: JSON.stringify({
+          test_id: reqBody.test_id,
+          comment: reqBody.comment,
+        }),
+      }
+    );
+    const dataRes = await response.json();
+    return NextResponse.json(dataRes);
+  } catch (error) {
+    console.error(error);
+    return NextResponse.json({ error });
+  }
+}
