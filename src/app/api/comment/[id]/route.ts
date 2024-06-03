@@ -26,12 +26,13 @@ export async function GET(
 export async function POST(req: NextRequest) {
   try {
     const reqBody = await req.json();
-    console.log(reqBody);
+
     const response = await fetch(
       `${process.env.API_BASE_URL}/api/v1/test-comments`,
       {
         method: 'POST',
         headers: {
+          'Content-Type': 'application/json',
           authorization: req.headers.get('authorization') ?? '',
         },
         body: JSON.stringify({
@@ -41,6 +42,7 @@ export async function POST(req: NextRequest) {
       }
     );
     const dataRes = await response.json();
+
     return NextResponse.json(dataRes);
   } catch (error) {
     console.error(error);

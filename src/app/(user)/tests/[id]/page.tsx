@@ -166,7 +166,7 @@ export default function TestLanding({ params }: { params: { id: string } }) {
       return { index: index + 1, time: part.part_duration };
     }) || [];
 
-  const handleInput = async () => {
+  const handleSendComment = async () => {
     const token = await user?.getIdToken();
 
     const response = await fetch(`/api/comment/${params.id}`, {
@@ -226,19 +226,17 @@ export default function TestLanding({ params }: { params: { id: string } }) {
                 placeholder="Viết comment"
                 className={styles.inputComment}
                 autoSize
+                value={comment}
                 onChange={(e) => {
                   setComment(e.currentTarget.value);
                 }}
-                onPressEnter={() => {
-                  handleInput();
-                }}
-                defaultValue={comment}
               />
               <Button
                 type="primary"
                 shape="circle"
                 icon={<SendOutlined />}
                 size="large"
+                onClick={handleSendComment}
               />
             </div>
           </div>
