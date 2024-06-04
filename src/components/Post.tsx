@@ -9,7 +9,7 @@ import Answer from './Answer';
 import { auth } from '@/lib';
 import { useEffect, useState } from 'react';
 
-interface Answer {
+interface UserAnswer {
   user_id: string;
   content: string;
   is_excellent: boolean;
@@ -32,7 +32,7 @@ interface Post {
   _id: string;
   user_id: string;
   text: string;
-  answers: Answer[];
+  answers: UserAnswer[];
   user: User;
   image_url: string;
   audio_url: string;
