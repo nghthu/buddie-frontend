@@ -2,6 +2,8 @@ import styles from '@/styles/components/Answer.module.scss';
 import TextCard from './TextCard';
 import clsx from 'clsx';
 import { StarOutlined } from '@ant-design/icons';
+import { auth } from '@/lib';
+import { useState } from 'react';
 
 interface Answer {
   user_id: string;
@@ -18,6 +20,8 @@ interface Answer {
 
 interface Props {
   data: Answer;
+  questionId: string;
+  canSetExcellent?: boolean;
 }
 
 const formatDate = (timestamp: string): string => {
@@ -28,8 +32,29 @@ const formatDate = (timestamp: string): string => {
   return `${day}/${month}/${year}`;
 };
 
-const Answer = ({ data }: Props) => {
+const Answer = ({ data, questionId, canSetExcellent }: Props) => {
   const formattedCreateDate = formatDate(data.created_at);
+  const user = auth.currentUser;
+  const [isExcellentAnswer, setIsExcellentAnswer] = useState(data.is_excellent);
+  const [canAwardExcellent, setCanAwardExcellent] = useState(canSetExcellent);
+
+  const setExcellentAnswerHandler = async () => {
+    const token = user?.getIdToken();
+
+    await fetch(`/api/questions/${questionId}`, {
+      method: 'PUT',
+      headers: {
+        authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({
+        is_excellent: true,
+        _id: data._id,
+      }),
+    });
+
+    setIsExcellentAnswer(true);
+    setCanAwardExcellent(false);
+  };
 
   return (
     <>
@@ -43,7 +68,7 @@ const Answer = ({ data }: Props) => {
             <p>{data.user.display_name}</p>
             <p>{formattedCreateDate}</p>
           </div>
-          {data.is_excellent && (
+          {isExcellentAnswer && (
             <div className={styles['yellow-card']}>
               <StarOutlined />
               &nbsp;Câu trả lời nổi bật
@@ -54,11 +79,14 @@ const Answer = ({ data }: Props) => {
             height="fit-content"
             className={clsx(
               styles['post-text-card'],
-              data.is_excellent ? styles.excellent : ''
+              isExcellentAnswer ? styles.excellent : ''
             )}
           >
             <div className={styles['post-text']}>
               <p>{data.content}</p>
+              {canAwardExcellent && (
+                <StarOutlined onClick={setExcellentAnswerHandler} />
+              )}
             </div>
           </TextCard>
         </div>

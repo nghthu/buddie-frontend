@@ -6,6 +6,8 @@ import styles from '@/styles/components/Post.module.scss';
 import clsx from 'clsx';
 import AudioPlayer from './AudioPlayer';
 import Answer from './Answer';
+import { auth } from '@/lib';
+import { useEffect, useState } from 'react';
 
 interface Answer {
   user_id: string;
@@ -53,6 +55,22 @@ const formatDate = (timestamp: string): string => {
 
 const Post = ({ postData, showDetail }: Props) => {
   const formattedCreateDate = formatDate(postData.created_at);
+  const user = auth.currentUser;
+  const [canSetExcellent, setCanSetExcellent] = useState(false);
+
+  useEffect(() => {
+    let hasExcellentAnswer = false;
+    if (postData.answers) {
+      postData.answers.forEach((answer) => {
+        if (answer.is_excellent) {
+          hasExcellentAnswer = true;
+        }
+      });
+    }
+    if (user?.uid === postData.user_id && !hasExcellentAnswer) {
+      setCanSetExcellent(true);
+    }
+  }, [user, postData]);
 
   return (
     <>
@@ -105,6 +123,8 @@ const Post = ({ postData, showDetail }: Props) => {
           <Answer
             key={answer._id}
             data={answer}
+            questionId={postData._id}
+            canSetExcellent={canSetExcellent}
           />
         ))}
       </div>
