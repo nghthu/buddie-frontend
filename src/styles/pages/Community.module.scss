@@ -2,7 +2,11 @@
   padding: 20px;
   margin: auto;
 }
-
+.wrapper {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
 .create-question-btn {
   background-color: #6b5d86;
   border: none;
@@ -26,4 +30,22 @@
 
 .file-input {
   display: none;
+}
+
+.searchAndCreate {
+  display: flex;
+  align-items: center;
+  margin-bottom: 2rem;
+}
+.search {
+  width: 50%;
+}
+
+.searchAndCreate {
+  display:flex;
+  align-items: center;
+  margin-bottom:2rem;
+}
+.search {
+  width: 50%;
 }

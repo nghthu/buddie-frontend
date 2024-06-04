@@ -19,8 +19,13 @@ export default function PartSelector({
             key={index}
           >
             <div className={styles.items}>
+              <img
+                src="/images/test.svg"
+                alt="Google"
+                className={styles.testIcon}
+              />
               <div>Phần {p.index}</div>
-              <div>Thời gian: {p.time} phút</div>
+              <div>Thời gian: {Number(p.time) / 60 || 0} phút</div>
             </div>
           </Link>
         ))}

@@ -19,7 +19,7 @@
   "rules": {
     "react/jsx-no-target-blank": "off",
     "react/react-in-jsx-scope": "off",
-    "prettier/prettier": ["error"],
+    "prettier/prettier": ["error", { "endOfLine": "auto" }],
     "require-jsdoc": "off"
   },
   "root": true

@@ -6,7 +6,7 @@ interface MenuProps {
   onMenuItemClick: (message: string) => void;
 }
 
-const WritingFunctionMenu = ({
+const ReadingFunctionMenu: React.FC<MenuProps> = ({
   visible,
   position,
   onMenuItemClick,
@@ -31,4 +31,4 @@ const WritingFunctionMenu = ({
   );
 };
 
-export default WritingFunctionMenu;
+export default ReadingFunctionMenu;

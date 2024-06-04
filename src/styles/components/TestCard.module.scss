@@ -4,7 +4,7 @@
   display: flex;
   flex-direction: column;
   width: 210px;
-  height: 240px;
+  max-height: 280px;
   gap: 0.8rem;
   padding: 2rem;
   align-items: center;
@@ -72,4 +72,9 @@
 }
 .header {
   font-weight: 500;
+  line-clamp: 2;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
 }

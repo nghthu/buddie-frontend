@@ -6,9 +6,6 @@ import { auth } from '@/lib';
 import { Spin } from 'antd';
 
 export default function ResultPage() {
-  const [resultData, setResultData] = useState<
-    Array<{ topic: string; content: string }>
-  >([]);
   const user = auth.currentUser;
   const [isLoading, setIsLoading] = useState(true);
 
@@ -54,13 +51,6 @@ export default function ResultPage() {
     undefined
   );
 
-  // useEffect(() => {
-  //   const storedResultData = localStorage.getItem('resultData');
-  //   if (storedResultData) {
-  //     setResultData(JSON.parse(storedResultData));
-  //   }
-  // }, []);
-
   const callAssessAPI = async (topic: string, content: string) => {
     const token = await user?.getIdToken();
     const response = await fetch('/api/ai/assess-writing/', {
@@ -86,7 +76,6 @@ export default function ResultPage() {
       let parsedResultData = [];
       if (storedResultData) {
         parsedResultData = JSON.parse(storedResultData);
-        setResultData(parsedResultData);
       }
 
       if (parsedResultData[0]) {

@@ -11,20 +11,27 @@ import TestDetails from '@/components/TestDetails';
 import PartSelector from '@/components/PartSelector';
 import Comment from '@/components/Comment';
 import { SendOutlined } from '@ant-design/icons';
-interface test_answer {
+// interface test_answer {
+//   test_id: string;
+//   parts: {
+//     _id: string;
+//     question_groups: {
+//       _id: string;
+//       questions: {
+//         _id: string;
+//         answer_result: {
+//           user_answer: string | string[];
+//         };
+//       }[];
+//     }[];
+//   }[];
+// }
+interface comment {
+  _id: string;
   test_id: string;
-  parts: {
-    _id: string;
-    question_groups: {
-      _id: string;
-      questions: {
-        _id: string;
-        answer_result: {
-          user_answer: string | string[];
-        };
-      }[];
-    }[];
-  }[];
+  user_id: string;
+  comment: string;
+  created_at: string;
 }
 interface FetchArgs {
   url: string;
@@ -33,7 +40,6 @@ interface FetchArgs {
 
 const fetcher = async ({ url, user }: FetchArgs) => {
   const token = await user?.getIdToken();
-  console.log(token);
   const response = await fetch(url, {
     headers: {
       authorization: `Bearer ${token}`,
@@ -50,8 +56,10 @@ const fetcher = async ({ url, user }: FetchArgs) => {
 const { TextArea } = Input;
 
 export default function TestLanding({ params }: { params: { id: string } }) {
-  const [totalPage, setTotalPage] = useState(1);
-  const [totalComments, setComments] = useState([] as any[]);
+  // TODO: Implement infinite scroll and fetch more data and use setTotalPage
+  const [totalPage] = useState(1);
+  const [totalComments, setComments] = useState([] as comment[]);
+  const [comment, setComment] = useState('');
   const scrollRef = useRef<HTMLDivElement>(null);
   const user = auth.currentUser;
   const {
@@ -75,10 +83,16 @@ export default function TestLanding({ params }: { params: { id: string } }) {
         description: error?.message,
       });
     }
-  }, [error, notificationApi]);
-  const handleLoad = () => {
-    setTotalPage((prev) => prev + 1);
-  };
+    if (errorComment) {
+      notificationApi.error({
+        message: 'Error',
+        description: errorComment?.message,
+      });
+    }
+  }, [error, errorComment, notificationApi]);
+  // const handleLoad = () => {
+  //   setTotalPage((prev) => prev + 1);
+  // };
   // TODO: use react inf scroll
   // useEffect(() => {
   //     const scrollElement = scrollRef.current;
@@ -107,6 +121,7 @@ export default function TestLanding({ params }: { params: { id: string } }) {
   if (isLoading) {
     return <Spin size="large" />;
   }
+
   const commentSection = totalComments.map((comment) => (
     <Comment
       key={comment._id}
@@ -119,6 +134,7 @@ export default function TestLanding({ params }: { params: { id: string } }) {
       content={comment.comment}
     />
   ));
+
   commentSection.push(
     <Comment
       key={'acssasdsad'}
@@ -131,9 +147,10 @@ export default function TestLanding({ params }: { params: { id: string } }) {
       }
     />
   );
+
   commentSection.push(
     <Comment
-      key={'acssasdsad'}
+      key={'acssasdsad2'}
       id={'as'}
       userName={'lorem Ipsum'}
       userPhotoURL="https://fastly.picsum.photos/id/1/200/300.jpg?hmac=jH5bDkLr6Tgy3oAg5khKCHeunZMHq0ehBZr6vGifPLY"
@@ -143,10 +160,31 @@ export default function TestLanding({ params }: { params: { id: string } }) {
       }
     />
   );
+
   const parts =
     test?.parts.map((part: { part_duration: number }, index: number) => {
       return { index: index + 1, time: part.part_duration };
     }) || [];
+
+  const handleSendComment = async () => {
+    const token = await user?.getIdToken();
+
+    const response = await fetch(`/api/comment/${params.id}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({
+        test_id: params.id,
+        comment: comment,
+      }),
+    });
+    setComment('');
+    const data = await response.json();
+    return data;
+  };
+
   return (
     <div className={styles.pageWrapper}>
       {contextHolder}
@@ -179,23 +217,26 @@ export default function TestLanding({ params }: { params: { id: string } }) {
         <div className={styles.commentInputWrapper}>
           <div className={styles.commentInput}>
             <img
-              src={
-                'https://fastly.picsum.photos/id/1/200/300.jpg?hmac=jH5bDkLr6Tgy3oAg5khKCHeunZMHq0ehBZr6vGifPLY'
-              }
+              src={user?.photoURL ?? ''}
               className={styles.avatar}
-              alt="avatar"
+              alt="Your avatar"
             />
             <div className={styles.inputAndSendBtn}>
               <TextArea
                 placeholder="Viết comment"
                 className={styles.inputComment}
                 autoSize
+                value={comment}
+                onChange={(e) => {
+                  setComment(e.currentTarget.value);
+                }}
               />
               <Button
                 type="primary"
                 shape="circle"
                 icon={<SendOutlined />}
                 size="large"
+                onClick={handleSendComment}
               />
             </div>
           </div>

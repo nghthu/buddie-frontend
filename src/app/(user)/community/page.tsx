@@ -2,27 +2,124 @@
 
 import Card from '@/components/Card';
 import Post from '@/components/Post';
-import { Input } from 'antd';
+import { Empty, Input, Spin, notification } from 'antd';
 import styles from '@/styles/pages/Community.module.scss';
 import { Button, Modal } from 'antd';
 import { useEffect, useRef, useState } from 'react';
 import { AudioOutlined, PictureOutlined } from '@ant-design/icons';
+import useSWR from 'swr';
+import { User } from 'firebase/auth';
 import { auth } from '@/lib';
-// import Link from 'next/link';
-const { TextArea } = Input;
+import InfiniteScroll from 'react-infinite-scroll-component';
+import type { SearchProps } from 'antd/es/input/Search';
 
+//import InfiniteScroll from 'react-infinite-scroll-component';
+const { TextArea } = Input;
+interface FetchArgs {
+  url: string;
+  user: User | null;
+}
+interface questionUser {
+  user_id: string;
+  display_name: string;
+  photo_url: string;
+}
+interface PostAnswer {
+  content: string;
+  is_excellent: boolean;
+  _id: string;
+  created_at: string;
+  user: questionUser;
+}
+interface question {
+  _id: string;
+  text: string;
+  created_at: string;
+  updated_at: string;
+  __v: string;
+  answers: PostAnswer[];
+  user: questionUser;
+  audio_url: string;
+  image_url: string;
+}
+const fetcher = async ({ url, user }: FetchArgs) => {
+  const token = await user?.getIdToken();
+  const response = await fetch(url, {
+    headers: {
+      authorization: `Bearer ${token}`,
+    },
+  }).then((res) => res.json());
+
+  if (response.status === 'error') {
+    throw new Error(response.error.message);
+  }
+
+  return response.data;
+};
+const LIMIT = 6;
+const { Search } = Input;
 const Community = () => {
-  // const [openPostDetail, setOpenPostDetail] = useState(false);
   const [openCreatePost, setOpenCreatePost] = useState(false);
   const [loadingCreate, setLoadingCreate] = useState(false);
   const [canSubmit, setCanSubmit] = useState(false);
   const [newPostValue, setNewPostValue] = useState('');
+  const [offset, setOffset] = useState(0);
+  const [totalQuestions, setTotalQuestions] = useState([] as question[]);
+  const [hasMoreQuestions, setHasMoreQuestions] = useState(true);
+  const [search, setSearch] = useState('');
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [selectedAudioFile, setSelectedAudioFile] = useState<File | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const audioFileInputRef = useRef<HTMLInputElement>(null);
 
+  // TODO: Implement infinite scroll and fetch more data and use setOffset
   const user = auth.currentUser;
+  const {
+    data: questions,
+    error,
+    isLoading,
+  } = useSWR(
+    {
+      url: `/api/community?offset=${offset}&limit=${LIMIT}&text=${search}`,
+      user,
+    },
+    fetcher
+  );
+  const [notificationApi, contextHolder] = notification.useNotification();
+
+  useEffect(() => {
+    if (error) {
+      notificationApi.error({
+        message: 'Error',
+        description: error?.message,
+      });
+    }
+  }, [error, notificationApi]);
+
+  useEffect(() => {
+    if (questions) {
+      if (offset + LIMIT >= questions.pagination.total_count) {
+        setHasMoreQuestions(false);
+      } else {
+        setHasMoreQuestions(true);
+      }
+    }
+  }, [offset, questions]);
+
+  useEffect(() => {
+    if (questions) {
+      setTotalQuestions((prev) => [...prev, ...questions.questions]);
+    }
+  }, [questions]);
+  const handleLoadMoreComments = () => {
+    if (!questions) return;
+    setOffset((prev) => prev + LIMIT);
+  };
+
+  useEffect(() => {
+    if (newPostValue !== '') setCanSubmit(true);
+    else setCanSubmit(false);
+  }, [newPostValue]);
 
   const handleCreatePost = async () => {
     setLoadingCreate(true);
@@ -66,14 +163,6 @@ const Community = () => {
     }
   };
 
-  // const showPostDetail = () => {
-  //   setOpenPostDetail(true);
-  // };
-
-  // const hidePostDetail = () => {
-  //   setOpenPostDetail(false);
-  // };
-
   const showCreateModal = () => {
     setOpenCreatePost(true);
   };
@@ -82,86 +171,74 @@ const Community = () => {
     setOpenCreatePost(false);
   };
 
-  const postData = {
-    _id: '6647ab24dfa6bec4eda507e3',
-    user_id: 'gVIadC2MMucZ21qLJX4cY6rwCSc2',
-    text: 'Mọi người có mẹo nào để cải thiện phát âm tiếng Anh không?',
-    audio_path:
-      'question/question-6647ab24dfa6bec4eda507e3/audio-092b726a-8bcf-4f24-9c46-58f75b3e86ae.mp3',
-    image_path:
-      'question/question-6647ab24dfa6bec4eda507e3/image-13bf0661-c395-42f2-99b9-3bbc578caaa2.jpg',
-    created_at: '2024-05-17T19:08:23.072Z',
-    updated_at: '2024-05-19T07:19:27.400Z',
-    __v: 12,
-    answers: [
-      {
-        user_id: 'GQkcm8SDaIayaLjTUn5BX7KJbY33',
-        content: 'Noi dung 1',
-        is_excellent: false,
-        _id: '6649a7cd182a91d89115c3ff',
-        created_at: '2024-05-19T07:18:37.171Z',
-        updated_at: '2024-05-19T07:18:37.171Z',
-        __v: 0,
-        user: {
-          user_id: 'GQkcm8SDaIayaLjTUn5BX7KJbY33',
-          display_name: 'Cuoc song',
-          photo_url:
-            'https://firebasestorage.googleapis.com/v0/b/english-buddie.appspot.com/o/user-avatar%2Fdefault-avatar.png?alt=media&token=34656993-5083-4b8f-bf30-85f8b6ced9c3',
-        },
-      },
-      {
-        user_id: 'GQkcm8SDaIayaLjTUn5BX7KJbY33',
-        content: 'Noi dung 1',
-        is_excellent: true,
-        _id: '6649a7fe3571007d47100c12',
-        created_at: '2024-05-19T07:19:26.777Z',
-        updated_at: '2024-05-19T07:19:26.777Z',
-        __v: 0,
-        user: {
-          user_id: 'GQkcm8SDaIayaLjTUn5BX7KJbY33',
-          display_name: 'Cuoc song',
-          photo_url:
-            'https://firebasestorage.googleapis.com/v0/b/english-buddie.appspot.com/o/user-avatar%2Fdefault-avatar.png?alt=media&token=34656993-5083-4b8f-bf30-85f8b6ced9c3',
-        },
-      },
-    ],
-    user: {
-      user_id: 'gVIadC2MMucZ21qLJX4cY6rwCSc2',
-      display_name: 'Thùy Nguyễn Ngọc',
-      photo_url:
-        'https://lh3.googleusercontent.com/a/ACg8ocJxb1DnluqtQ6QdSoWFcoCVRegfYintRPqUJrdxVbSHSc5pNg=s96-c',
-    },
-    audio_url:
-      'https://firebasestorage.googleapis.com/v0/b/english-buddie.appspot.com/o/question%2Fquestion-6647ab24dfa6bec4eda507e3%2Faudio-092b726a-8bcf-4f24-9c46-58f75b3e86ae.mp3?alt=media&token=f4acdc8d-5ff4-41d8-944e-e26c83a76151',
-    image_url:
-      'https://firebasestorage.googleapis.com/v0/b/english-buddie.appspot.com/o/question%2Fquestion-6647ab24dfa6bec4eda507e3%2Fimage-13bf0661-c395-42f2-99b9-3bbc578caaa2.jpg?alt=media&token=e0f302f1-a28f-48c1-874a-ea6c431c6e75',
+  const onSearch: SearchProps['onSearch'] = (value) => {
+    // split the search value into an array of words, delimiter is space
+    const searchWords = encodeURIComponent(value.trim());
+    setSearch(searchWords);
+    setTotalQuestions([]);
   };
 
-  useEffect(() => {
-    if (newPostValue !== '') setCanSubmit(true);
-    else setCanSubmit(false);
-  }, [newPostValue]);
+  const postData = totalQuestions.map((question: question) => {
+    return (
+      <Post
+        key={question._id}
+        postData={question}
+        comments={question.answers.length}
+      />
+    );
+  });
+
+  if (isLoading) {
+    return <Spin size="default" />;
+  }
+
+  hasMoreQuestions
+    ? postData.push(
+        <Empty
+          description={<></>}
+          key="empty"
+          style={{ height: '200px' }}
+        />
+      )
+    : null;
 
   return (
     <>
-      <Card
-        width="90%"
-        height="fit-content"
-        className={styles.container}
-      >
-        <button
-          className={styles['create-question-btn']}
-          onClick={showCreateModal}
+      {contextHolder}
+      <div className={styles.wrapper}>
+        <Card
+          width="90%"
+          height="fit-content"
+          className={styles.container}
         >
-          Tạo câu hỏi
-        </button>
-        {/* <Link href={`/community/6647ab24dfa6bec4eda507e3`}> */}
-        <Post
-          postData={postData}
-          showDetail
-        />
-        {/* </Link> */}
-      </Card>
+          <div className={styles.searchAndCreate}>
+            <div className={styles.search}>
+              <Search
+                placeholder="Nhập từ khóa cần tìm"
+                onSearch={onSearch}
+                style={{ width: 300 }}
+              />
+            </div>
+            <button
+              className={styles['create-question-btn']}
+              onClick={showCreateModal}
+            >
+              Tạo câu hỏi
+            </button>
+          </div>
+          <InfiniteScroll
+            dataLength={postData.length}
+            next={() => {
+              handleLoadMoreComments();
+            }}
+            hasMore={hasMoreQuestions}
+            loader={<h4>Loading...</h4>}
+            scrollThreshold={1}
+          >
+            {postData}
+          </InfiniteScroll>
+        </Card>
+      </div>
       <Modal
         open={openCreatePost}
         title="Tạo câu hỏi"
@@ -187,9 +264,9 @@ const Community = () => {
       >
         <TextArea
           value={newPostValue}
-          onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
-            setNewPostValue(e.target.value)
-          }
+          onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => {
+            setNewPostValue(e.target.value);
+          }}
           placeholder="Aa"
           autoSize={{ minRows: 3, maxRows: 5 }}
         />

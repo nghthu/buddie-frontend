@@ -137,7 +137,7 @@ const Header = (props: Props) => {
             overlayStyle={{ marginTop: '10px' }}
           >
             <a onClick={(e) => e.preventDefault()}>
-              <Space>
+              <Space align={'center'}>
                 <img
                   height={40}
                   width={40}

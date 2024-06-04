@@ -11,9 +11,12 @@ import questionLayouts from '@/styles/components/questionLayouts.module.scss';
 import textCardStyles from '@/styles/components/TextCard.module.scss';
 import buttonStyles from '@/styles/components/WebButton.module.scss';
 import clsx from 'clsx';
-//import BuddieSuport from './BuddieSupport';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import React from 'react';
+
+import BuddieSupport from './BuddieSupport';
+import { CloseChatContext } from './CloseChatContext';
+
 interface test_answer {
   test_id: string;
   parts: {
@@ -59,36 +62,71 @@ interface question {
   options: Array<string>;
   answer: Array<string> | string;
 }
-export default function ReadingLayout(props: {
+interface chatRequests {
+  avatar: string;
+  request: string;
+  response: string;
+}
+
+interface Props {
   partNumber: number;
   data: data;
-  setAnswer: React.Dispatch<React.SetStateAction<test_answer>>;
   answers: test_answer;
-}) {
+  chatVisible: boolean;
+  isChatProcessing: boolean;
+  chatRequests: Array<chatRequests>;
+  onContextMenu: (e: React.MouseEvent<HTMLDivElement>) => void;
+
+  setChatTopic: React.Dispatch<React.SetStateAction<string>>;
+  setAnswer: React.Dispatch<React.SetStateAction<test_answer>>;
+  setChatVisible: React.Dispatch<React.SetStateAction<boolean>>;
+  setChatRequests: React.Dispatch<React.SetStateAction<Array<chatRequests>>>;
+  setIsChatProcessing: React.Dispatch<React.SetStateAction<boolean>>;
+}
+
+export default function ReadingLayout({
+  partNumber,
+  data,
+  answers,
+  chatVisible,
+  isChatProcessing,
+  chatRequests,
+  onContextMenu,
+  setChatTopic,
+  setAnswer,
+  setChatVisible,
+  setChatRequests,
+  setIsChatProcessing,
+}: Props) {
   const [currentQuestionGroup, setCurrentQuestionGroup] = useState(1);
-  const maxGroup = props.data['question_groups'].length;
-  const questionGroups = props.data['question_groups'].map(
+  useEffect(() => {
+    setChatTopic(data.part_prompt);
+  }, [data.part_prompt]);
+
+  const maxGroup = data['question_groups'].length;
+  const questionGroups = (data['question_groups'] as questiongroup[]).map(
     (questionGroup: questiongroup, index: number) => {
       const questions = questionGroup['questions'].map(
         (question: question, index2: number) => {
           const question_use_for_answer =
-            props.answers?.parts[props.partNumber - 1]?.question_groups[index]
-              ?.questions[index2];
+            answers?.parts[partNumber - 1]?.question_groups[index]?.questions[
+              index2
+            ];
           return (
             <React.Fragment key={question['question_number']}>
               {question['question_type'] === 'single_choice' && (
                 <SingleChoiceLayout
                   question={question['question_prompt']}
                   options={question['options']}
-                  partId={props.data._id}
+                  partId={data._id}
                   questionGroupsId={questionGroup._id}
                   questionId={question._id}
                   questionIndex={question['question_number']}
-                  setAnswer={props.setAnswer}
+                  setAnswer={setAnswer}
                   userAnswer={
                     question_use_for_answer?.answer_result.user_answer
                   }
-                  //userAnswer={props.answers[question['question_number']]}
+                  //userAnswer={answers[question['question_number']]}
                 />
               )}
               {question['question_type'] === 'multiple_choices' && (
@@ -96,11 +134,11 @@ export default function ReadingLayout(props: {
                   question={question['question_prompt']}
                   options={question['options']}
                   answers={question['answer'] as string[]}
-                  partId={props.data._id}
+                  partId={data._id}
                   questionGroupsId={questionGroup._id}
                   questionId={question._id}
                   questionIndex={question['question_number']}
-                  setAnswer={props.setAnswer}
+                  setAnswer={setAnswer}
                   userAnswer={
                     question_use_for_answer?.answer_result.user_answer
                   }
@@ -111,11 +149,11 @@ export default function ReadingLayout(props: {
                   question={question['question_prompt']}
                   options={question['options']}
                   answer={question['answer'] as string}
-                  partId={props.data._id}
+                  partId={data._id}
                   questionGroupsId={questionGroup._id}
                   questionId={question._id}
                   questionIndex={question['question_number']}
-                  setAnswer={props.setAnswer}
+                  setAnswer={setAnswer}
                   userAnswer={
                     question_use_for_answer?.answer_result.user_answer
                   }
@@ -125,11 +163,11 @@ export default function ReadingLayout(props: {
                 <FillTheBlankLayout
                   question={question['question_prompt']}
                   answer={question['answer'] as string}
-                  partId={props.data._id}
+                  partId={data._id}
                   questionGroupsId={questionGroup._id}
                   questionId={question._id}
                   questionIndex={question['question_number']}
-                  setAnswer={props.setAnswer}
+                  setAnswer={setAnswer}
                   userAnswer={
                     question_use_for_answer?.answer_result.user_answer
                   }
@@ -139,6 +177,7 @@ export default function ReadingLayout(props: {
           );
         }
       );
+
       return (
         <TextCard
           key={index}
@@ -183,6 +222,11 @@ export default function ReadingLayout(props: {
       );
     }
   );
+
+  const hideChat = () => {
+    setChatVisible(false);
+  };
+
   return (
     <div className={questionLayouts.readingLayout}>
       <div className={questionLayouts.contextWrapper}>
@@ -195,8 +239,9 @@ export default function ReadingLayout(props: {
           )}
         >
           <ReadingContextLayout
-            context={props.data.part_prompt}
-            images={props.data.part_image_urls}
+            context={data.part_prompt}
+            images={data.part_image_urls}
+            onContextMenu={onContextMenu}
           />
         </TextCard>
         <div className={questionLayouts.buttonWrapper}>
@@ -217,8 +262,6 @@ export default function ReadingLayout(props: {
         </div>
       </div>
       <div className={questionLayouts.questionContainer}>
-        {questionGroups[currentQuestionGroup - 1]}
-        Buddie support here
         <div className={questionLayouts.buttonWrapper}>
           {currentQuestionGroup > 1 && (
             <Button
@@ -241,6 +284,20 @@ export default function ReadingLayout(props: {
             </Button>
           )}
         </div>
+        {questionGroups[currentQuestionGroup - 1]}
+        {chatVisible && (
+          <div>
+            <CloseChatContext.Provider value={hideChat}>
+              <BuddieSupport
+                requests={chatRequests}
+                setRequests={setChatRequests}
+                isProcessing={isChatProcessing}
+                setIsProcessing={setIsChatProcessing}
+                width={'100%'}
+              ></BuddieSupport>
+            </CloseChatContext.Provider>
+          </div>
+        )}
       </div>
     </div>
   );
