@@ -39,6 +39,7 @@ export default function TestCard(props: {
   const handleClick = () => {
     showModal();
   };
+  // TODO: handle timer
   const handleSelectChange = (value: string) => {
     console.log(value);
   };
@@ -104,7 +105,7 @@ export default function TestCard(props: {
             <Rate
               disabled
               defaultValue={props.review ? props.review.star : 0}
-            />{' '}
+            />
             ({props.review ? props.review.count : 0})
           </div>
           <div>

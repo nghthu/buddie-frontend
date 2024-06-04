@@ -2,7 +2,7 @@
 import ReadingLayout from '@/components/ReadingLayout';
 import SkillHeader from '@/components/SkillHeader';
 // import { useRouter } from 'next/navigation';
-import React from 'react';
+import React, { useRef } from 'react';
 import { useEffect, useState } from 'react';
 import { DoubleRightOutlined, DoubleLeftOutlined } from '@ant-design/icons';
 import { Spin, Button, notification } from 'antd';
@@ -11,6 +11,7 @@ import styles from '@/styles/components/SkillHeader.module.scss';
 import { User } from 'firebase/auth';
 import { auth } from '@/lib';
 import useSWR from 'swr';
+import ReadingFunctionMenu from '@/components/ReadingFunctionMenu';
 interface test_answer {
   test_id: string;
   parts: {
@@ -52,7 +53,6 @@ interface FetchArgs {
 
 const fetcher = async ({ url, user }: FetchArgs) => {
   const token = await user?.getIdToken();
-  console.log(token);
   const response = await fetch(url, {
     headers: {
       authorization: `Bearer ${token}`,
@@ -65,6 +65,7 @@ const fetcher = async ({ url, user }: FetchArgs) => {
 
   return response.data;
 };
+
 export default function IeltsPart({
   params,
 }: {
@@ -75,8 +76,24 @@ export default function IeltsPart({
     test_id: '',
     parts: [],
   });
-  const [testTime, setTestTime] = useState('20:00');
+  // TODO: use timer and setTestTime
+  const [testTime] = useState('20:00');
+
   const [currentPart, setCurrentPart] = useState(1);
+
+  const [chatTopic, setChatTopic] = useState('');
+  const [chatVisible, setChatVisible] = useState(false);
+  const [isChatProcessing, setIsChatProcessing] = useState(false);
+  const [selection, setSelection] = useState<string>('');
+  const [menuVisible, setMenuVisible] = useState(false);
+  const [menuPosition, setMenuPosition] = useState({ x: 0, y: 0 });
+
+  const [chatRequests, setChatRequests] = useState<
+    Array<{ avatar: string; request: string; response: string }>
+  >([]);
+
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
+
   // const changePart = (part: number) => {
   //   setCurrentPart(part);
   // };
@@ -182,8 +199,6 @@ export default function IeltsPart({
                   _id: question_group._id,
                   questions: [],
                 });
-                console.log('bug');
-                console.log(temp_test_answer);
                 question_group.questions.map((question: { _id: string }) => {
                   temp_test_answer['parts'][i1]['question_groups'][i2][
                     'questions'
@@ -201,13 +216,133 @@ export default function IeltsPart({
       }
     }
   }, [tests, params.part, params.id]);
+
   if (isLoading) {
     return <Spin size="large" />;
   }
 
-  const temp_metaData = { ...tests };
+  const showMenu = (event: React.MouseEvent) => {
+    event.preventDefault();
 
-  console.log('answers: ', answers);
+    let newSelection = '';
+    if ((event.target as Element).tagName === 'TEXTAREA') {
+      newSelection =
+        textareaRef.current?.value.substring(
+          textareaRef.current?.selectionStart || 0,
+          textareaRef.current?.selectionEnd || 0
+        ) || '';
+    } else if ((event.target as Element).tagName === 'DIV') {
+      newSelection = window.getSelection()?.toString() || '';
+    }
+
+    if (newSelection != '') {
+      setSelection(newSelection);
+      setMenuVisible(true);
+      setMenuPosition({ x: event.clientX, y: event.clientY });
+    }
+  };
+
+  const hideMenu = () => {
+    setMenuVisible(false);
+  };
+
+  const callTranslateAPI = async () => {
+    const token = await user?.getIdToken();
+
+    const response = await fetch('/api/ai/translate/', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({
+        target_lang: 'vi',
+        content: selection,
+      }),
+    });
+
+    const data = await response.json();
+    return data;
+  };
+
+  const callParaphraseAPI = async (topic: string, content: string) => {
+    const token = await user?.getIdToken();
+
+    const response = await fetch('/api/ai/paraphrase-writing/', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({
+        type: 'essay',
+        topic: topic,
+        content: content,
+      }),
+    });
+
+    const data = await response.json();
+    return data;
+  };
+
+  const callSynonymsAPI = async (word: string) => {
+    const token = await user?.getIdToken();
+
+    const response = await fetch(`/api/ai/synonyms?word=${word}`, {
+      headers: {
+        authorization: `Bearer ${token}`,
+      },
+    });
+
+    const data = await response.json();
+    return data;
+  };
+
+  const showChat = async (message: string) => {
+    setIsChatProcessing(true);
+
+    let apiResponse;
+    const request = {
+      avatar: user?.photoURL || '',
+      request: message + ' ' + selection,
+      response: 'Đang xử lý... đợi Buddie chút nhé!',
+    };
+
+    setChatRequests((prevRequests) => [...prevRequests, request]);
+    setChatVisible(true);
+
+    if (message === 'Dịch') {
+      apiResponse = await callTranslateAPI();
+      request.response = apiResponse.data.translated;
+      setIsChatProcessing(false);
+    }
+
+    if (message === 'Viết lại') {
+      apiResponse = await callParaphraseAPI(chatTopic, selection);
+      request.response = apiResponse.data.paraphrased;
+      setIsChatProcessing(false);
+    }
+
+    if (message === 'Từ đồng nghĩa') {
+      apiResponse = await callSynonymsAPI(selection);
+      request.response = apiResponse.data.synonyms.join(', ');
+      setIsChatProcessing(false);
+    }
+
+    setChatRequests((prevRequests) => {
+      const newRequests = [...prevRequests];
+      newRequests[newRequests.length - 1] = request;
+      return newRequests;
+    });
+
+    // Clear the selection
+    if (textareaRef.current) {
+      textareaRef.current.selectionStart = 0;
+      textareaRef.current.selectionEnd = 0;
+    }
+  };
+
+  const temp_metaData = { ...tests };
   delete temp_metaData['parts'];
   const metaData = temp_metaData;
   const jsonData = [];
@@ -247,30 +382,35 @@ export default function IeltsPart({
   );
 
   const parts = jsonData.map((part: subpart) => {
-    // const prevPart =
-    //   params.part === 'all'
-    //     ? Math.max(part['part_number'] - 1, 1)
-    //     : Number(params.part);
-    // const nextPart =
-    //   params.part === 'all'
-    //     ? Math.min(part['part_number'] + 1, jsonData.length)
-    //     : Number(params.part);
-    // console.log('part: ', part['part_number']);
     return (
       <React.Fragment key={part['part_number']}>
         {currentPart === part['part_number'] && (
           <ReadingLayout
             partNumber={part['part_number']}
             data={part}
-            setAnswer={setAnswers}
+            chatVisible={chatVisible}
+            isChatProcessing={isChatProcessing}
+            chatRequests={chatRequests}
             answers={answers}
+            onContextMenu={showMenu}
+            setChatTopic={setChatTopic}
+            setAnswer={setAnswers}
+            setChatVisible={setChatVisible}
+            setChatRequests={setChatRequests}
+            setIsChatProcessing={setIsChatProcessing}
           />
         )}
+        <ReadingFunctionMenu
+          visible={menuVisible}
+          position={menuPosition}
+          onMenuItemClick={showChat}
+        />
       </React.Fragment>
     );
   });
+
   return (
-    <>
+    <div onClick={hideMenu}>
       {contextHolder}
       <SkillHeader
         title={metaData['test_name']}
@@ -279,6 +419,6 @@ export default function IeltsPart({
         {passageButtons}
       </SkillHeader>
       {parts}
-    </>
+    </div>
   );
 }

@@ -6,11 +6,11 @@ interface MenuProps {
   onMenuItemClick: (message: string) => void;
 }
 
-const WritingFunctionMenu: React.FC<MenuProps> = ({
+const WritingFunctionMenu = ({
   visible,
   position,
   onMenuItemClick,
-}) => {
+}: MenuProps) => {
   if (!visible) {
     return null;
   }
@@ -24,7 +24,7 @@ const WritingFunctionMenu: React.FC<MenuProps> = ({
         left: position.x,
       }}
     >
-      <p onClick={() => onMenuItemClick('Dịch')}>//Dịch</p>
+      <p onClick={() => onMenuItemClick('Dịch')}>Dịch</p>
       <p onClick={() => onMenuItemClick('Viết lại')}>Viết lại</p>
       <p onClick={() => onMenuItemClick('Từ đồng nghĩa')}>Từ đồng nghĩa</p>
     </div>

@@ -10,7 +10,6 @@
   "quoteProps": "as-needed",
   "jsxSingleQuote": false,
   "bracketSameLine": false,
-  "endOfLine": "lf",
   "singleAttributePerLine": true,
   "htmlWhitespaceSensitivity": "css",
   "embeddedLanguageFormatting": "auto",

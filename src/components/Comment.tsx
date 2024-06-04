@@ -1,7 +1,11 @@
+'use client';
+/* eslint-disable @next/next/no-img-element */
 import styles from '@/styles/components/Comment.module.scss';
-
+import clsx from 'clsx';
+import { useState } from 'react';
 export default function Comment({
-  id,
+  // TODO: find some use for id
+
   userName,
   userPhotoURL,
   createdDate,
@@ -13,6 +17,10 @@ export default function Comment({
   createdDate: string;
   content: string;
 }) {
+  const [isClamping, setIsClamping] = useState(true);
+  function handleClamping() {
+    setIsClamping(!isClamping);
+  }
   return (
     <div className={styles.wrapper}>
       <img
@@ -25,7 +33,12 @@ export default function Comment({
           <div className={styles.userName}>{userName}</div>
           <div>{createdDate}</div>
         </div>
-        <div className={styles.content}>{content}</div>
+        <div
+          onClick={() => handleClamping()}
+          className={clsx(styles.content, isClamping && styles.clamping)}
+        >
+          {content}
+        </div>
       </div>
     </div>
   );

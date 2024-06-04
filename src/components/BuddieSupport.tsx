@@ -1,15 +1,55 @@
 import Card from '@/components/Card';
 import styles from '@/styles/components/BuddieSupport.module.scss';
+import { auth } from '@/lib';
 
 const BuddieSupport = (props: {
   requests?: Array<{ request: string; avatar: string; response: string }>;
+  setRequests: (
+    requests: Array<{ request: string; avatar: string; response: string }>
+  ) => void;
+  isProcessing?: boolean;
+  setIsProcessing?: (isProcessing: boolean) => void;
+  width?: string;
+  height?: string;
 }) => {
-  const translateHandler = () => {};
+  const user = auth.currentUser;
+  const translateHandler = async (chatResponse: string) => {
+    props.setIsProcessing && props.setIsProcessing(true);
+    const request = {
+      avatar: user?.photoURL || '',
+      request: `Dịch câu trả lời trên`,
+      response: 'Đang dịch... Đợi Buddie chút nhé!',
+    };
+
+    const newRequests = [...(props.requests || []), request];
+    props.setRequests(newRequests);
+
+    const token = await user?.getIdToken();
+
+    const response = await fetch('/api/ai/translate/', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({
+        target_lang: 'vi',
+        content: chatResponse,
+      }),
+    });
+
+    const result = await response.json();
+
+    newRequests[newRequests.length - 1].response = result.data.translated;
+    props.setRequests(newRequests);
+
+    props.setIsProcessing && props.setIsProcessing(false);
+  };
 
   return (
     <Card
-      width="300px"
-      height="80vh"
+      width={props.width ?? '300px'}
+      height={props.height ?? '80vh'}
       showCloseButton
       backgroundColor="#ECEEF9"
       className={styles['chat-box']}
@@ -32,12 +72,14 @@ const BuddieSupport = (props: {
                 <p>Buddie</p>
               </div>
               <p>{chat.response}</p>
-              <img
-                className={styles.translate}
-                title="Dịch"
-                src="/images/translation.png"
-                onClick={translateHandler}
-              />
+              {!props.isProcessing && (
+                <img
+                  className={styles.translate}
+                  title="Dịch"
+                  src="/images/translation.png"
+                  onClick={() => translateHandler(chat.response)}
+                />
+              )}
             </div>
           </div>
         ))}

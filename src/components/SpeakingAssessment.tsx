@@ -211,7 +211,7 @@ const SpeakingAssessment = () => {
             strokeColor={conicColors}
             format={() => `${DUMMY_DATA.overall}`}
           />
-          <p>Overall</p>
+          <p>Tổng</p>
         </div>
 
         <div className={styles.score}>

@@ -2,6 +2,7 @@
   display: flex;
   flex-direction: column;
   align-items: center;
+  margin-bottom: 20px;
 }
 
 .controls {
@@ -10,7 +11,7 @@
 }
 
 .progressBar {
-  width: 70vw;
+  width: 50vw;
   height: 5px;
   background-color: #ccc;
   margin-left: 10px;
@@ -24,9 +25,8 @@
 }
 
 .play-btn {
-  border-radius: 50%;
-  width: 40px;
-  height: 40px;
+  width: 30px;
+  height: 30px;
   & :hover {
     cursor: pointer;
   }

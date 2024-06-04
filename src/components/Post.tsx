@@ -3,70 +3,97 @@
 import TextCard from './TextCard';
 import { SoundOutlined } from '@ant-design/icons';
 import styles from '@/styles/components/Post.module.scss';
+import { useState } from 'react';
 import clsx from 'clsx';
-
-interface Post {
-  name: string;
-  avater: string;
-  date: string;
-  text: string;
-  audio: string;
-  postImg: string;
+import { Modal } from 'antd';
+import PostDetail from './PostDetail';
+interface User {
+  user_id: string;
+  display_name: string;
+  photo_url: string;
 }
-
-interface Comments {
-  commentNumber: number;
+interface PostAnswer {
+  content: string;
+  is_excellent: boolean;
+  _id: string;
+  created_at: string;
+  user: User;
+}
+interface Post {
+  _id: string;
+  text: string;
+  created_at: string;
+  updated_at: string;
+  __v: string;
+  answers: PostAnswer[];
+  user: User;
+  audio_url: string;
+  image_url: string;
 }
 
 interface Props {
   postData: Post;
-  comments: Comments;
+  comments: number;
   onClick?: (event: React.MouseEvent<HTMLDivElement>) => void;
   showComments?: boolean;
 }
 
-const Post = ({ postData, comments, onClick, showComments }: Props) => {
+const Post = ({ postData, comments }: Props) => {
+  const [openPostDetail, setOpenPostDetail] = useState(false);
+
+  const showPostDetail = () => {
+    setOpenPostDetail(true);
+  };
+
+  const hidePostDetail = () => {
+    setOpenPostDetail(false);
+  };
   return (
     <>
       <div className={styles.post}>
         <img
           className={styles.avatar}
-          src={postData.avatar}
+          src={postData.user.photo_url}
         />
         <div className={styles['post-info']}>
           <div className={styles['post-info-user']}>
-            <p>{postData.name}</p>
-            <p>{postData.date}</p>
+            <p>{postData.user.display_name}</p>
+            <p>{new Date(postData.created_at).toUTCString()}</p>
           </div>
           <TextCard
             width="100%"
             height="fit-content"
             className={styles['post-text-card']}
-            onClick={onClick}
+            onClick={() => showPostDetail()}
           >
             <div className={styles['post-text']}>
               <p>{postData.text}</p>
-              {postData.audio !== undefined && <SoundOutlined />}
+              {postData.audio_url !== undefined && <SoundOutlined />}
             </div>
-            {postData.postImg && (
+            {postData.image_url && (
               <img
                 className={styles['post-img']}
-                src={postData.postImg}
+                src={postData.image_url}
               />
             )}
-            {showComments && (
-              <div
-                className={clsx(
-                  comments.commentNumber !== 0 && styles.green,
-                  styles.answer
-                )}
-              >
-                {comments.commentNumber}
-              </div>
-            )}
+            <div
+              className={clsx(comments !== 0 && styles.green, styles.answer)}
+            >
+              {comments}
+            </div>
           </TextCard>
         </div>
       </div>
+
+      <Modal
+        open={openPostDetail}
+        title=""
+        onCancel={hidePostDetail}
+        footer={[]}
+        width={800}
+      >
+        <PostDetail postData={postData} />
+      </Modal>
     </>
   );
 };

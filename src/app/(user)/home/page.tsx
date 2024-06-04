@@ -18,10 +18,13 @@ const Home = () => {
             <h1>Luyện tập IELTS</h1>
             <p>Với sự trợ giúp của AI thông minh</p>
           </div>
-          <img
-            src="/images/logo/hello.svg"
-            alt="hello"
-          />
+          {
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              src="/images/logo/hello.svg"
+              alt="hello"
+            />
+          }
         </div>
 
         <div className={styles.skillContainer}>
@@ -65,7 +68,13 @@ const Home = () => {
       </div>
 
       <div className={styles.historyContainer}>
-        <h1> Kết quả luyện thi gần đây</h1>
+        <div className={styles.headerContainer}>
+          <h1> Kết quả luyện thi gần đây</h1>
+          <Link href={'/tests/history'}>
+            <p>Xem tất cả</p>
+          </Link>
+        </div>
+
         <div className={styles.resultContainer}>
           <div className={styles.result}>
             <h1>7h21p</h1>

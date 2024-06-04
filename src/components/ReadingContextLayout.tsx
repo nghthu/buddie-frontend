@@ -3,6 +3,7 @@ import styles from '@/styles/components/questionLayouts.module.scss';
 export default function ReadingContextLayout(props: {
   context: string;
   images: Array<string>;
+  onContextMenu: (e: React.MouseEvent<HTMLDivElement>) => void;
 }) {
   let context = props.context;
   const imageIndexs = [];
@@ -22,7 +23,10 @@ export default function ReadingContextLayout(props: {
   }
   return (
     <div className={styles.contextLayout}>
-      <div style={{ fontWeight: '300' }}>
+      <div
+        style={{ fontWeight: '300' }}
+        onContextMenu={props.onContextMenu}
+      >
         {props.context && <>{props.context}</>}
       </div>
     </div>

@@ -38,7 +38,8 @@ export default function TestSelector(props: {
   skill: string;
   text?: string;
 }) {
-  const [totalPage, setTotalPage] = useState(1);
+  // TODO: Implement infinite scroll and fetch more data and use setTotalPage
+  const [totalPage] = useState(1);
   // const tests = useRef([]);
   const [filteredTests, setFilteredTests] = useState([]);
   const [searchValue, setSearchValue] = useState('');
@@ -78,9 +79,9 @@ export default function TestSelector(props: {
     }
   }, [isLoading]);
 
-  const handleLoad = () => {
-    setTotalPage((prev) => prev + 1);
-  };
+  // const handleLoad = () => {
+  //   setTotalPage((prev) => prev + 1);
+  // };
   // useEffect(() => {
   //     handleFilterTests();
   // }, [selectedSkill, searchValue]);
@@ -105,7 +106,6 @@ export default function TestSelector(props: {
   const onSearch: SearchProps['onSearch'] = (value) => {
     // split the search value into an array of words, delimiter is space
     const searchWords = encodeURIComponent(value.trim());
-    console.log(searchWords);
     setSearchValue(searchWords);
   };
   const handleChange = (value: string) => {
@@ -118,7 +118,6 @@ export default function TestSelector(props: {
   if ((isLoading && filteredTests.length === 0) || props.pageLoading) {
     return <Spin size="default" />;
   }
-  console.log(rawTests);
   const testComponent = filteredTests.map(
     (test: {
       _id: string;

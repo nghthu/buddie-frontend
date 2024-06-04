@@ -10,12 +10,12 @@ export const POST = async function createTestSubmission(req: Request) {
       {
         method: 'POST',
         headers: req.headers,
-        body: reqData,
+        body: JSON.stringify(reqData),
       }
     );
     const data = await response.json();
-    console.log(chalk.bgCyan('Create Test Submission Response:'), data);
-    return NextResponse.json(data);
+    console.log(chalk.bgCyan('Create Test Submission Response:'), data.data);
+    return NextResponse.json(data.data);
   } catch (error) {
     console.error(error);
     return NextResponse.json({ error });

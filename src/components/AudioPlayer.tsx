@@ -1,12 +1,17 @@
 import { useState, useRef } from 'react';
 import styles from '@/styles/components/AudioPlayer.module.scss';
-import { CaretRightOutlined } from '@ant-design/icons';
+import { CaretRightOutlined, PauseOutlined } from '@ant-design/icons';
+import { Button } from 'antd';
 
 interface AudioPlayerProps {
   audioUrl: string;
+  disableStopButton?: boolean;
 }
 
-const AudioPlayer: React.FC<AudioPlayerProps> = ({ audioUrl }) => {
+const AudioPlayer = ({
+  audioUrl,
+  disableStopButton = false,
+}: AudioPlayerProps) => {
   const audioRef = useRef<HTMLAudioElement>(null);
   const [isPlaying, setIsPlaying] = useState<boolean>(false);
   const [currentTime, setCurrentTime] = useState<number>(0);
@@ -18,12 +23,20 @@ const AudioPlayer: React.FC<AudioPlayerProps> = ({ audioUrl }) => {
         audioRef.current.pause();
       } else {
         audioRef.current.play();
-        console.log(audioRef.current.duration);
         setDuration(audioRef.current.duration);
       }
       setIsPlaying(!isPlaying);
     }
   };
+
+  // const stop = () => {
+  //   if (audioRef.current) {
+  //     audioRef.current.pause();
+  //     audioRef.current.currentTime = 0;
+  //     setCurrentTime(0);
+  //     setIsPlaying(false);
+  //   }
+  // };
 
   const handleTimeUpdate = () => {
     if (audioRef.current) {
@@ -40,12 +53,21 @@ const AudioPlayer: React.FC<AudioPlayerProps> = ({ audioUrl }) => {
       />
       <div className={styles.controls}>
         {!isPlaying && (
-          <button
+          <Button
+            shape="circle"
             onClick={togglePlay}
             className={styles['play-btn']}
-          >
-            <CaretRightOutlined />
-          </button>
+            icon={<CaretRightOutlined />}
+          />
+        )}
+
+        {isPlaying && !disableStopButton && (
+          <Button
+            shape="circle"
+            onClick={togglePlay}
+            className={styles['play-btn']}
+            icon={<PauseOutlined />}
+          />
         )}
 
         <div className={styles.progressBar}>

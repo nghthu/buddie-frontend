@@ -14,16 +14,59 @@ import { Checkbox } from 'antd';
 import type { CheckboxProps } from 'antd';
 import { auth } from '@/lib';
 import { User } from 'firebase/auth';
-import { Spin, notification } from 'antd';
-import * as FFmpeg from '@ffmpeg/ffmpeg';
-import { createFFmpeg } from '@ffmpeg/ffmpeg';
+import { Spin } from 'antd';
+import useSWR from 'swr';
 // import { createFFmpeg, fetchFile } from '@ffmpeg/ffmpeg';
+import { DoubleRightOutlined } from '@ant-design/icons';
 
 const mimeType: string = 'audio/webm';
 // const mimeType: string = 'audio/mpeg';
 // const ffmpeg = createFFmpeg({ log: true });
 
-const PracticeSpeaking = ({ params }: { params: { part: string } }) => {
+const fetcher = async ({ url, user }: { url: string; user: User | null }) => {
+  const token = await user?.getIdToken();
+  const response = await fetch(url, {
+    headers: {
+      authorization: `Bearer ${token}`,
+    },
+  }).then((res) => res.json());
+
+  if (response.status === 'error') {
+    throw new Error(response.error.message);
+  }
+
+  return response.data;
+};
+
+interface QuestionInfo {
+  question_number: number;
+  question_type: string;
+  question_prompt: string;
+  question_image_urls: string[];
+  question_duration: number;
+  options: string[];
+  answer: string;
+}
+
+interface QuestionGroupInfo {
+  question_groups_duration: number;
+  question_groups_prompt: string;
+  question_groups_recording: string;
+  question_groups_image_urls: string[];
+}
+
+interface QuestionGroup {
+  is_single_question: boolean;
+  question_groups_info: QuestionGroupInfo;
+  questions: QuestionInfo[];
+}
+
+const PracticeSpeaking = ({
+  params,
+}: {
+  params: { id: string; part: string };
+}) => {
+  const [currentPart, setCurrentPart] = useState(0);
   const [permission, setPermission] = useState(false);
   const [stream, setStream] = useState<MediaStream | null>(null);
   const mediaRecorder = useRef<MediaRecorder | null>(null);
@@ -36,116 +79,58 @@ const PracticeSpeaking = ({ params }: { params: { part: string } }) => {
   const [answers, setAnswers] = useState<Blob[]>([]);
   const [instruction, setInstruction] = useState(true);
   const [wantToSubmit, setWantToSubmit] = useState(false);
+  const [testData, setTestData] = useState<QuestionGroup | null>(null);
   // const [mp3audio, setMp3Audio] = useState<string | null>(null);
   const router = useRouter();
   const user = auth.currentUser;
+  let finalPart = 0;
 
-  // dummy
-  const question_groups = {
-    is_single_question: true,
-    question_groups_info: {
-      question_groups_duration: 0,
-      question_groups_prompt:
-        'In this first part, the examiner will ask you some questions about yourself. DO NOT give out real personal information on your answers.',
-      question_groups_recording: '',
-      question_groups_image_urls: [],
-    },
-    questions: [
-      {
-        question_number: 1,
-        question_type: 'speaking',
-        question_prompt: "What's your name?",
-        question_image_urls: [],
-        question_duration: 0,
-        question_preparation_time: 5,
-        question_recording: '',
-      },
-      {
-        question_number: 2,
-        question_type: 'speaking',
-        question_prompt: 'Which town or city do you come from?',
-        question_image_urls: [],
-        question_duration: 0,
-        question_preparation_time: 5,
-        question_recording: '',
-      },
-      {
-        question_number: 3,
-        question_type: 'speaking',
-        question_prompt: "What's the best thing about living there?",
-        question_image_urls: [],
-        question_duration: 0,
-        question_preparation_time: 5,
-        question_recording: '',
-      },
-      {
-        question_number: 4,
-        question_type: 'speaking',
-        question_prompt: 'How do you plan your time in a day?',
-        question_image_urls: [],
-        question_duration: 0,
-        question_preparation_time: 5,
-        question_recording: '',
-      },
-      {
-        question_number: 5,
-        question_type: 'speaking',
-        question_prompt: 'Is it easy to manage time for you?',
-        question_image_urls: [],
-        question_duration: 0,
-        question_preparation_time: 5,
-        question_recording: '',
-      },
-      {
-        question_number: 6,
-        question_type: 'speaking',
-        question_prompt: 'When do you find it hard to allocate time?',
-        question_image_urls: [],
-        question_duration: 0,
-        question_preparation_time: 5,
-        question_recording: '',
-      },
-      {
-        question_number: 7,
-        question_type: 'speaking',
-        question_prompt: 'Do you like being busy?',
-        question_image_urls: [],
-        question_duration: 0,
-        question_preparation_time: 5,
-        question_recording: '',
-      },
-    ],
-  };
+  const { data, isLoading } = useSWR(
+    { url: `/api/tests/${params.id}`, user },
+    fetcher
+  );
 
-  question_groups.questions.unshift({
-    question_number: 0,
-    question_type: 'mic test',
-    question_prompt:
-      'Trước khi bắt đầu, hãy kiểm tra micro của bạn bằng cách nhấn vào nút bên dưới và ghi âm.',
-    question_image_urls: [],
-    question_duration: 0,
-    question_preparation_time: 5,
-    question_recording: '',
-  });
+  finalPart = data?.parts.length - 1;
 
-  async function convertWebmToMp3(webmBlob: Blob): Promise<Blob> {
-    const ffmpeg = createFFmpeg({ log: false });
-    await ffmpeg.load();
-
-    const inputName = 'input.webm';
-    const outputName = 'output.mp3';
-
-    const arrayBuffer = await new Response(webmBlob).arrayBuffer();
-
-    ffmpeg.FS('writeFile', inputName, new Uint8Array(arrayBuffer));
-
-    await ffmpeg.run('-i', inputName, outputName);
-
-    const outputData = ffmpeg.FS('readFile', outputName);
-    const outputBlob = new Blob([outputData.buffer], { type: 'audio/mp3' });
-
-    return outputBlob;
+  if (data && testData === null) {
+    console.log(data);
+    let dataOfTest = data.parts[0].question_groups[0];
+    if (params.part !== 'all') {
+      dataOfTest = data.parts[Number(params.part) - 1].question_groups[0];
+    } else {
+      setCurrentPart(0);
+    }
+    dataOfTest.questions.unshift({
+      question_number: 0,
+      question_type: 'mic test',
+      question_prompt:
+        'Trước khi bắt đầu, hãy kiểm tra micro của bạn bằng cách nhấn vào nút bên dưới và ghi âm.',
+      question_image_urls: [],
+      question_duration: 0,
+      question_preparation_time: 5,
+      question_recording: '',
+    });
+    setTestData(dataOfTest);
   }
+
+  // async function convertWebmToMp3(webmBlob: Blob): Promise<Blob> {
+  //   const ffmpeg = createFFmpeg({ log: false });
+  //   await ffmpeg.load();
+
+  //   const inputName = 'input.webm';
+  //   const outputName = 'output.mp3';
+
+  //   const arrayBuffer = await new Response(webmBlob).arrayBuffer();
+
+  //   ffmpeg.FS('writeFile', inputName, new Uint8Array(arrayBuffer));
+
+  //   await ffmpeg.run('-i', inputName, outputName);
+
+  //   const outputData = ffmpeg.FS('readFile', outputName);
+  //   const outputBlob = new Blob([outputData.buffer], { type: 'audio/mp3' });
+
+  //   return outputBlob;
+  // }
 
   const startRecording = async (streamData: MediaStream) => {
     setRecordingStatus('recording');
@@ -241,23 +226,25 @@ const PracticeSpeaking = ({ params }: { params: { part: string } }) => {
       setInstruction(false);
     } else {
       if (currentAnswer && wantToSubmit) {
+        console.log('logcheck2');
         setAnswers((prevAnswers) => [...prevAnswers, currentAnswer]);
 
-        console.log('haha');
         // send test api
         const token = await user?.getIdToken();
 
-        const mp3Blob = await convertWebmToMp3(currentAnswer);
+        // const mp3Blob = await convertWebmToMp3(currentAnswer);
 
         const formData = new FormData();
 
-        formData.append('speaking_audio', mp3Blob, 'answer.mp3');
-        formData.append('speaking_part', '1');
-        formData.append('audio_type', 'mp3');
-        formData.append(
-          'question',
-          question_groups.questions[currentQuestion].question_prompt
-        );
+        // --------- start uncomment the following-------------------------------
+        // formData.append('speaking_audio', currentAnswer, 'answer.webm');
+        // formData.append('speaking_part', '1');
+        // formData.append('audio_type', 'mp3');
+        // formData.append(
+        //   'question',
+        //   testData.questions[currentQuestion].question_prompt
+        // );
+        //------------------end uncomment-------------------------------------------
 
         await fetch(`/api/ai/assess-speaking`, {
           method: 'POST',
@@ -267,12 +254,15 @@ const PracticeSpeaking = ({ params }: { params: { part: string } }) => {
           body: formData,
         });
       }
-      if (currentQuestion < question_groups.questions.length - 1) {
-        setCurrentQuestion((prevQuestion) => prevQuestion + 1);
-      } else if (currentQuestion === question_groups.questions.length - 1) {
-        // handle submit
-        console.log('submit');
-      }
+      // --------- start uncomment the following-------------------------------
+      // if (currentQuestion < testData.questions.length - 1) {
+      //   console.log('logcheck', currentQuestion);
+      //   setCurrentQuestion((prevQuestion) => prevQuestion + 1);
+      // } else if (currentQuestion === testData.questions.length - 1) {
+      //   // handle submit
+      //   console.log('submit');
+      // }
+      //------------------end uncomment-------------------------------------------
 
       setCurrentAnswer(null);
       setAudio(null);
@@ -280,9 +270,27 @@ const PracticeSpeaking = ({ params }: { params: { part: string } }) => {
     }
   };
 
+  const nextPartHandler = () => {
+    const nextPart = currentPart + 1;
+    setCurrentPart((prevPart) => prevPart + 1);
+    setTestData(data.parts[nextPart].question_groups[0]);
+    setCurrentQuestion(0);
+  };
+
   const setSubmitHandler: CheckboxProps['onChange'] = (e) => {
     setWantToSubmit(e.target.checked);
   };
+
+  const submitHandler = () => {
+    console.log(answers);
+  };
+
+  if (isLoading) return <Spin size="large" />;
+
+  const isAllPart = params.part === 'all';
+  const isLastQuestionOfPart =
+    currentQuestion === (testData?.questions && testData.questions.length - 1);
+  const isFinalPart = currentPart === finalPart;
 
   return (
     <>
@@ -293,7 +301,7 @@ const PracticeSpeaking = ({ params }: { params: { part: string } }) => {
               className={styles.logo}
               src="/images/logo/main.svg"
             />
-            <p>{question_groups.question_groups_info.question_groups_prompt}</p>
+            <p>{testData?.question_groups_info.question_groups_prompt}</p>
           </div>
           <Button
             className={styles.next}
@@ -310,7 +318,9 @@ const PracticeSpeaking = ({ params }: { params: { part: string } }) => {
               className={styles.logo}
               src="/images/logo/main.svg"
             />
-            <p>{question_groups.questions[currentQuestion].question_prompt}</p>
+            <p className={styles['question-prompt']}>
+              {testData?.questions[currentQuestion].question_prompt}
+            </p>
             {currentQuestion > 0 && (
               <Checkbox
                 onChange={setSubmitHandler}
@@ -338,21 +348,32 @@ const PracticeSpeaking = ({ params }: { params: { part: string } }) => {
           <TextCard
             width="50%"
             height="170px"
+            className={styles.transcription}
           >
             {transcript}
           </TextCard>
           <div className={styles['action-btn']}>
-            <Button onClick={() => router.push('/ielts/speaking')}>
-              Thoát
-            </Button>
-            <Button onClick={nextHandler}>
-              {currentQuestion !== 0 &&
-                currentQuestion !== question_groups.questions.length - 1 &&
-                'Tiếp theo'}
-              {currentQuestion === 0 && 'Bắt đầu'}
-              {currentQuestion === question_groups.questions.length - 1 &&
-                'Kết thúc'}
-            </Button>
+            <Button onClick={() => router.push('/ielts')}>Thoát</Button>
+
+            {currentQuestion === 0 &&
+              (!isAllPart || (isAllPart && currentPart === 0)) && (
+                <Button onClick={nextHandler}>Bắt đầu</Button>
+              )}
+
+            {currentQuestion !== 0 && !isLastQuestionOfPart && (
+              <Button onClick={nextHandler}>
+                <DoubleRightOutlined />
+              </Button>
+            )}
+
+            {isLastQuestionOfPart && isAllPart && (
+              <Button onClick={nextPartHandler}>Phần thi tiếp theo</Button>
+            )}
+
+            {isLastQuestionOfPart &&
+              (!isAllPart || (isAllPart && isFinalPart)) && (
+                <Button onClick={submitHandler}>Nộp bài</Button>
+              )}
           </div>
         </>
       )}
