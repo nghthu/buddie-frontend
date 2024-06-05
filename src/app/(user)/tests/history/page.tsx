@@ -11,7 +11,7 @@ const UserTestHistory = () => {
   const [pageLoading, setPageLoading] = useState(false);
   return (
     <>
-      <SkillHeader title={'Đề Thi Đã Làm'}></SkillHeader>
+      <SkillHeader title={'Lịch sử Làm bài'}></SkillHeader>
       <TestHistory
         pageLoading={pageLoading}
         setPageLoading={setPageLoading}
