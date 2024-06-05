@@ -50,7 +50,7 @@ const CreateTest = () => {
     if (currentTab === '1') {
       await form.validateFields();
       const values = form.getFieldsValue();
-      form.setFieldsValue({ tags: values.tags.split(' ') });
+      form.setFieldsValue({ tags: values.tags ? values.tags.split(' ') : [] });
       setCurrentTab('2');
     } else {
       await form.validateFields();
