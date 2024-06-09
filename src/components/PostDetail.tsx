@@ -6,7 +6,7 @@ import styles from '@/styles/components/Post.module.scss';
 import PostAnswer from './PostAnswer';
 import clsx from 'clsx';
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Button, Input } from 'antd';
 import { auth } from '@/lib';
 
@@ -44,12 +44,16 @@ const PostDetail = ({ postData }: Props) => {
   const user = auth.currentUser;
 
   const [value, setValue] = useState('');
-  const postAnswers = postData.answers.map((answer) => (
-    <PostAnswer
-      key={answer._id}
-      answer={answer}
-    />
-  ));
+  const [postAnswers, setPostAnswers] = useState<React.JSX.Element[]>([]);
+  useEffect(() => {
+    const postAnswersTemp = postData.answers.map((answer) => (
+      <PostAnswer
+        key={answer._id}
+        answer={answer}
+      />
+    ));
+    setPostAnswers(postAnswersTemp);
+  }, []);
 
   const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setValue(e.target.value);
@@ -57,16 +61,27 @@ const PostDetail = ({ postData }: Props) => {
   // TODO: api
   const handlePost = async () => {
     const token = await user?.getIdToken();
-    await fetch(`/api/answer`, {
-      method: 'POST',
+    const res = await fetch(`/api/community/${postData._id}`, {
+      method: 'PUT',
       headers: {
         authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        post_id: postData._id,
-        content: value,
+        answer: { content: value },
       }),
+    }).then((res) => res.json());
+    console.log(res);
+    const newAnswer = res.data.answers.filter((answer: Post) => {
+      return answer.user.user_id === token;
     });
+    setPostAnswers((prev) => [
+      ...prev,
+      <PostAnswer
+        key={newAnswer._id}
+        answer={newAnswer}
+      />,
+    ]);
   };
 
   return (
@@ -101,6 +116,7 @@ const PostDetail = ({ postData }: Props) => {
             )}
           </TextCard>
           <div className={styles.replies}>{postAnswers}</div>
+
           <div className={styles.userInput}>
             <div>
               <img
