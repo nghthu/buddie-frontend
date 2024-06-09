@@ -116,7 +116,7 @@ const Profile = () => {
             </div>
           </TextCard>
         </div>
-        <h2>Lượng request còn lại</h2>
+        <h2>Số lượng Buddie Support còn lại</h2>
         <div className={styles.communityActivities}>
           <TextCard
             width={'100%'}
@@ -125,11 +125,11 @@ const Profile = () => {
           >
             <div className={styles.itemContainer2}>
               <div className={styles.items}>
-                <h4>Request thường</h4>
+                <h4>Buddie Support tiêu chuẩn</h4>
                 <div>{profile.standard_request_count}</div>
               </div>
-              <div className={styles.items}>
-                <h4>Request pro</h4>
+              <div className={styles.items_gold}>
+                <h4>Buddie Support pro</h4>
                 <div>{profile.pro_request_count}</div>
               </div>
             </div>

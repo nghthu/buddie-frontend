@@ -23,6 +23,7 @@ interface test_answer {
   test_id: string;
   parts: {
     _id: string;
+    part_number: number;
     question_groups: {
       _id: string;
       questions: {
@@ -273,6 +274,7 @@ export default function ReadingLayout({
       method: 'POST',
       headers: {
         authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json',
       },
       body: JSON.stringify(answers),
     }).then((res) => res.json());
@@ -316,6 +318,7 @@ export default function ReadingLayout({
         </div>
       </div>
       <div className={questionLayouts.questionContainer}>
+        {questionGroups[currentQuestionGroup - 1]}
         <div className={questionLayouts.buttonWrapper}>
           {currentQuestionGroup > 1 && (
             <Button
@@ -338,7 +341,6 @@ export default function ReadingLayout({
             </Button>
           )}
         </div>
-        {questionGroups[currentQuestionGroup - 1]}
         {chatVisible && (
           <div>
             <CloseChatContext.Provider value={hideChat}>

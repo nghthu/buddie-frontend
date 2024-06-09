@@ -22,6 +22,13 @@ interface Props {
 }
 export default function PostAnswer({ answer }: Props) {
   const [clamp, setClamp] = useState(true);
+  const newDate = new Date(answer.created_at);
+  const formattedDate =
+    (newDate.getDate() < 10 ? newDate.getDate() : '0' + newDate.getDate()) +
+    '/' +
+    (newDate.getMonth() + 1) +
+    '/' +
+    newDate.getFullYear();
   return (
     <div
       className={clsx(
@@ -36,7 +43,7 @@ export default function PostAnswer({ answer }: Props) {
         />
         <div className={styles['post-answer-name-date']}>
           <p>{answer.user.display_name}</p>
-          <p>{new Date(answer.created_at).toUTCString()}</p>
+          <p>{formattedDate}</p>
         </div>
       </div>
       <div

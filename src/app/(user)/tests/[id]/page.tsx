@@ -118,8 +118,14 @@ export default function TestLanding({ params }: { params: { id: string } }) {
   useEffect(() => {
     if (comments) {
       setComments((prev) => {
-        const tempSet = new Set([...prev, ...comments.test_comments]);
-        return Array.from(tempSet);
+        const tempSet = [...prev, ...comments.test_comments];
+        const seen = new Set();
+        const uniqueComments = tempSet.filter((comment) => {
+          const isDuplicate = seen.has(comment._id);
+          seen.add(comment._id);
+          return !isDuplicate;
+        });
+        return Array.from(uniqueComments);
       });
     }
   }, [comments]);
@@ -137,32 +143,6 @@ export default function TestLanding({ params }: { params: { id: string } }) {
       content={comment.comment}
     />
   ));
-
-  commentSection.push(
-    <Comment
-      key={'acssasdsad'}
-      id={'as'}
-      userName={'lorem Ipsum'}
-      userPhotoURL="https://fastly.picsum.photos/id/1/200/300.jpg?hmac=jH5bDkLr6Tgy3oAg5khKCHeunZMHq0ehBZr6vGifPLY"
-      createdDate={'1-1-1970'}
-      content={
-        'lmaasd ksadj alksdj lkasjd lsaj dlksajd lkasjd alksjd oiasj daslid jlsak dhsalkd jalsdj alksdjo lmaasd ksadj alksdj lkasjd lsaj dlksajd lkasjd alksjd oiasj daslid jlsak dhsalkd jalsdj alksdjo lmaasd ksadj alksdj lkasjd lsaj dlksajd lkasjd alksjd oiasj daslid jlsak dhsalkd jalsdj alksdjo lmaasd ksadj alksdj lkasjd lsaj dlksajd lkasjd alksjd oiasj daslid jlsak dhsalkd jalsdj alksdjo lmaasd ksadj alksdj lkasjd lsaj dlksajd lkasjd alksjd oiasj daslid jlsak dhsalkd jalsdj alksdjolmaasd ksadj alksdj lkasjd lsaj dlksajd lkasjd alksjd oiasj daslid jlsak dhsalkd jalsdj alksdjolmaasd ksadj alksdj lkasjd lsaj dlksajd lkasjd alksjd oiasj daslid jlsak dhsalkd jalsdj alksdjolmaasd ksadj alksdj lkasjd lsaj dlksajd lkasjd alksjd oiasj daslid jlsak dhsalkd jalsdj alksdjo'
-      }
-    />
-  );
-
-  commentSection.push(
-    <Comment
-      key={'acssasdsad2'}
-      id={'as'}
-      userName={'lorem Ipsum'}
-      userPhotoURL="https://fastly.picsum.photos/id/1/200/300.jpg?hmac=jH5bDkLr6Tgy3oAg5khKCHeunZMHq0ehBZr6vGifPLY"
-      createdDate={'1-1-1970'}
-      content={
-        'lmaasd ksadj alksdj lkasjd lsaj dlksajd lkasjd alksjd oiasj daslid jlsak dhsalkd jalsdj alksdjo lmaasd ksadj alksdj lkasjd lsaj dlksajd lkasjd alksjd oiasj daslid jlsak dhsalkd jalsdj alksdjo lmaasd ksadj alksdj lkasjd lsaj dlksajd lkasjd alksjd oiasj daslid jlsak'
-      }
-    />
-  );
 
   const parts =
     test?.parts.map((part: { part_duration: number }, index: number) => {
@@ -185,7 +165,17 @@ export default function TestLanding({ params }: { params: { id: string } }) {
     });
     setComment('');
     const data = await response.json();
-    return data;
+    if (data.status === 'error') {
+      notificationApi.error({
+        message: 'Error',
+        description: data.error.message,
+      });
+    } else {
+      setComments((prev) => {
+        const tempSet = new Set([...prev, data.data]);
+        return Array.from(tempSet);
+      });
+    }
   };
 
   return (
@@ -198,10 +188,10 @@ export default function TestLanding({ params }: { params: { id: string } }) {
       >
         <TestDetails
           user_name={test?.user?.display_name || 'lorem ipsum'}
-          rating={test?.review.star || 3.2}
-          rating_count={test?.review.count || 13}
+          rating={test?.review.star || 0}
+          rating_count={test?.review.count || 0}
           update_date={test.updated_at || '2024-04-23T06:57:19.523Z'}
-          submission_count={test.submission_count || 100}
+          submission_count={test.submission_count || 0}
           test_id={test._id}
         />
         <PartSelector

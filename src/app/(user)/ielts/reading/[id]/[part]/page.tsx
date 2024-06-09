@@ -23,6 +23,7 @@ interface test_answer {
   test_id: string;
   parts: {
     _id: string;
+    part_number: number;
     question_groups: {
       _id: string;
       questions: {
@@ -178,6 +179,7 @@ export default function IeltsPart({
           test_id: string;
           parts: {
             _id: string;
+            part_number: number;
             question_groups: {
               _id: string;
               questions: {
@@ -190,6 +192,7 @@ export default function IeltsPart({
         //push in the right part
         temp_test_answer['parts'].push({
           _id: tests['parts'][Number(params.part) - 1]['_id'],
+          part_number: Number(params.part),
           question_groups: [],
         });
 
@@ -219,6 +222,7 @@ export default function IeltsPart({
           test_id: string;
           parts: {
             _id: string;
+            part_number: number;
             question_groups: {
               _id: string;
               questions: {
@@ -239,6 +243,7 @@ export default function IeltsPart({
           ) => {
             temp_test_answer['parts'].push({
               _id: part._id,
+              part_number: i1 + 1,
               question_groups: [],
             });
 

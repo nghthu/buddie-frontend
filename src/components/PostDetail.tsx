@@ -71,19 +71,26 @@ const PostDetail = ({ postData }: Props) => {
         answer: { content: value },
       }),
     }).then((res) => res.json());
-    console.log(res);
+    const userId = user?.uid;
     const newAnswer = res.data.answers.filter((answer: Post) => {
-      return answer.user.user_id === token;
+      return answer.user.user_id === userId;
     });
     setPostAnswers((prev) => [
       ...prev,
       <PostAnswer
         key={newAnswer._id}
-        answer={newAnswer}
+        answer={newAnswer[0]}
       />,
     ]);
+    setValue('');
   };
-
+  const newDate = new Date(postData.created_at);
+  const formattedDate =
+    (newDate.getDate() < 10 ? newDate.getDate() : '0' + newDate.getDate()) +
+    '/' +
+    (newDate.getMonth() + 1) +
+    '/' +
+    newDate.getFullYear();
   return (
     <>
       <div className={styles.post}>
@@ -94,7 +101,7 @@ const PostDetail = ({ postData }: Props) => {
         <div className={styles['post-info-modal-version']}>
           <div className={styles['post-info-user']}>
             <p>{postData.user.display_name}</p>
-            <p>{new Date(postData.created_at).toUTCString()}</p>
+            <p>{formattedDate}</p>
           </div>
           <TextCard
             width="100%"
