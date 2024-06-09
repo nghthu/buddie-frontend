@@ -10,6 +10,31 @@ import { CloseChatContext } from '@/components/CloseChatContext';
 import { auth } from '@/lib';
 import { Spin } from 'antd';
 
+interface QuestionInfo {
+  question_number: number;
+  question_type: string;
+  question_prompt: string;
+  question_image_urls: string[];
+  question_duration: number;
+  options: string[];
+  answer: string;
+  _id: string;
+}
+
+interface QuestionGroupInfo {
+  question_groups_duration: number;
+  question_groups_prompt: string;
+  question_groups_recording: string;
+  question_groups_image_urls: string[];
+}
+
+interface QuestionGroup {
+  is_single_question: boolean;
+  question_groups_info: QuestionGroupInfo;
+  questions: QuestionInfo[];
+  _id: string;
+}
+
 type PartData =
   | {
       part_number: number;
@@ -17,7 +42,7 @@ type PartData =
       part_recording: string;
       part_prompt: string;
       part_image_urls: string[];
-      // question_groups: any[];
+      question_groups: QuestionGroup[];
     }
   | undefined;
 
@@ -36,9 +61,9 @@ export default function PracticePage({
     Array<{ avatar: string; request: string; response: string }>
   >([]);
   const [partData, setPartData] = useState<PartData>(undefined);
-  // const [resultData, setResultData] = useState<
-  //   Array<{ topic: string; content: string }>
-  // >([]);
+  const [resultData, setResultData] = useState<
+    Array<{ topic: string; content: string }>
+  >([]);
   const [isChatProcessing, setIsChatProcessing] = useState(false);
   const [isDataLoading, setIsDataLoading] = useState(false);
   const user = auth.currentUser;
@@ -56,10 +81,10 @@ export default function PracticePage({
     return result.data;
   };
 
-  // const question =
-  //   partData?.question_groups[0].questions[
-  //     Math.floor(Math.random() * partData.question_groups[0].questions.length)
-  //   ];
+  const question =
+    partData?.question_groups[0].questions[
+      Math.floor(Math.random() * partData.question_groups[0].questions.length)
+    ];
 
   useEffect(() => {
     const fetchPartData = async () => {
@@ -85,20 +110,20 @@ export default function PracticePage({
     fetchPartData();
   }, [part]);
 
-  // useEffect(() => {
-  //   localStorage.setItem('resultData', JSON.stringify(resultData));
-  // }, [resultData]);
+  useEffect(() => {
+    localStorage.setItem('resultData', JSON.stringify(resultData));
+  }, [resultData]);
 
   const handleDoneButtonClick = () => {
-    // if (question && textareaRef.current) {
-    //   setResultData((prevResults) => [
-    //     ...prevResults,
-    //     {
-    //       topic: question?.question_prompt,
-    //       content: textareaRef.current?.value || '',
-    //     },
-    //   ]);
-    // }
+    if (question && textareaRef.current) {
+      setResultData((prevResults) => [
+        ...prevResults,
+        {
+          topic: question?.question_prompt,
+          content: textareaRef.current?.value || '',
+        },
+      ]);
+    }
   };
 
   const showMenu = (event: React.MouseEvent) => {
@@ -145,25 +170,25 @@ export default function PracticePage({
     return data;
   };
 
-  // const callParaphraseAPI = async (topic: string, content: string) => {
-  //   const token = await user?.getIdToken();
+  const callParaphraseAPI = async (topic: string, content: string) => {
+    const token = await user?.getIdToken();
 
-  //   const response = await fetch('/api/ai/paraphrase-writing/', {
-  //     method: 'POST',
-  //     headers: {
-  //       'Content-Type': 'application/json',
-  //       authorization: `Bearer ${token}`,
-  //     },
-  //     body: JSON.stringify({
-  //       type: 'essay',
-  //       topic: topic,
-  //       content: content,
-  //     }),
-  //   });
+    const response = await fetch('/api/ai/paraphrase-writing/', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({
+        type: 'essay',
+        topic: topic,
+        content: content,
+      }),
+    });
 
-  //   const data = await response.json();
-  //   return data;
-  // };
+    const data = await response.json();
+    return data;
+  };
 
   const callSynonymsAPI = async (word: string) => {
     const token = await user?.getIdToken();
@@ -198,12 +223,13 @@ export default function PracticePage({
     }
 
     if (message === 'Viết lại') {
-      // apiResponse = await callParaphraseAPI(
-      //   question?.question_prompt,
-      //   selection
-      // );
-      // request.response = apiResponse.data.paraphrased;
-      // setIsChatProcessing(false);
+      if (question && question.question_prompt)
+        apiResponse = await callParaphraseAPI(
+          question?.question_prompt,
+          selection
+        );
+      request.response = apiResponse.data.paraphrased;
+      setIsChatProcessing(false);
     }
 
     if (message === 'Từ đồng nghĩa') {
@@ -250,7 +276,7 @@ export default function PracticePage({
                 className={styles.task}
                 onContextMenu={showMenu}
               >
-                {/* {question?.question_prompt} */}
+                {question?.question_prompt}
               </div>
 
               {part !== '2' && (
@@ -274,7 +300,7 @@ export default function PracticePage({
                     alt=""
                   />
                   <p className={styles.textPracticing}>
-                    {/* {question?.question_prompt.split('.')[0]} */}
+                    {question?.question_prompt.split('.')[0]}
                   </p>
                 </div>
                 <CountdownClock />

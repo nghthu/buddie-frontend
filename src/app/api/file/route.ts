@@ -1,12 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
-import chalk from 'chalk';
-import { NextApiResponse } from 'next';
-import { Readable } from 'stream';
+// import chalk from 'chalk';
+// import { NextApiResponse } from 'next';
+// import { Readable } from 'stream';
 
-export const GET = async function getFile(
-  req: NextRequest,
-  res: NextApiResponse
-) {
+export const GET = async function getFile(req: NextRequest) {
   try {
     console.log(
       'hello',
@@ -24,18 +21,20 @@ export const GET = async function getFile(
       }
     );
 
-    const contentType = response.headers.get('Content-Type');
+    return NextResponse.json(response);
+
+    // const contentType = response.headers.get('Content-Type');
     // if (contentType) res.setHeader('Content-Type', contentType);
 
     // Pipe the Express server's response stream directly to the client's response
 
-    const nodeReadableStream = Readable.from(response.body);
-    nodeReadableStream.pipe(res);
+    // const nodeReadableStream = Readable.from(response.body);
+    // nodeReadableStream.pipe(res);
 
     // console.log(chalk.bgCyan('res'), data);
-    readableStream.on('end', () => {
-      res.end();
-    });
+    // readableStream.on('end', () => {
+    //   res.end();
+    // });
   } catch (error) {
     console.error(error);
     return NextResponse.json({ error });
