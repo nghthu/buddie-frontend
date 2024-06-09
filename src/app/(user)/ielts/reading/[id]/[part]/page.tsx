@@ -12,6 +12,13 @@ import { User } from 'firebase/auth';
 import { auth } from '@/lib';
 import useSWR from 'swr';
 import ReadingFunctionMenu from '@/components/ReadingFunctionMenu';
+import ReadingResult from '@/components/ReadingResult';
+interface questionAndAnswer {
+  index: number | number[];
+  question: string;
+  answer: string | string[];
+  userAnswer: string | string[];
+}
 interface test_answer {
   test_id: string;
   parts: {
@@ -35,7 +42,7 @@ interface questiongroup {
     question_groups_image_urls: Array<string>;
     question_groups_recording: string;
   };
-  questions?: Array<object>;
+  questions?: Array<question>;
 }
 interface subpart {
   _id: string;
@@ -46,6 +53,50 @@ interface subpart {
   part_image_urls: Array<string>;
   question_groups: Array<questiongroup>;
 }
+interface question {
+  _id: string;
+  question_number: number;
+  question_type: string;
+  question_prompt: string;
+  question_image_urls: Array<string>;
+  question_duration: number;
+  options: Array<string>;
+  answer: Array<string> | string;
+}
+
+// for response from api
+interface Question {
+  answer_result: {
+    user_answer: string | string[];
+    assess: boolean;
+    is_correct: boolean;
+  };
+  _id: string;
+}
+
+interface QuestionGroup {
+  questions: Question[];
+  _id: string;
+}
+
+interface Part {
+  question_groups: QuestionGroup[];
+  _id: string;
+}
+
+interface TestData {
+  user_id: string;
+  test_id: string;
+  question_count: number;
+  correct_answer_count: number;
+  score: number;
+  parts: Part[];
+  _id: string;
+  created_at: string;
+  updated_at: string;
+  __v: number;
+}
+
 interface FetchArgs {
   url: string;
   user: User | null;
@@ -58,11 +109,9 @@ const fetcher = async ({ url, user }: FetchArgs) => {
       authorization: `Bearer ${token}`,
     },
   }).then((res) => res.json());
-
   if (response.status === 'error') {
     throw new Error(response.error.message);
   }
-
   return response.data;
 };
 
@@ -71,15 +120,18 @@ export default function IeltsPart({
 }: {
   params: { id: string; part: string };
 }) {
-  // const router = useRouter();
   const [answers, setAnswers] = useState<test_answer>({
     test_id: '',
     parts: [],
   });
+
+  const [fetchedData, setFetchedData] = useState<TestData>();
   // TODO: use timer and setTestTime
   const [testTime] = useState('20:00');
 
   const [currentPart, setCurrentPart] = useState(1);
+
+  const [resultPage, setResultPage] = useState(false);
 
   const [chatTopic, setChatTopic] = useState('');
   const [chatVisible, setChatVisible] = useState(false);
@@ -398,6 +450,8 @@ export default function IeltsPart({
             setChatVisible={setChatVisible}
             setChatRequests={setChatRequests}
             setIsChatProcessing={setIsChatProcessing}
+            setResultPage={setResultPage}
+            setFetchedData={setFetchedData}
           />
         )}
         <ReadingFunctionMenu
@@ -409,6 +463,53 @@ export default function IeltsPart({
     );
   });
 
+  // get questions and user answers in a formatted structure
+  const questionOnly: questionAndAnswer[] = [];
+  jsonData.forEach((part: subpart) => {
+    // Iterate through each question group
+    part.question_groups.forEach((questionGroup: questiongroup) => {
+      // Iterate through each question
+      questionGroup.questions?.forEach((question: question) => {
+        // Get the question prompt
+        const questionPrompt = question.question_prompt;
+        const answer = question.answer;
+        // get the answer from answers using the question_id
+        let answerFromUser: string | string[] = '';
+
+        answers.parts.forEach((part) => {
+          part.question_groups.forEach((questionGroup) => {
+            questionGroup.questions.forEach((q) => {
+              if (q._id === question._id) {
+                answerFromUser = q.answer_result.user_answer;
+              }
+            });
+          });
+        });
+
+        if (question.question_type !== 'multiple_choices') {
+          const questionNumber = question.question_number;
+          questionOnly.push({
+            index: questionNumber,
+            question: questionPrompt,
+            answer: answer,
+            userAnswer: answerFromUser,
+          });
+        } else {
+          const questionNumber = [];
+          for (let i = 0; i < question.answer.length; i++) {
+            questionNumber.push(question.question_number + i);
+          }
+          questionOnly.push({
+            index: questionNumber,
+            question: questionPrompt,
+            answer: answer,
+            userAnswer: answerFromUser,
+          });
+        }
+      });
+    });
+  });
+
   return (
     <div onClick={hideMenu}>
       {contextHolder}
@@ -416,7 +517,13 @@ export default function IeltsPart({
         title={metaData['test_name']}
         countdownTime={testTime}
       >
-        {passageButtons}
+        {!resultPage && passageButtons}
+        {resultPage && (
+          <ReadingResult
+            fetchedData={fetchedData}
+            questionAndAnswer={questionOnly}
+          />
+        )}
       </SkillHeader>
       {parts}
     </div>

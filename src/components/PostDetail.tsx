@@ -1,10 +1,17 @@
 'use client';
 
 import TextCard from './TextCard';
-import { SoundOutlined } from '@ant-design/icons';
+import { SendOutlined, SoundOutlined } from '@ant-design/icons';
 import styles from '@/styles/components/Post.module.scss';
 import PostAnswer from './PostAnswer';
 import clsx from 'clsx';
+
+import React, { useState } from 'react';
+import { Button, Input } from 'antd';
+import { auth } from '@/lib';
+
+const { TextArea } = Input;
+
 interface User {
   user_id: string;
   display_name: string;
@@ -34,12 +41,33 @@ interface Props {
 }
 
 const PostDetail = ({ postData }: Props) => {
+  const user = auth.currentUser;
+
+  const [value, setValue] = useState('');
   const postAnswers = postData.answers.map((answer) => (
     <PostAnswer
       key={answer._id}
       answer={answer}
     />
   ));
+
+  const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    setValue(e.target.value);
+  };
+  // TODO: api
+  const handlePost = async () => {
+    const token = await user?.getIdToken();
+    await fetch(`/api/answer`, {
+      method: 'POST',
+      headers: {
+        authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({
+        post_id: postData._id,
+        content: value,
+      }),
+    });
+  };
 
   return (
     <>
@@ -72,7 +100,28 @@ const PostDetail = ({ postData }: Props) => {
               />
             )}
           </TextCard>
-          {postAnswers}
+          <div className={styles.replies}>{postAnswers}</div>
+          <div className={styles.userInput}>
+            <div>
+              <img
+                src={user?.photoURL ?? ''}
+                alt="User Avatar"
+                className={clsx(styles.avatar, styles.bigger)}
+              />
+              <TextArea
+                placeholder="Nhập câu trả lời của bạn"
+                autoSize={{ minRows: 1, maxRows: 3 }}
+                value={value}
+                onChange={handleChange}
+              />
+            </div>
+            <Button
+              type="primary"
+              shape="circle"
+              icon={<SendOutlined />}
+              onClick={handlePost}
+            />
+          </div>
         </div>
       </div>
     </>

@@ -63,12 +63,15 @@ export default function MultiChoiceLayout(props: {
     });
   }
   if (props.options) {
+    const formattedOptions = props.options.map((option: string, index) => {
+      return { label: index + 1, value: option };
+    });
     const multiChoiceGroup = (
       <Checkbox.Group
         onChange={(checkedValues: string[]) => {
           handleSetAnswer(checkedValues);
         }}
-        options={props.options}
+        options={formattedOptions}
         className={styles.multiChoiceGroup}
         defaultValue={props.userAnswer as string[] | undefined}
       ></Checkbox.Group>

@@ -26,12 +26,17 @@ import { SendOutlined } from '@ant-design/icons';
 //     }[];
 //   }[];
 // }
+interface userComment {
+  user_id: string;
+  display_name: string;
+  photo_url: string;
+}
 interface comment {
   _id: string;
   test_id: string;
-  user_id: string;
   comment: string;
   created_at: string;
+  user: userComment;
 }
 interface FetchArgs {
   url: string;
@@ -126,10 +131,8 @@ export default function TestLanding({ params }: { params: { id: string } }) {
     <Comment
       key={comment._id}
       id={comment._id}
-      userName={'lorem Ipsum'}
-      userPhotoURL={
-        'https://fastly.picsum.photos/id/1/200/300.jpg?hmac=jH5bDkLr6Tgy3oAg5khKCHeunZMHq0ehBZr6vGifPLY'
-      }
+      userName={comment.user.display_name}
+      userPhotoURL={comment.user.photo_url}
       createdDate={comment.created_at}
       content={comment.comment}
     />
@@ -199,6 +202,7 @@ export default function TestLanding({ params }: { params: { id: string } }) {
           rating_count={test?.review.count || 13}
           update_date={test.updated_at || '2024-04-23T06:57:19.523Z'}
           submission_count={test.submission_count || 100}
+          test_id={test._id}
         />
         <PartSelector
           parts={parts}
