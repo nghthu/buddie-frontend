@@ -97,20 +97,16 @@ export default function TestCardHistory(props: {
       )}
       {props.isUserTest && (
         <>
-            <div className={styles.score}>
-                85%
-            </div>
-            <div>
-                48/60 phút
-            </div>
-            <Link href={`/tests/${props.testId}`}>
-                <Button
-                className={styles.button}
-                onClick={() => props.setPageLoading(true)}
-                >
-                Làm lại
-                </Button>
-            </Link>
+          <div className={styles.score}>85%</div>
+          <div>48/60 phút</div>
+          <Link href={`/tests/${props.testId}`}>
+            <Button
+              className={styles.button}
+              onClick={() => props.setPageLoading(true)}
+            >
+              Làm lại
+            </Button>
+          </Link>
         </>
       )}
       <Modal
