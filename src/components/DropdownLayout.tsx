@@ -53,7 +53,7 @@ export default function DropdownLayout(props: {
   }
   if (props.options) {
     const selecOptions = props.options.map((option: string, index) => {
-      return { label: option, value: index + 1 };
+      return { label: option, value: (index + 1).toString() };
     });
     const select = (
       <Select

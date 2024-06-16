@@ -13,12 +13,6 @@ import { auth } from '@/lib';
 import useSWR from 'swr';
 import ReadingFunctionMenu from '@/components/ReadingFunctionMenu';
 import ReadingResult from '@/components/ReadingResult';
-interface questionAndAnswer {
-  index: number | number[];
-  question: string;
-  answer: string | string[];
-  userAnswer: string | string[];
-}
 interface test_answer {
   test_id: string;
   parts: {
@@ -468,69 +462,27 @@ export default function IeltsPart({
     );
   });
 
-  // get questions and user answers in a formatted structure
-  const questionOnly: questionAndAnswer[] = [];
-  jsonData.forEach((part: subpart) => {
-    // Iterate through each question group
-    part.question_groups.forEach((questionGroup: questiongroup) => {
-      // Iterate through each question
-      questionGroup.questions?.forEach((question: question) => {
-        // Get the question prompt
-        const questionPrompt = question.question_prompt;
-        const answer = question.answer;
-        // get the answer from answers using the question_id
-        let answerFromUser: string | string[] = '';
-
-        answers.parts.forEach((part) => {
-          part.question_groups.forEach((questionGroup) => {
-            questionGroup.questions.forEach((q) => {
-              if (q._id === question._id) {
-                answerFromUser = q.answer_result.user_answer;
-              }
-            });
-          });
-        });
-
-        if (question.question_type !== 'multiple_choices') {
-          const questionNumber = question.question_number;
-          questionOnly.push({
-            index: questionNumber,
-            question: questionPrompt,
-            answer: answer,
-            userAnswer: answerFromUser,
-          });
-        } else {
-          const questionNumber = [];
-          for (let i = 0; i < question.answer.length; i++) {
-            questionNumber.push(question.question_number + i);
-          }
-          questionOnly.push({
-            index: questionNumber,
-            question: questionPrompt,
-            answer: answer,
-            userAnswer: answerFromUser,
-          });
-        }
-      });
-    });
-  });
-
   return (
     <div onClick={hideMenu}>
       {contextHolder}
-      <SkillHeader
-        title={metaData['test_name']}
-        countdownTime={testTime}
-      >
-        {!resultPage && passageButtons}
-        {resultPage && (
-          <ReadingResult
-            fetchedData={fetchedData}
-            questionAndAnswer={questionOnly}
-          />
-        )}
-      </SkillHeader>
-      {parts}
+      {!resultPage && (
+        <>
+          <SkillHeader
+            title={metaData['test_name']}
+            countdownTime={testTime}
+          >
+            {passageButtons}
+          </SkillHeader>
+          {parts}
+        </>
+      )}
+      {resultPage && (
+        <ReadingResult
+          jsonData={jsonData}
+          fetchedData={fetchedData}
+          answers={answers}
+        />
+      )}
     </div>
   );
 }

@@ -65,7 +65,7 @@ export default function MultiChoiceLayout(props: {
   }
   if (props.options) {
     const formattedOptions = props.options.map((option: string, index) => {
-      return { label: index + 1, value: option };
+      return { label: option, value: (index + 1).toString() };
     });
     const multiChoiceGroup = (
       <Checkbox.Group

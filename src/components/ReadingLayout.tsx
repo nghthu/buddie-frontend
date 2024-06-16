@@ -270,15 +270,16 @@ export default function ReadingLayout({
   const handleSubmitAnswer = async () => {
     setIsDisabled(true);
     const token = await user?.getIdToken();
-    const res = await fetch(`/api/test-submissions`, {
+    const response = await fetch(`/api/test-submissions`, {
       method: 'POST',
       headers: {
         authorization: `Bearer ${token}`,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify(answers),
-    }).then((res) => res.json());
-    setFetchedData(res.data);
+    });
+    const res = await response.json();
+    setFetchedData(res);
     setResultPage(true);
   };
   const display = (

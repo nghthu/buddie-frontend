@@ -57,7 +57,7 @@ export default function SingleChoiceLayout(props: {
             key={option + '<div></div>'}
             className={styles.radio}
             name={props.question}
-            value={index + 1}
+            value={(index + 1).toString()}
           >
             {' '}
             {option}
