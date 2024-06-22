@@ -126,7 +126,7 @@ const Header = (props: Props) => {
             onClick={() => tabClickHandler('ielts')}
           >
             <p className={clsx(activatedTab === 'ielts' && styles.activate)}>
-              IELTS cùng AI ✨
+              IELTS cùng AI✨
             </p>
           </Link>
           <Dropdown

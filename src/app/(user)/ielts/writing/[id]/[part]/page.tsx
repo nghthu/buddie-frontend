@@ -108,7 +108,7 @@ export default function PracticePage({
     };
 
     fetchPartData();
-  }, [part]);
+  }, [part, getPartData]);
 
   useEffect(() => {
     localStorage.setItem('resultData', JSON.stringify(resultData));
