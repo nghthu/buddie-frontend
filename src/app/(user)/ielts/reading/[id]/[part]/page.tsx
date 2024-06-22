@@ -12,10 +12,12 @@ import { User } from 'firebase/auth';
 import { auth } from '@/lib';
 import useSWR from 'swr';
 import ReadingFunctionMenu from '@/components/ReadingFunctionMenu';
+import ReadingResult from '@/components/ReadingResult';
 interface test_answer {
   test_id: string;
   parts: {
     _id: string;
+    part_number: number;
     question_groups: {
       _id: string;
       questions: {
@@ -35,7 +37,7 @@ interface questiongroup {
     question_groups_image_urls: Array<string>;
     question_groups_recording: string;
   };
-  questions?: Array<object>;
+  questions?: Array<question>;
 }
 interface subpart {
   _id: string;
@@ -46,6 +48,50 @@ interface subpart {
   part_image_urls: Array<string>;
   question_groups: Array<questiongroup>;
 }
+interface question {
+  _id: string;
+  question_number: number;
+  question_type: string;
+  question_prompt: string;
+  question_image_urls: Array<string>;
+  question_duration: number;
+  options: Array<string>;
+  answer: Array<string> | string;
+}
+
+// for response from api
+interface Question {
+  answer_result: {
+    user_answer: string | string[];
+    assess: boolean;
+    is_correct: boolean;
+  };
+  _id: string;
+}
+
+interface QuestionGroup {
+  questions: Question[];
+  _id: string;
+}
+
+interface Part {
+  question_groups: QuestionGroup[];
+  _id: string;
+}
+
+interface TestData {
+  user_id: string;
+  test_id: string;
+  question_count: number;
+  correct_answer_count: number;
+  score: number;
+  parts: Part[];
+  _id: string;
+  created_at: string;
+  updated_at: string;
+  __v: number;
+}
+
 interface FetchArgs {
   url: string;
   user: User | null;
@@ -58,11 +104,9 @@ const fetcher = async ({ url, user }: FetchArgs) => {
       authorization: `Bearer ${token}`,
     },
   }).then((res) => res.json());
-
   if (response.status === 'error') {
     throw new Error(response.error.message);
   }
-
   return response.data;
 };
 
@@ -71,15 +115,18 @@ export default function IeltsPart({
 }: {
   params: { id: string; part: string };
 }) {
-  // const router = useRouter();
   const [answers, setAnswers] = useState<test_answer>({
     test_id: '',
     parts: [],
   });
+
+  const [fetchedData, setFetchedData] = useState<TestData>();
   // TODO: use timer and setTestTime
   const [testTime] = useState('20:00');
 
   const [currentPart, setCurrentPart] = useState(1);
+
+  const [resultPage, setResultPage] = useState(false);
 
   const [chatTopic, setChatTopic] = useState('');
   const [chatVisible, setChatVisible] = useState(false);
@@ -126,6 +173,7 @@ export default function IeltsPart({
           test_id: string;
           parts: {
             _id: string;
+            part_number: number;
             question_groups: {
               _id: string;
               questions: {
@@ -138,6 +186,7 @@ export default function IeltsPart({
         //push in the right part
         temp_test_answer['parts'].push({
           _id: tests['parts'][Number(params.part) - 1]['_id'],
+          part_number: Number(params.part),
           question_groups: [],
         });
 
@@ -167,6 +216,7 @@ export default function IeltsPart({
           test_id: string;
           parts: {
             _id: string;
+            part_number: number;
             question_groups: {
               _id: string;
               questions: {
@@ -187,6 +237,7 @@ export default function IeltsPart({
           ) => {
             temp_test_answer['parts'].push({
               _id: part._id,
+              part_number: i1 + 1,
               question_groups: [],
             });
 
@@ -398,6 +449,8 @@ export default function IeltsPart({
             setChatVisible={setChatVisible}
             setChatRequests={setChatRequests}
             setIsChatProcessing={setIsChatProcessing}
+            setResultPage={setResultPage}
+            setFetchedData={setFetchedData}
           />
         )}
         <ReadingFunctionMenu
@@ -412,13 +465,24 @@ export default function IeltsPart({
   return (
     <div onClick={hideMenu}>
       {contextHolder}
-      <SkillHeader
-        title={metaData['test_name']}
-        countdownTime={testTime}
-      >
-        {passageButtons}
-      </SkillHeader>
-      {parts}
+      {!resultPage && (
+        <>
+          <SkillHeader
+            title={metaData['test_name']}
+            countdownTime={testTime}
+          >
+            {passageButtons}
+          </SkillHeader>
+          {parts}
+        </>
+      )}
+      {resultPage && (
+        <ReadingResult
+          jsonData={jsonData}
+          fetchedData={fetchedData}
+          answers={answers}
+        />
+      )}
     </div>
   );
 }
