@@ -12,7 +12,6 @@ import { User } from 'firebase/auth';
 import { auth } from '@/lib';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import type { SearchProps } from 'antd/es/input/Search';
-
 const { TextArea } = Input;
 interface FetchArgs {
   url: string;
@@ -144,13 +143,24 @@ const Community = () => {
     }
     formData.append('text', newPostValue);
 
-    await fetch(`/api/questions`, {
+    const res = await fetch(`/api/questions`, {
       method: 'POST',
       headers: {
         authorization: `Bearer ${token}`,
       },
       body: formData,
+    }).then((res) => res.json());
+    console.log(res);
+    setTotalQuestions((prev) => {
+      const seen = new Set();
+      const returnRes = [res ?? {}, ...prev].filter((question) => {
+        if (seen.has(question._id)) return false;
+        seen.add(question._id);
+        return true;
+      });
+      return returnRes;
     });
+    setOffset((prev) => prev + 1);
     handleCancelCreate();
     setLoadingCreate(false);
   };
@@ -181,7 +191,26 @@ const Community = () => {
   const hideCreateModal = () => {
     setOpenCreatePost(false);
   };
-
+  const refresh = async () => {
+    const token = await user?.getIdToken();
+    const res = await fetch(
+      `/api/community?offset=${offset}&limit=${LIMIT}&text=${search}`,
+      {
+        headers: {
+          authorization: `Bearer ${token}`,
+        },
+      }
+    ).then((res) => res.json());
+    setTotalQuestions(() => {
+      const seen = new Set();
+      const returnRes = [...(res.data.questions ?? [])].filter((question) => {
+        if (seen.has(question._id)) return false;
+        seen.add(question._id);
+        return true;
+      });
+      return returnRes;
+    });
+  };
   const onSearch: SearchProps['onSearch'] = (value) => {
     // split the search value into an array of words, delimiter is space
     const searchWords = encodeURIComponent(value.trim());
@@ -195,6 +224,7 @@ const Community = () => {
         key={question._id}
         postData={question}
         comments={question.answers.length}
+        onClose={refresh}
       />
     );
   });

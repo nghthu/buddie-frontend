@@ -24,9 +24,11 @@ export default function PostAnswer({ answer }: Props) {
   const [clamp, setClamp] = useState(true);
   const newDate = new Date(answer.created_at);
   const formattedDate =
-    (newDate.getDate() < 10 ? newDate.getDate() : '0' + newDate.getDate()) +
+    (newDate.getDate() < 10 ? '0' + newDate.getDate() : newDate.getDate()) +
     '/' +
-    (newDate.getMonth() + 1) +
+    (newDate.getMonth() + 1 < 10
+      ? '0' + newDate.getMonth()
+      : newDate.getMonth()) +
     '/' +
     newDate.getFullYear();
   return (
