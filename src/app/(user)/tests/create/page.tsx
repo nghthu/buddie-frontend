@@ -469,16 +469,6 @@ const CreateTest = () => {
 
                                         <div className={styles.timeInput}>
                                           <Form.Item
-                                            label="Thời gian Chuẩn bị"
-                                            name={[
-                                              questionField.name,
-                                              'question_preparation_time',
-                                            ]}
-                                          >
-                                            <InputNumber min={1} />
-                                          </Form.Item>
-
-                                          <Form.Item
                                             label="Thời gian Làm bài"
                                             name={[
                                               questionField.name,
@@ -585,7 +575,7 @@ const CreateTest = () => {
                                                         ]}
                                                         noStyle
                                                       >
-                                                        <Input placeholder="Đáp án" />
+                                                        <Input placeholder="Lựa chọn..." />
                                                       </Form.Item>
 
                                                       <MinusCircleOutlined
@@ -680,7 +670,7 @@ const CreateTest = () => {
                                                             ]}
                                                             noStyle
                                                           >
-                                                            <Input placeholder="Option text" />
+                                                            <Input placeholder="Lựa chọn..." />
                                                           </Form.Item>
 
                                                           <Form.Item>
