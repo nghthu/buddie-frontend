@@ -62,9 +62,12 @@ const { TextArea } = Input;
 
 export default function TestLanding({ params }: { params: { id: string } }) {
   // TODO: Implement infinite scroll and fetch more data and use setTotalPage
+  const [isFetching, setIsFetching] = useState(false);
   const [totalPage] = useState(1);
   const [totalComments, setComments] = useState([] as comment[]);
   const [comment, setComment] = useState('');
+  const [rating, setRating] = useState(0);
+  const [totalRating, setTotalRating] = useState(0);
   const scrollRef = useRef<HTMLDivElement>(null);
   const user = auth.currentUser;
   const {
@@ -129,6 +132,12 @@ export default function TestLanding({ params }: { params: { id: string } }) {
       });
     }
   }, [comments]);
+  useEffect(() => {
+    if (test && test.review) {
+      setRating(test.review.star);
+      setTotalRating(test.review.count);
+    }
+  }, [test]);
   if (isLoading) {
     return <Spin size="large" />;
   }
@@ -150,6 +159,7 @@ export default function TestLanding({ params }: { params: { id: string } }) {
     }) || [];
 
   const handleSendComment = async () => {
+    setIsFetching(true);
     const token = await user?.getIdToken();
 
     const response = await fetch(`/api/comment/${params.id}`, {
@@ -176,8 +186,22 @@ export default function TestLanding({ params }: { params: { id: string } }) {
         return Array.from(tempSet);
       });
     }
+    setIsFetching(false);
   };
-
+  const handleRefresh = (rate: number) => {
+    // const token = await user?.getIdToken();
+    setRating((prev) => {
+      const totalRate = totalRating;
+      return (prev * totalRate + rate) / (totalRate + 1);
+    });
+    setTotalRating((prev) => prev + 1);
+    // const newTest = await fetch(`/api/tests/${params.id}`, {
+    //   headers: {
+    //     authorization: `Bearer ${token}`,
+    //   },
+    // }).then((res) => res.json());
+    // await mutate(`/api/tests/${params.id}`, newTest.data, true);
+  };
   return (
     <div className={styles.pageWrapper}>
       {contextHolder}
@@ -188,11 +212,12 @@ export default function TestLanding({ params }: { params: { id: string } }) {
       >
         <TestDetails
           user_name={test?.user?.display_name || 'lorem ipsum'}
-          rating={test?.review.star || 0}
-          rating_count={test?.review.count || 0}
-          update_date={test.updated_at || '2024-04-23T06:57:19.523Z'}
+          rating={rating || 0}
+          rating_count={totalRating || 0}
+          create_date={test.created_at || '2024-04-23T06:57:19.523Z'}
           submission_count={test.submission_count || 0}
           test_id={test._id}
+          handleRefresh={handleRefresh}
         />
         <PartSelector
           parts={parts}
@@ -236,6 +261,7 @@ export default function TestLanding({ params }: { params: { id: string } }) {
                 icon={<SendOutlined />}
                 size="large"
                 onClick={handleSendComment}
+                disabled={isFetching}
               />
             </div>
           </div>

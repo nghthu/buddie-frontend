@@ -6,7 +6,7 @@ import styles from '@/styles/components/Post.module.scss';
 import PostAnswer from './PostAnswer';
 import clsx from 'clsx';
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Button, Input } from 'antd';
 import { auth } from '@/lib';
 
@@ -44,7 +44,12 @@ const PostDetail = ({ postData }: Props) => {
   const user = auth.currentUser;
 
   const [value, setValue] = useState('');
+  const [isPosting, setIsPosting] = useState(false);
   const [postAnswers, setPostAnswers] = useState<React.JSX.Element[]>([]);
+  const audioref = useRef<HTMLAudioElement>(null);
+
+  const [audioPlaying, setAudioPlaying] = useState(false);
+
   useEffect(() => {
     const postAnswersTemp = postData.answers.map((answer) => (
       <PostAnswer
@@ -55,11 +60,22 @@ const PostDetail = ({ postData }: Props) => {
     setPostAnswers(postAnswersTemp);
   }, []);
 
+  const handleAudio = (e: React.MouseEvent<HTMLElement>) => {
+    e.stopPropagation();
+    if (audioPlaying) {
+      audioref.current?.pause();
+    } else {
+      audioref.current?.play();
+    }
+    setAudioPlaying((prev) => !prev);
+  };
+
   const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setValue(e.target.value);
   };
   // TODO: api
   const handlePost = async () => {
+    setIsPosting(true);
     const token = await user?.getIdToken();
     const res = await fetch(`/api/community/${postData._id}`, {
       method: 'PUT',
@@ -72,17 +88,24 @@ const PostDetail = ({ postData }: Props) => {
       }),
     }).then((res) => res.json());
     const userId = user?.uid;
-    const newAnswer = res.data.answers.filter((answer: Post) => {
-      return answer.user.user_id === userId;
-    });
+    const newAnswer = res.data.answers
+      .filter((answer: Post) => {
+        return answer.user.user_id === userId;
+      })
+      .sort((a: Post, b: Post) => {
+        return (
+          new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+        );
+      })[0];
     setPostAnswers((prev) => [
       ...prev,
       <PostAnswer
         key={newAnswer._id}
-        answer={newAnswer[0]}
+        answer={newAnswer}
       />,
     ]);
     setValue('');
+    setIsPosting(false);
   };
   const newDate = new Date(postData.created_at);
   const formattedDate =
@@ -113,7 +136,15 @@ const PostDetail = ({ postData }: Props) => {
           >
             <div className={styles['post-text']}>
               <p>{postData.text}</p>
-              {postData.audio_url !== undefined && <SoundOutlined />}
+              {postData.audio_url !== undefined && (
+                <>
+                  <audio
+                    ref={audioref}
+                    src={postData.audio_url}
+                  />
+                  <SoundOutlined onClick={handleAudio} />
+                </>
+              )}
             </div>
             {postData.image_url && (
               <img
@@ -143,6 +174,7 @@ const PostDetail = ({ postData }: Props) => {
               shape="circle"
               icon={<SendOutlined />}
               onClick={handlePost}
+              disabled={value === '' || isPosting}
             />
           </div>
         </div>

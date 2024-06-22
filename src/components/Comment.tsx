@@ -22,10 +22,13 @@ export default function Comment({
     setIsClamping(!isClamping);
   }
   const newDate = new Date(createdDate);
+
   const formattedDate =
-    (newDate.getDate() < 10 ? newDate.getDate() : '0' + newDate.getDate()) +
+    (newDate.getDate() < 10 ? '0' + newDate.getDate() : newDate.getDate()) +
     '/' +
-    (newDate.getMonth() + 1) +
+    (newDate.getMonth() + 1 < 10
+      ? '0' + newDate.getMonth()
+      : newDate.getMonth()) +
     '/' +
     newDate.getFullYear();
   return (

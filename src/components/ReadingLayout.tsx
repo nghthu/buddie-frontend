@@ -11,7 +11,7 @@ import questionLayouts from '@/styles/components/questionLayouts.module.scss';
 import textCardStyles from '@/styles/components/TextCard.module.scss';
 import buttonStyles from '@/styles/components/WebButton.module.scss';
 import clsx from 'clsx';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import React from 'react';
 
 import BuddieSupport from './BuddieSupport';
@@ -114,8 +114,6 @@ interface Props {
   part: string;
   chatRequests: Array<chatRequests>;
   onContextMenu: (e: React.MouseEvent<HTMLDivElement>) => void;
-
-  setChatTopic: React.Dispatch<React.SetStateAction<string>>;
   setAnswer: React.Dispatch<React.SetStateAction<test_answer>>;
   setChatVisible: React.Dispatch<React.SetStateAction<boolean>>;
   setChatRequests: React.Dispatch<React.SetStateAction<Array<chatRequests>>>;
@@ -134,7 +132,6 @@ export default function ReadingLayout({
   testId,
   part,
   onContextMenu,
-  setChatTopic,
   setAnswer,
   setChatVisible,
   setChatRequests,
@@ -146,10 +143,6 @@ export default function ReadingLayout({
   const [currentQuestionGroup, setCurrentQuestionGroup] = useState(1);
   const [isDisabled, setIsDisabled] = useState(false);
   const router = useRouter();
-
-  useEffect(() => {
-    setChatTopic(data.part_prompt);
-  }, [data.part_prompt]);
 
   const maxGroup = data['question_groups'].length;
   const questionGroups = (data['question_groups'] as questiongroup[]).map(
