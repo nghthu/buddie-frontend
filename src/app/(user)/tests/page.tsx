@@ -8,7 +8,7 @@ const UserTestLibrary = () => {
   const [pageLoading, setPageLoading] = useState(false);
   return (
     <>
-      <SkillHeader title={'Lịch sử làm bài'}></SkillHeader>
+      <SkillHeader title={'Danh sách Đề thi'}></SkillHeader>
       <TestLibrary
         pageLoading={pageLoading}
         setPageLoading={setPageLoading}
