@@ -2,7 +2,7 @@
 
 import styles from '@/styles/pages/tests/create/Create.module.scss';
 import { Button, Card, Checkbox, InputNumber, Radio, Space, Tabs } from 'antd';
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import {
   FormOutlined,
   OrderedListOutlined,
@@ -21,13 +21,29 @@ const { Option } = Select;
 const CreateTest = () => {
   const [currentTab, setCurrentTab] = useState('1');
   const [form] = Form.useForm();
-  const [haveOptions, setHaveOptions] = useState(false);
-  const [haveChoices, setHaveChoices] = useState(false);
+
+  const fileInputRefPart = useRef<HTMLInputElement>(null);
+  const audioFileInputRefPart = useRef<HTMLInputElement>(null);
+  const fileInputRefQuestionGroup = useRef<HTMLInputElement>(null);
+  const audioFileInputRefQuestionGroup = useRef<HTMLInputElement>(null);
+  const fileInputRefQuestion = useRef<HTMLInputElement>(null);
+  const audioFileInputRefQuestion = useRef<HTMLInputElement>(null);
+  const [uploadedFileNames, setUploadedFileNames] = useState<{
+    [key: string]: string | null;
+  }>({});
+  const [haveOptions, setHaveOptions] = useState<{
+    [key: string]: boolean;
+  }>({});
+  const [haveChoices, setHaveChoices] = useState<{
+    [key: string]: boolean;
+  }>({});
   const router = useRouter();
   const user = auth.currentUser;
 
   const callCreateTestAPI = async () => {
     const token = await user?.getIdToken();
+    console.log(token);
+    console.log(form.getFieldsValue());
 
     const response = await fetch(`/api/tests/create`, {
       method: 'POST',
@@ -43,6 +59,7 @@ const CreateTest = () => {
     }
 
     const result = await response.json();
+    console.log(result);
     return result;
   };
 
@@ -68,6 +85,188 @@ const CreateTest = () => {
 
   const handleTabChange = (key: string) => {
     setCurrentTab(key);
+  };
+
+  type Part = {
+    part_number: number;
+    part_duration: number | null;
+    part_recording: string | null;
+    part_prompt: string;
+    part_image_urls: string;
+    question_groups: Array<QuestionGroup>;
+  };
+
+  type QuestionGroup = {
+    is_single_question: boolean;
+    question_groups_info: {
+      question_groups_duration: number | null;
+      question_groups_prompt: string;
+      question_groups_recording: string | null;
+      question_groups_image_urls: string;
+    };
+    questions: Array<Question>;
+  };
+
+  type Question = {
+    question_number: number;
+    question_type: string;
+    question_prompt: string;
+    question_image_urls: string;
+    question_duration: number | null;
+    question_preparation_time: number | null;
+    question_recording: string | null;
+  };
+
+  const handleFileChangePart =
+    (partIndex: number, type: string) =>
+    (event: React.ChangeEvent<HTMLInputElement>) => {
+      const file: File | undefined = event.target.files?.[0];
+      if (file) {
+        form.setFieldsValue({
+          parts: form
+            .getFieldsValue()
+            .parts.map((part: Part, index: number) => {
+              if (index === partIndex) {
+                return type === 'audio'
+                  ? { ...part, part_recording: file }
+                  : { ...part, part_image_urls: file };
+              }
+              return part;
+            }),
+        });
+
+        const newUploadedFileNames = { ...uploadedFileNames };
+        const key = `part_${partIndex + 1}_${type}`;
+        newUploadedFileNames[key] = file.name;
+        setUploadedFileNames(newUploadedFileNames);
+      }
+
+      console.log(form.getFieldsValue());
+    };
+
+  const handleFileChangeQuestionGroup =
+    (partIndex: number, questionGroupIndex: number, type: string) =>
+    (event: React.ChangeEvent<HTMLInputElement>) => {
+      const file = event.target.files?.[0];
+      if (file) {
+        form.setFieldsValue({
+          parts: form
+            .getFieldsValue()
+            .parts.map((part: Part, index: number) => {
+              if (index === partIndex) {
+                return {
+                  ...part,
+                  question_groups: part.question_groups.map(
+                    (questionGroup: QuestionGroup, i: number) => {
+                      if (i === questionGroupIndex) {
+                        return type === 'audio'
+                          ? {
+                              ...questionGroup,
+                              question_groups_info: {
+                                ...questionGroup.question_groups_info,
+                                question_groups_recording: file,
+                              },
+                            }
+                          : {
+                              ...questionGroup,
+                              question_groups_info: {
+                                ...questionGroup.question_groups_info,
+                                question_groups_image_urls: file,
+                              },
+                            };
+                      }
+                      return questionGroup;
+                    }
+                  ),
+                };
+              }
+              return part;
+            }),
+        });
+
+        const newUploadedFileNames = { ...uploadedFileNames };
+        const key = `part_${partIndex + 1}_question_group_${
+          questionGroupIndex + 1
+        }_${type}`;
+        newUploadedFileNames[key] = file.name;
+        setUploadedFileNames(newUploadedFileNames);
+      }
+    };
+
+  const handleFileChangeQuestion =
+    (
+      partIndex: number,
+      questionGroupIndex: number,
+      questionIndex: number,
+      type: string
+    ) =>
+    (event: React.ChangeEvent<HTMLInputElement>) => {
+      const file = event.target.files?.[0];
+      if (file) {
+        form.setFieldsValue({
+          parts: form
+            .getFieldsValue()
+            .parts.map((part: Part, index: number) => {
+              if (index === partIndex) {
+                return {
+                  ...part,
+                  question_groups: part.question_groups.map(
+                    (questionGroup: QuestionGroup, i: number) => {
+                      if (i === questionGroupIndex) {
+                        return {
+                          ...questionGroup,
+                          questions: questionGroup.questions.map(
+                            (question: Question, j: number) => {
+                              if (j === questionIndex) {
+                                return type === 'audio'
+                                  ? { ...question, question_recording: file }
+                                  : { ...question, question_image_urls: file };
+                              }
+                              return question;
+                            }
+                          ),
+                        };
+                      }
+                      return questionGroup;
+                    }
+                  ),
+                };
+              }
+              return part;
+            }),
+        });
+
+        const newUploadedFileNames = { ...uploadedFileNames };
+        const key = `part_${partIndex + 1}_question_group_${
+          questionGroupIndex + 1
+        }_question_${questionIndex + 1}_${type}`;
+        newUploadedFileNames[key] = file.name;
+        setUploadedFileNames(newUploadedFileNames);
+      }
+    };
+
+  useEffect(() => {}, [haveOptions, haveChoices, uploadedFileNames]);
+
+  const handleQuestionTypeChange = (
+    partIndex: number,
+    questionGroupIndex: number,
+    questionIndex: number,
+    value: string
+  ) => {
+    const key = `part_${partIndex + 1}_question_group_${
+      questionGroupIndex + 1
+    }_question_${questionIndex + 1}`;
+
+    if (value === 'selection' || value === 'single_choice') {
+      setHaveOptions({ ...haveOptions, [key]: true });
+      setHaveChoices({ ...haveChoices, [key]: false });
+    } else if (value === 'multiple_choices') {
+      setHaveOptions({ ...haveOptions, [key]: true });
+      setHaveChoices({ ...haveChoices, [key]: true });
+    } else {
+      setHaveOptions({ ...haveOptions, [key]: false });
+      setHaveChoices({ ...haveChoices, [key]: false });
+    }
   };
 
   const items = [
@@ -221,7 +420,6 @@ const CreateTest = () => {
                     >
                       <Input type="hidden" />
                     </Form.Item>
-
                     <Form.Item
                       className={styles.prompt}
                       label="Tiêu đề Phần thi"
@@ -230,22 +428,52 @@ const CreateTest = () => {
                       <Input.TextArea placeholder="Tiêu đề Phần thi" />
                     </Form.Item>
 
+                    {uploadedFileNames[`part_${index + 1}_audio`] && (
+                      <div className={styles.uploadedFileName}>
+                        {uploadedFileNames[`part_${index + 1}_audio`]}
+                      </div>
+                    )}
+
+                    {uploadedFileNames[`part_${index + 1}_image`] && (
+                      <div className={styles.uploadedFileName}>
+                        {uploadedFileNames[`part_${index + 1}_image`]}
+                      </div>
+                    )}
+
                     <div className={styles.buttonsContainer}>
                       <Form.Item name={[field.name, 'part_recording']}>
-                        <Button icon={<SoundOutlined />}></Button>
+                        <input
+                          type="file"
+                          ref={audioFileInputRefPart}
+                          style={{ display: 'none' }}
+                          onChange={handleFileChangePart(index, 'audio')}
+                        />
+                        <Button
+                          type="text"
+                          icon={<SoundOutlined />}
+                          onClick={() => audioFileInputRefPart.current?.click()}
+                        ></Button>
                       </Form.Item>
                       <Form.Item name={[field.name, 'part_image_urls']}>
-                        <Button icon={<PictureOutlined />}></Button>
+                        <input
+                          type="file"
+                          ref={fileInputRefPart}
+                          style={{ display: 'none' }}
+                          onChange={handleFileChangePart(index, 'image')}
+                        />
+                        <Button
+                          type="text"
+                          icon={<PictureOutlined />}
+                          onClick={() => fileInputRefPart.current?.click()}
+                        />
                       </Form.Item>
                     </div>
-
                     <Form.Item
                       label="Thời gian làm bài (phút)"
                       name={[field.name, 'part_duration']}
                     >
                       <InputNumber min={1} />
                     </Form.Item>
-
                     <Form.List name={[field.name, 'question_groups']}>
                       {(subFields, subOpt) => (
                         <div>
@@ -280,16 +508,87 @@ const CreateTest = () => {
                               >
                                 <Input.TextArea placeholder="Tiêu đề Nhóm câu hỏi..." />
                               </Form.Item>
+
+                              {uploadedFileNames[
+                                `part_${index + 1}_question_group_${
+                                  subField.name + 1
+                                }_audio`
+                              ] && (
+                                <div className={styles.uploadedFileName}>
+                                  {
+                                    uploadedFileNames[
+                                      `part_${index + 1}_question_group_${
+                                        subField.name + 1
+                                      }_audio`
+                                    ]
+                                  }
+                                </div>
+                              )}
+
+                              {uploadedFileNames[
+                                `part_${index + 1}_question_group_${
+                                  subField.name + 1
+                                }_image`
+                              ] && (
+                                <div className={styles.uploadedFileName}>
+                                  {
+                                    uploadedFileNames[
+                                      `part_${index + 1}_question_group_${
+                                        subField.name + 1
+                                      }_image`
+                                    ]
+                                  }
+                                </div>
+                              )}
+
                               <div className={styles.buttonsContainer}>
                                 <Form.Item
-                                  name={[field.name, 'part_recording']}
+                                  name={[
+                                    subField.name,
+                                    'question_groups_recording',
+                                  ]}
                                 >
-                                  <Button icon={<SoundOutlined />}></Button>
+                                  <input
+                                    type="file"
+                                    ref={audioFileInputRefQuestionGroup}
+                                    style={{ display: 'none' }}
+                                    onChange={handleFileChangeQuestionGroup(
+                                      index,
+                                      subField.name,
+                                      'audio'
+                                    )}
+                                  />
+                                  <Button
+                                    type="text"
+                                    icon={<SoundOutlined />}
+                                    onClick={() =>
+                                      audioFileInputRefQuestionGroup.current?.click()
+                                    }
+                                  />
                                 </Form.Item>
                                 <Form.Item
-                                  name={[field.name, 'part_image_urls']}
+                                  name={[
+                                    subField.name,
+                                    'question_groups_image_urls',
+                                  ]}
                                 >
-                                  <Button icon={<PictureOutlined />}></Button>
+                                  <input
+                                    type="file"
+                                    ref={fileInputRefQuestionGroup}
+                                    style={{ display: 'none' }}
+                                    onChange={handleFileChangeQuestionGroup(
+                                      index,
+                                      subField.name,
+                                      'image'
+                                    )}
+                                  />
+                                  <Button
+                                    type="text"
+                                    icon={<PictureOutlined />}
+                                    onClick={() =>
+                                      fileInputRefQuestionGroup.current?.click()
+                                    }
+                                  />
                                 </Form.Item>
                               </div>
 
@@ -397,28 +696,103 @@ const CreateTest = () => {
                                         >
                                           <Input.TextArea placeholder="Nội dung Câu hỏi..." />
                                         </Form.Item>
+
+                                        {uploadedFileNames[
+                                          `part_${index + 1}_question_group_${
+                                            subField.name + 1
+                                          }_question_${
+                                            questionField.name + 1
+                                          }_audio`
+                                        ] && (
+                                          <div>
+                                            {
+                                              uploadedFileNames[
+                                                `part_${
+                                                  index + 1
+                                                }_question_group_${
+                                                  subField.name + 1
+                                                }_question_${
+                                                  questionField.name + 1
+                                                }_audio`
+                                              ]
+                                            }
+                                          </div>
+                                        )}
+
+                                        {uploadedFileNames[
+                                          `part_${index + 1}_question_group_${
+                                            subField.name + 1
+                                          }_question_${
+                                            questionField.name + 1
+                                          }_image`
+                                        ] && (
+                                          <div>
+                                            {
+                                              uploadedFileNames[
+                                                `part_${
+                                                  index + 1
+                                                }_question_group_${
+                                                  subField.name + 1
+                                                }_question_${
+                                                  questionField.name + 1
+                                                }_image`
+                                              ]
+                                            }
+                                          </div>
+                                        )}
+
                                         <div
                                           className={styles.buttonsContainer}
                                         >
                                           <Form.Item
                                             name={[
-                                              field.name,
-                                              'part_recording',
+                                              questionField.name,
+                                              'question_recording',
                                             ]}
                                           >
+                                            <input
+                                              type="file"
+                                              ref={audioFileInputRefQuestion}
+                                              style={{ display: 'none' }}
+                                              onChange={handleFileChangeQuestion(
+                                                index,
+                                                subField.name,
+                                                questionField.name,
+                                                'audio'
+                                              )}
+                                            />
                                             <Button
+                                              type="text"
                                               icon={<SoundOutlined />}
-                                            ></Button>
+                                              onClick={() =>
+                                                audioFileInputRefQuestion.current?.click()
+                                              }
+                                            />
                                           </Form.Item>
                                           <Form.Item
                                             name={[
                                               field.name,
-                                              'part_image_urls',
+                                              'question_image_urls',
                                             ]}
                                           >
+                                            <input
+                                              type="file"
+                                              ref={fileInputRefQuestion}
+                                              style={{ display: 'none' }}
+                                              onChange={handleFileChangeQuestion(
+                                                index,
+                                                subField.name,
+                                                questionField.name,
+                                                'image'
+                                              )}
+                                            />
                                             <Button
+                                              type="text"
                                               icon={<PictureOutlined />}
-                                            ></Button>
+                                              onClick={() =>
+                                                fileInputRefQuestion.current?.click()
+                                              }
+                                            />
                                           </Form.Item>
                                         </div>
 
@@ -431,22 +805,12 @@ const CreateTest = () => {
                                         >
                                           <Select
                                             onChange={(value) => {
-                                              if (
-                                                value === 'selection' ||
-                                                value === 'single_choice' ||
-                                                value === 'multiple_choices'
-                                              ) {
-                                                setHaveOptions(true);
-                                                if (
-                                                  value === 'multiple_choices'
-                                                ) {
-                                                  setHaveChoices(true);
-                                                } else {
-                                                  setHaveChoices(false);
-                                                }
-                                              } else {
-                                                setHaveOptions(false);
-                                              }
+                                              handleQuestionTypeChange(
+                                                index,
+                                                subField.name,
+                                                questionField.name,
+                                                value
+                                              );
                                             }}
                                           >
                                             <Option value="selection">
@@ -479,229 +843,262 @@ const CreateTest = () => {
                                           </Form.Item>
                                         </div>
 
-                                        {haveOptions && haveChoices && (
-                                          <Form.List
-                                            name={[
-                                              questionField.name,
-                                              'options',
-                                            ]}
-                                          >
-                                            {(fields, { add, remove }) => (
-                                              <div
-                                                className={
-                                                  styles.optionsContainer
-                                                }
-                                              >
-                                                {fields.map(
-                                                  (optionField, index) => (
-                                                    <Space
-                                                      key={optionField.key}
-                                                      align="baseline"
-                                                    >
-                                                      <Form.Item>
-                                                        <Checkbox
-                                                          onChange={(e) => {
-                                                            let answer =
-                                                              form.getFieldValue(
-                                                                [
-                                                                  'parts',
-                                                                  field.name,
-                                                                  'question_groups',
-                                                                  subField.name,
-                                                                  'questions',
-                                                                  questionField.name,
-                                                                  'answer',
-                                                                ]
-                                                              ) || [];
+                                        {haveOptions[
+                                          `part_${index + 1}_question_group_${
+                                            subField.name + 1
+                                          }_question_${questionField.name + 1}`
+                                        ] &&
+                                          haveChoices[
+                                            `part_${index + 1}_question_group_${
+                                              subField.name + 1
+                                            }_question_${
+                                              questionField.name + 1
+                                            }`
+                                          ] && (
+                                            <Form.List
+                                              name={[
+                                                questionField.name,
+                                                'options',
+                                              ]}
+                                            >
+                                              {(fields, { add, remove }) => (
+                                                <div
+                                                  className={
+                                                    styles.optionsContainer
+                                                  }
+                                                >
+                                                  {fields.map(
+                                                    (optionField, index) => (
+                                                      <Space
+                                                        key={optionField.key}
+                                                        align="baseline"
+                                                      >
+                                                        <Form.Item>
+                                                          <Checkbox
+                                                            onChange={(e) => {
+                                                              let answer =
+                                                                form.getFieldValue(
+                                                                  [
+                                                                    'parts',
+                                                                    field.name,
+                                                                    'question_groups',
+                                                                    subField.name,
+                                                                    'questions',
+                                                                    questionField.name,
+                                                                    'answer',
+                                                                  ]
+                                                                ) || [];
 
-                                                            if (
-                                                              e.target.checked
-                                                            ) {
-                                                              answer.push(
-                                                                String(
-                                                                  index + 1
-                                                                )
-                                                              );
-                                                            } else {
-                                                              answer =
-                                                                answer.filter(
-                                                                  (a: string) =>
-                                                                    a !==
-                                                                    String(
-                                                                      index + 1
-                                                                    )
+                                                              if (
+                                                                e.target.checked
+                                                              ) {
+                                                                answer.push(
+                                                                  String(
+                                                                    index + 1
+                                                                  )
                                                                 );
-                                                            }
+                                                              } else {
+                                                                answer =
+                                                                  answer.filter(
+                                                                    (
+                                                                      a: string
+                                                                    ) =>
+                                                                      a !==
+                                                                      String(
+                                                                        index +
+                                                                          1
+                                                                      )
+                                                                  );
+                                                              }
 
-                                                            form.setFieldsValue(
-                                                              {
-                                                                parts: {
-                                                                  [field.name]:
+                                                              form.setFieldsValue(
+                                                                {
+                                                                  parts: {
+                                                                    [field.name]:
+                                                                      {
+                                                                        question_groups:
+                                                                          {
+                                                                            [subField.name]:
+                                                                              {
+                                                                                questions:
+                                                                                  {
+                                                                                    [questionField.name]:
+                                                                                      {
+                                                                                        answer,
+                                                                                      },
+                                                                                  },
+                                                                              },
+                                                                          },
+                                                                      },
+                                                                  },
+                                                                }
+                                                              );
+                                                            }}
+                                                          ></Checkbox>
+                                                        </Form.Item>
+
+                                                        <Form.Item
+                                                          {...optionField}
+                                                          validateTrigger={[
+                                                            'onChange',
+                                                            'onBlur',
+                                                          ]}
+                                                          rules={[
+                                                            {
+                                                              required: true,
+                                                              whitespace: true,
+                                                              message:
+                                                                'Vui lòng nhập hoặc xóa đáp án này.',
+                                                            },
+                                                          ]}
+                                                          noStyle
+                                                        >
+                                                          <Input placeholder="Lựa chọn..." />
+                                                        </Form.Item>
+
+                                                        <MinusCircleOutlined
+                                                          onClick={() =>
+                                                            remove(
+                                                              optionField.name
+                                                            )
+                                                          }
+                                                        />
+                                                      </Space>
+                                                    )
+                                                  )}
+
+                                                  <Form.Item>
+                                                    <Button
+                                                      type="dashed"
+                                                      onClick={() => add()}
+                                                      block
+                                                      icon={<PlusOutlined />}
+                                                    >
+                                                      Thêm Đáp án
+                                                    </Button>
+                                                  </Form.Item>
+                                                </div>
+                                              )}
+                                            </Form.List>
+                                          )}
+
+                                        {haveOptions[
+                                          `part_${index + 1}_question_group_${
+                                            subField.name + 1
+                                          }_question_${questionField.name + 1}`
+                                        ] &&
+                                          !haveChoices[
+                                            `part_${index + 1}_question_group_${
+                                              subField.name + 1
+                                            }_question_${
+                                              questionField.name + 1
+                                            }`
+                                          ] && (
+                                            <Form.List
+                                              name={[
+                                                questionField.name,
+                                                'options',
+                                              ]}
+                                            >
+                                              {(fields, { add, remove }) => (
+                                                <div>
+                                                  <Radio.Group
+                                                    onChange={(e) => {
+                                                      const answer = String(
+                                                        e.target.value
+                                                      );
+                                                      form.setFieldsValue({
+                                                        parts: {
+                                                          [field.name]: {
+                                                            question_groups: {
+                                                              [subField.name]: {
+                                                                questions: {
+                                                                  [questionField.name]:
                                                                     {
-                                                                      question_groups:
-                                                                        {
-                                                                          [subField.name]:
-                                                                            {
-                                                                              questions:
-                                                                                {
-                                                                                  [questionField.name]:
-                                                                                    {
-                                                                                      answer,
-                                                                                    },
-                                                                                },
-                                                                            },
-                                                                        },
+                                                                      answer,
                                                                     },
                                                                 },
-                                                              }
-                                                            );
-                                                          }}
-                                                        ></Checkbox>
-                                                      </Form.Item>
-
-                                                      <Form.Item
-                                                        {...optionField}
-                                                        validateTrigger={[
-                                                          'onChange',
-                                                          'onBlur',
-                                                        ]}
-                                                        rules={[
-                                                          {
-                                                            required: true,
-                                                            whitespace: true,
-                                                            message:
-                                                              'Vui lòng nhập hoặc xóa đáp án này.',
-                                                          },
-                                                        ]}
-                                                        noStyle
-                                                      >
-                                                        <Input placeholder="Lựa chọn..." />
-                                                      </Form.Item>
-
-                                                      <MinusCircleOutlined
-                                                        onClick={() =>
-                                                          remove(
-                                                            optionField.name
-                                                          )
-                                                        }
-                                                      />
-                                                    </Space>
-                                                  )
-                                                )}
-
-                                                <Form.Item>
-                                                  <Button
-                                                    type="dashed"
-                                                    onClick={() => add()}
-                                                    block
-                                                    icon={<PlusOutlined />}
-                                                  >
-                                                    Thêm Đáp án
-                                                  </Button>
-                                                </Form.Item>
-                                              </div>
-                                            )}
-                                          </Form.List>
-                                        )}
-
-                                        {haveOptions && !haveChoices && (
-                                          <Form.List
-                                            name={[
-                                              questionField.name,
-                                              'options',
-                                            ]}
-                                          >
-                                            {(fields, { add, remove }) => (
-                                              <div>
-                                                <Radio.Group
-                                                  onChange={(e) => {
-                                                    const answer = String(
-                                                      e.target.value
-                                                    );
-                                                    form.setFieldsValue({
-                                                      parts: {
-                                                        [field.name]: {
-                                                          question_groups: {
-                                                            [subField.name]: {
-                                                              questions: {
-                                                                [questionField.name]:
-                                                                  {
-                                                                    answer,
-                                                                  },
                                                               },
                                                             },
                                                           },
                                                         },
-                                                      },
-                                                    });
-                                                  }}
-                                                >
-                                                  <div
-                                                    className={
-                                                      styles.optionsContainer
-                                                    }
+                                                      });
+                                                    }}
                                                   >
-                                                    {fields.map(
-                                                      (optionField, index) => (
-                                                        <Space
-                                                          key={optionField.key}
-                                                          align="baseline"
-                                                        >
-                                                          <Form.Item>
-                                                            <Radio
-                                                              value={index + 1}
-                                                            ></Radio>
-                                                          </Form.Item>
-
-                                                          <Form.Item
-                                                            {...optionField}
-                                                            validateTrigger={[
-                                                              'onChange',
-                                                              'onBlur',
-                                                            ]}
-                                                            rules={[
-                                                              {
-                                                                required: true,
-                                                                whitespace:
-                                                                  true,
-                                                                message:
-                                                                  'Vui lòng nhập hoặc xóa đáp án này.',
-                                                              },
-                                                            ]}
-                                                            noStyle
+                                                    <div
+                                                      className={
+                                                        styles.optionsContainer
+                                                      }
+                                                    >
+                                                      {fields.map(
+                                                        (
+                                                          optionField,
+                                                          index
+                                                        ) => (
+                                                          <Space
+                                                            key={
+                                                              optionField.key
+                                                            }
+                                                            align="baseline"
                                                           >
-                                                            <Input placeholder="Lựa chọn..." />
-                                                          </Form.Item>
+                                                            <Form.Item>
+                                                              <Radio
+                                                                value={
+                                                                  index + 1
+                                                                }
+                                                              ></Radio>
+                                                            </Form.Item>
 
-                                                          <Form.Item>
-                                                            <MinusCircleOutlined
-                                                              onClick={() =>
-                                                                remove(
-                                                                  optionField.name
-                                                                )
-                                                              }
-                                                            />
-                                                          </Form.Item>
-                                                        </Space>
-                                                      )
-                                                    )}
-                                                  </div>
-                                                </Radio.Group>
+                                                            <Form.Item
+                                                              {...optionField}
+                                                              validateTrigger={[
+                                                                'onChange',
+                                                                'onBlur',
+                                                              ]}
+                                                              rules={[
+                                                                {
+                                                                  required:
+                                                                    true,
+                                                                  whitespace:
+                                                                    true,
+                                                                  message:
+                                                                    'Vui lòng nhập hoặc xóa đáp án này.',
+                                                                },
+                                                              ]}
+                                                              noStyle
+                                                            >
+                                                              <Input placeholder="Lựa chọn..." />
+                                                            </Form.Item>
 
-                                                <Form.Item>
-                                                  <Button
-                                                    type="dashed"
-                                                    onClick={() => add()}
-                                                    block
-                                                    icon={<PlusOutlined />}
-                                                  >
-                                                    Thêm Đáp án
-                                                  </Button>
-                                                </Form.Item>
-                                              </div>
-                                            )}
-                                          </Form.List>
-                                        )}
+                                                            <Form.Item>
+                                                              <MinusCircleOutlined
+                                                                onClick={() =>
+                                                                  remove(
+                                                                    optionField.name
+                                                                  )
+                                                                }
+                                                              />
+                                                            </Form.Item>
+                                                          </Space>
+                                                        )
+                                                      )}
+                                                    </div>
+                                                  </Radio.Group>
+
+                                                  <Form.Item>
+                                                    <Button
+                                                      type="dashed"
+                                                      onClick={() => add()}
+                                                      block
+                                                      icon={<PlusOutlined />}
+                                                    >
+                                                      Thêm Đáp án
+                                                    </Button>
+                                                  </Form.Item>
+                                                </div>
+                                              )}
+                                            </Form.List>
+                                          )}
                                       </Card>
                                     ))}
                                     <Button
