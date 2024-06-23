@@ -120,7 +120,7 @@ const CreateTest = () => {
   const handleFileChangePart =
     (partIndex: number, type: string) =>
     (event: React.ChangeEvent<HTMLInputElement>) => {
-      const file: File | undefined = event.target.files?.[0];
+      const file = event.target.files?.[0];
       if (file) {
         form.setFieldsValue({
           parts: form
