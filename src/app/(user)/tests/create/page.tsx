@@ -24,10 +24,30 @@ const CreateTest = () => {
 
   const fileInputRefPart = useRef<HTMLInputElement>(null);
   const audioFileInputRefPart = useRef<HTMLInputElement>(null);
+  const [partSelectedFile, setPartSelectedFile] = useState<Array<File | null>>([
+    null,
+  ]);
+  const [partSelectedAudioFile, setPartSelectedAudioFile] = useState<
+    Array<File | null>
+  >([null]);
+
   const fileInputRefQuestionGroup = useRef<HTMLInputElement>(null);
   const audioFileInputRefQuestionGroup = useRef<HTMLInputElement>(null);
+  const [questionGroupSelectedFile, setQuestionGroupSelectedFile] = useState<
+    Array<File | null>
+  >([null]);
+  const [questionGroupSelectedAudioFile, setQuestionGroupSelectedAudioFile] =
+    useState<Array<File | null>>([null]);
+
   const fileInputRefQuestion = useRef<HTMLInputElement>(null);
   const audioFileInputRefQuestion = useRef<HTMLInputElement>(null);
+  const [questionSelectedFile, setQuestionSelectedFile] = useState<
+    Array<File | null>
+  >([null]);
+  const [questionSelectedAudioFile, setQuestionSelectedAudioFile] = useState<
+    Array<File | null>
+  >([null]);
+
   const [uploadedFileNames, setUploadedFileNames] = useState<{
     [key: string]: string | null;
   }>({});
@@ -45,13 +65,55 @@ const CreateTest = () => {
     console.log(token);
     console.log(form.getFieldsValue());
 
+    const formData = new FormData();
+    formData.append('test', JSON.stringify(form.getFieldsValue()));
+    formData.append('test_recording', form.getFieldValue('test_recording'));
+
+    partSelectedFile.forEach((file) => {
+      if (file) {
+        formData.append(`part_images`, file);
+      }
+    });
+
+    partSelectedAudioFile.forEach((file) => {
+      if (file) {
+        formData.append(`part_recording`, file);
+      }
+    });
+
+    questionGroupSelectedFile.forEach((file) => {
+      if (file) {
+        formData.append(`question_group_images`, file);
+      }
+    });
+
+    questionGroupSelectedAudioFile.forEach((file) => {
+      if (file) {
+        formData.append(`question_group_recording`, file);
+      }
+    });
+
+    questionSelectedFile.forEach((file) => {
+      if (file) {
+        formData.append(`question_images`, file);
+      }
+    });
+
+    questionSelectedAudioFile.forEach((file) => {
+      if (file) {
+        formData.append(`question_recording`, file);
+      }
+    });
+
+    console.log(formData.get('part_images'));
+
     const response = await fetch(`/api/tests/create`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         Authorization: `Bearer ${token}`,
       },
-      body: JSON.stringify(form.getFieldsValue()),
+      body: formData,
     });
 
     if (!response.ok) {
@@ -120,8 +182,17 @@ const CreateTest = () => {
   const handleFileChangePart =
     (partIndex: number, type: string) =>
     (event: React.ChangeEvent<HTMLInputElement>) => {
-      const file = event.target.files?.[0];
-      if (file) {
+      const originalFile = event.target.files?.[0];
+      if (originalFile) {
+        // Extract file extension
+        const fileExtension = originalFile.name.split('.').pop();
+        // Construct new file name
+        const newFileName = `part_recording-${partIndex + 1}.${fileExtension}`;
+        // Create a new File object with the new name
+        const file = new File([originalFile], newFileName, {
+          type: originalFile.type,
+        });
+
         form.setFieldsValue({
           parts: form
             .getFieldsValue()
@@ -135,6 +206,12 @@ const CreateTest = () => {
             }),
         });
 
+        if (type === 'audio') {
+          setPartSelectedAudioFile([...partSelectedAudioFile, file]);
+        } else {
+          setPartSelectedFile([...partSelectedFile, file]);
+        }
+
         const newUploadedFileNames = { ...uploadedFileNames };
         const key = `part_${partIndex + 1}_${type}`;
         newUploadedFileNames[key] = file.name;
@@ -147,8 +224,19 @@ const CreateTest = () => {
   const handleFileChangeQuestionGroup =
     (partIndex: number, questionGroupIndex: number, type: string) =>
     (event: React.ChangeEvent<HTMLInputElement>) => {
-      const file = event.target.files?.[0];
-      if (file) {
+      const originalFile = event.target.files?.[0];
+      if (originalFile) {
+        // Extract file extension
+        const fileExtension = originalFile.name.split('.').pop();
+        // Construct new file name
+        const newFileName = `part_${partIndex + 1}_question_group_${
+          questionGroupIndex + 1
+        }_${type}.${fileExtension}`;
+        // Create a new File object with the new name
+        const file = new File([originalFile], newFileName, {
+          type: originalFile.type,
+        });
+
         form.setFieldsValue({
           parts: form
             .getFieldsValue()
@@ -162,17 +250,11 @@ const CreateTest = () => {
                         return type === 'audio'
                           ? {
                               ...questionGroup,
-                              question_groups_info: {
-                                ...questionGroup.question_groups_info,
-                                question_groups_recording: file,
-                              },
+                              question_groups_recording: file,
                             }
                           : {
                               ...questionGroup,
-                              question_groups_info: {
-                                ...questionGroup.question_groups_info,
-                                question_groups_image_urls: file,
-                              },
+                              question_groups_image_urls: file,
                             };
                       }
                       return questionGroup;
@@ -183,6 +265,15 @@ const CreateTest = () => {
               return part;
             }),
         });
+
+        if (type === 'audio') {
+          setQuestionGroupSelectedAudioFile([
+            ...questionGroupSelectedAudioFile,
+            file,
+          ]);
+        } else {
+          setQuestionGroupSelectedFile([...questionGroupSelectedFile, file]);
+        }
 
         const newUploadedFileNames = { ...uploadedFileNames };
         const key = `part_${partIndex + 1}_question_group_${
@@ -201,8 +292,19 @@ const CreateTest = () => {
       type: string
     ) =>
     (event: React.ChangeEvent<HTMLInputElement>) => {
-      const file = event.target.files?.[0];
-      if (file) {
+      const originalFile = event.target.files?.[0];
+      if (originalFile) {
+        // Extract file extension
+        const fileExtension = originalFile.name.split('.').pop();
+        // Construct new file name
+        const newFileName = `part_${partIndex + 1}_question_group_${
+          questionGroupIndex + 1
+        }_question_${questionIndex + 1}_${type}.${fileExtension}`;
+        // Create a new File object with the new name
+        const file = new File([originalFile], newFileName, {
+          type: originalFile.type,
+        });
+
         form.setFieldsValue({
           parts: form
             .getFieldsValue()
@@ -235,6 +337,12 @@ const CreateTest = () => {
               return part;
             }),
         });
+
+        if (type === 'audio') {
+          setQuestionSelectedAudioFile([...questionSelectedAudioFile, file]);
+        } else {
+          setQuestionSelectedFile([...questionSelectedFile, file]);
+        }
 
         const newUploadedFileNames = { ...uploadedFileNames };
         const key = `part_${partIndex + 1}_question_group_${
