@@ -1,13 +1,10 @@
 'use client';
 
-import { useAuthState } from 'react-firebase-hooks/auth';
-import { auth } from '@/lib';
 import SkillHeader from '@/components/SkillHeader';
 import TestSelector from '@/components/TestSelector';
 import { useState } from 'react';
 
 const IELTS = () => {
-  const [user, loading, error] = useAuthState(auth);
   const [pageLoading, setPageLoading] = useState(false);
   return (
     <>

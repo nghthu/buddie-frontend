@@ -1,7 +1,7 @@
 'use client';
 import { ClockCircleOutlined } from '@ant-design/icons';
 import styles from '@/styles/components/TestCard.module.scss';
-import { Button, Modal, Rate, Select } from 'antd';
+import { Button, Modal, Rate, Select, Space } from 'antd';
 import { SetStateAction, useState } from 'react';
 
 import Link from 'next/link';
@@ -99,7 +99,9 @@ export default function TestCard(props: {
       {props.isUserTest && (
         <>
           <div style={{ display: 'flex', flexWrap: 'wrap' }}>
-            Đăng bởi: <p>{props.user?.display_name}</p>
+            Đăng bởi:
+            <Space />
+            {props.user?.display_name}
           </div>
           <div>
             <Rate

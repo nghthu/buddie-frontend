@@ -10,6 +10,31 @@ import { CloseChatContext } from '@/components/CloseChatContext';
 import { auth } from '@/lib';
 import { Spin } from 'antd';
 
+interface QuestionInfo {
+  question_number: number;
+  question_type: string;
+  question_prompt: string;
+  question_image_urls: string[];
+  question_duration: number;
+  options: string[];
+  answer: string;
+  _id: string;
+}
+
+interface QuestionGroupInfo {
+  question_groups_duration: number;
+  question_groups_prompt: string;
+  question_groups_recording: string;
+  question_groups_image_urls: string[];
+}
+
+interface QuestionGroup {
+  is_single_question: boolean;
+  question_groups_info: QuestionGroupInfo;
+  questions: QuestionInfo[];
+  _id: string;
+}
+
 type PartData =
   | {
       part_number: number;
@@ -17,7 +42,7 @@ type PartData =
       part_recording: string;
       part_prompt: string;
       part_image_urls: string[];
-      question_groups: any[];
+      question_groups: QuestionGroup[];
     }
   | undefined;
 
@@ -198,10 +223,11 @@ export default function PracticePage({
     }
 
     if (message === 'Viết lại') {
-      apiResponse = await callParaphraseAPI(
-        question?.question_prompt,
-        selection
-      );
+      if (question && question.question_prompt)
+        apiResponse = await callParaphraseAPI(
+          question?.question_prompt,
+          selection
+        );
       request.response = apiResponse.data.paraphrased;
       setIsChatProcessing(false);
     }

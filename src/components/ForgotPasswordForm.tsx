@@ -15,11 +15,11 @@ export interface ForgotPasswordProps {
   email?: string;
 }
 
-const emailRegex = /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/;
+const emailRegex = /^[\w-.]+@([\w-]+\.)+[\w-]{2,4}$/;
 
 const ForgotPasswordForm = () => {
   const [form] = Form.useForm<ForgotPasswordProps>();
-  const [authStateUser, authStateLoading, authStateError] = useAuthState(auth);
+  const [authStateUser] = useAuthState(auth);
   const [sendPasswordResetEmail, sending, error] =
     useSendPasswordResetEmail(auth);
   const router = useRouter();

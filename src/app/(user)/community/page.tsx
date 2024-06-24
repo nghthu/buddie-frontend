@@ -13,7 +13,6 @@ import { auth } from '@/lib';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import type { SearchProps } from 'antd/es/input/Search';
 
-//import InfiniteScroll from 'react-infinite-scroll-component';
 const { TextArea } = Input;
 interface FetchArgs {
   url: string;
@@ -98,7 +97,7 @@ const Community = () => {
 
   useEffect(() => {
     if (questions) {
-      if (offset + LIMIT >= questions.pagination.total_count) {
+      if (offset + LIMIT >= questions?.pagination?.total_count) {
         setHasMoreQuestions(false);
       } else {
         setHasMoreQuestions(true);
@@ -108,9 +107,20 @@ const Community = () => {
 
   useEffect(() => {
     if (questions) {
-      setTotalQuestions((prev) => [...prev, ...questions.questions]);
+      setTotalQuestions((prev) => {
+        const seen = new Set();
+        const returnRes = [...prev, ...(questions.questions ?? [])].filter(
+          (question) => {
+            if (seen.has(question._id)) return false;
+            seen.add(question._id);
+            return true;
+          }
+        );
+        return returnRes;
+      });
     }
   }, [questions]);
+
   const handleLoadMoreComments = () => {
     if (!questions) return;
     setOffset((prev) => prev + LIMIT);
@@ -150,6 +160,7 @@ const Community = () => {
     setSelectedFile(null);
     setSelectedAudioFile(null);
     setNewPostValue('');
+    hideCreateModal();
   };
 
   const handleFileSelect = (
@@ -187,21 +198,15 @@ const Community = () => {
       />
     );
   });
-
-  if (isLoading) {
-    return <Spin size="default" />;
-  }
-
-  hasMoreQuestions
+  hasMoreQuestions && !isLoading
     ? postData.push(
         <Empty
-          description={<></>}
           key="empty"
           style={{ height: '200px' }}
+          description={<p>Kéo xuống tiếp để tải thêm câu hỏi</p>}
         />
       )
     : null;
-
   return (
     <>
       {contextHolder}
@@ -226,17 +231,22 @@ const Community = () => {
               Tạo câu hỏi
             </button>
           </div>
-          <InfiniteScroll
-            dataLength={postData.length}
-            next={() => {
-              handleLoadMoreComments();
-            }}
-            hasMore={hasMoreQuestions}
-            loader={<h4>Loading...</h4>}
-            scrollThreshold={1}
-          >
-            {postData}
-          </InfiniteScroll>
+          {postData.length === 0 && !isLoading && (
+            <Empty description={<h2>Không có câu hỏi nào</h2>} />
+          )}
+          {postData.length >= 0 && (
+            <InfiniteScroll
+              dataLength={postData.length}
+              next={() => {
+                handleLoadMoreComments();
+              }}
+              hasMore={hasMoreQuestions}
+              loader={<Spin size="small" />}
+              scrollThreshold={1}
+            >
+              {postData}
+            </InfiniteScroll>
+          )}
         </Card>
       </div>
       <Modal

@@ -1,7 +1,5 @@
 'use client';
-import { Button } from 'antd';
 import { CheckCircleOutlined } from '@ant-design/icons';
-import clsx from 'clsx';
 import styles from '@/styles/pages/Home.module.scss';
 import Link from 'next/link';
 

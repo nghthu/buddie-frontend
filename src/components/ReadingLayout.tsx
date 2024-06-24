@@ -1,5 +1,5 @@
 'use client';
-import { Button } from 'antd';
+import { Button, Spin } from 'antd';
 import DropdownLayout from './DropdownLayout';
 import MultiChoiceLayout from './MultiChoiceLayout';
 import ReadingContextLayout from './ReadingContextLayout';
@@ -16,11 +16,14 @@ import React from 'react';
 
 import BuddieSupport from './BuddieSupport';
 import { CloseChatContext } from './CloseChatContext';
+import Link from 'next/link';
+import { auth } from '@/lib';
 
 interface test_answer {
   test_id: string;
   parts: {
     _id: string;
+    part_number: number;
     question_groups: {
       _id: string;
       questions: {
@@ -68,6 +71,38 @@ interface chatRequests {
   response: string;
 }
 
+interface Question {
+  answer_result: {
+    user_answer: string | string[];
+    assess: boolean;
+    is_correct: boolean;
+  };
+  _id: string;
+}
+
+interface QuestionGroup {
+  questions: Question[];
+  _id: string;
+}
+
+interface Part {
+  question_groups: QuestionGroup[];
+  _id: string;
+}
+
+interface TestData {
+  user_id: string;
+  test_id: string;
+  question_count: number;
+  correct_answer_count: number;
+  score: number;
+  parts: Part[];
+  _id: string;
+  created_at: string;
+  updated_at: string;
+  __v: number;
+}
+
 interface Props {
   partNumber: number;
   data: data;
@@ -82,6 +117,8 @@ interface Props {
   setChatVisible: React.Dispatch<React.SetStateAction<boolean>>;
   setChatRequests: React.Dispatch<React.SetStateAction<Array<chatRequests>>>;
   setIsChatProcessing: React.Dispatch<React.SetStateAction<boolean>>;
+  setResultPage: React.Dispatch<React.SetStateAction<boolean>>;
+  setFetchedData: React.Dispatch<React.SetStateAction<TestData | undefined>>;
 }
 
 export default function ReadingLayout({
@@ -97,8 +134,12 @@ export default function ReadingLayout({
   setChatVisible,
   setChatRequests,
   setIsChatProcessing,
+  setResultPage,
+  setFetchedData,
 }: Props) {
+  const user = auth.currentUser;
   const [currentQuestionGroup, setCurrentQuestionGroup] = useState(1);
+  const [isDisabled, setIsDisabled] = useState(false);
   useEffect(() => {
     setChatTopic(data.part_prompt);
   }, [data.part_prompt]);
@@ -226,8 +267,22 @@ export default function ReadingLayout({
   const hideChat = () => {
     setChatVisible(false);
   };
-
-  return (
+  const handleSubmitAnswer = async () => {
+    setIsDisabled(true);
+    const token = await user?.getIdToken();
+    const response = await fetch(`/api/test-submissions`, {
+      method: 'POST',
+      headers: {
+        authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(answers),
+    });
+    const res = await response.json();
+    setFetchedData(res);
+    setResultPage(true);
+  };
+  const display = (
     <div className={questionLayouts.readingLayout}>
       <div className={questionLayouts.contextWrapper}>
         <TextCard
@@ -245,23 +300,26 @@ export default function ReadingLayout({
           />
         </TextCard>
         <div className={questionLayouts.buttonWrapper}>
-          <Button
-            className={clsx(buttonStyles.webButton, 'ant-btn-red')}
-            type={'primary'}
-            onClick={() => {}}
-          >
-            Kết thúc
-          </Button>
+          <Link href={'/ielts'}>
+            <Button
+              className={clsx(buttonStyles.webButton, 'ant-btn-red')}
+              type={'primary'}
+              onClick={() => {}}
+            >
+              Quay về
+            </Button>
+          </Link>
           <Button
             className={buttonStyles.webButton}
             type={'primary'}
-            onClick={() => {}}
+            onClick={handleSubmitAnswer}
           >
             Nộp bài
           </Button>
         </div>
       </div>
       <div className={questionLayouts.questionContainer}>
+        {questionGroups[currentQuestionGroup - 1]}
         <div className={questionLayouts.buttonWrapper}>
           {currentQuestionGroup > 1 && (
             <Button
@@ -284,7 +342,6 @@ export default function ReadingLayout({
             </Button>
           )}
         </div>
-        {questionGroups[currentQuestionGroup - 1]}
         {chatVisible && (
           <div>
             <CloseChatContext.Provider value={hideChat}>
@@ -300,5 +357,11 @@ export default function ReadingLayout({
         )}
       </div>
     </div>
+  );
+  return (
+    <>
+      {!isDisabled && display}
+      {isDisabled && <Spin size="large">{display}</Spin>}
+    </>
   );
 }

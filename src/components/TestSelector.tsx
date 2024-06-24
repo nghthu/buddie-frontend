@@ -11,6 +11,7 @@ import { LoadingOutlined } from '@ant-design/icons';
 import styles from '@/styles/components/TestSelector.module.scss';
 import { Input } from 'antd';
 import type { SearchProps } from 'antd/es/input/Search';
+import InfiniteScroll from 'react-infinite-scroll-component';
 interface FetchArgs {
   url: string;
   user: User | null;
@@ -39,7 +40,7 @@ export default function TestSelector(props: {
   text?: string;
 }) {
   // TODO: Implement infinite scroll and fetch more data and use setTotalPage
-  const [totalPage] = useState(1);
+  const [totalPage, setTotalPage] = useState(1);
   // const tests = useRef([]);
   const [filteredTests, setFilteredTests] = useState([]);
   const [searchValue, setSearchValue] = useState('');
@@ -145,6 +146,10 @@ export default function TestSelector(props: {
       );
     }
   );
+  const hasMore = rawTests && totalPage < rawTests.pagination.total_count / 10;
+  const handleInfScroll = () => {
+    setTotalPage((prev) => prev + 1);
+  };
   return (
     <div className={styles.container}>
       {contextHolder}
@@ -186,8 +191,19 @@ export default function TestSelector(props: {
       <div
         className={styles.wrapper}
         ref={scrollRef}
+        id="infScrollDiv"
       >
-        {testComponent}
+        <InfiniteScroll
+          dataLength={filteredTests.length}
+          scrollableTarget="infScrollDiv"
+          scrollThreshold={0.9}
+          next={handleInfScroll}
+          hasMore={hasMore}
+          loader={<Spin size="default" />}
+          className={styles.wrapper}
+        >
+          {testComponent}
+        </InfiniteScroll>
         {testComponent.length === 0 && (
           <Empty
             image={Empty.PRESENTED_IMAGE_SIMPLE}

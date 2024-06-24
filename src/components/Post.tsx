@@ -48,6 +48,13 @@ const Post = ({ postData, comments }: Props) => {
   const hidePostDetail = () => {
     setOpenPostDetail(false);
   };
+  const newDate = new Date(postData.created_at);
+  const formattedDate =
+    (newDate.getDate() < 10 ? newDate.getDate() : '0' + newDate.getDate()) +
+    '/' +
+    (newDate.getMonth() + 1) +
+    '/' +
+    newDate.getFullYear();
   return (
     <>
       <div className={styles.post}>
@@ -58,7 +65,7 @@ const Post = ({ postData, comments }: Props) => {
         <div className={styles['post-info']}>
           <div className={styles['post-info-user']}>
             <p>{postData.user.display_name}</p>
-            <p>{new Date(postData.created_at).toUTCString()}</p>
+            <p>{formattedDate}</p>
           </div>
           <TextCard
             width="100%"

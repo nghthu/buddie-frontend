@@ -27,7 +27,7 @@ const Header = (props: Props) => {
 
   const accountItems: MenuProps['items'] = [
     {
-      label: <a href="">Thông tin</a>,
+      label: <a href="/profile">Thông tin</a>,
       key: '0',
     },
     {
