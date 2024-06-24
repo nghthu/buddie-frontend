@@ -16,6 +16,10 @@
   flex-direction: column;
   overflow-y: scroll;
   align-items: center;
+  & p {
+    margin-right: auto;
+    padding: 10px 0 0 20px;
+  }
 }
 .commentInputWrapper {
   margin-top: 1rem;

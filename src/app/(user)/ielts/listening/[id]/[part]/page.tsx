@@ -128,7 +128,8 @@ const ListeningPractice = ({
   const submitHandler = async () => {
     const structuredAnswers = {
       test_id: data._id,
-      parts: data.parts.map((part: Part) => ({
+      parts: data.parts.map((part: Part, index: number) => ({
+        part_number: index + 1,
         _id: part._id,
         question_groups: part.question_groups.map(
           (questionGroup: QuestionGroup) => ({
