@@ -67,7 +67,10 @@ const CreateTest = () => {
 
     const formData = new FormData();
     formData.append('test', JSON.stringify(form.getFieldsValue()));
-    formData.append('test_recording', form.getFieldValue('test_recording'));
+
+    if (form.getFieldValue('test_recording')) {
+      formData.append('test_recording', form.getFieldValue('test_recording'));
+    }
 
     partSelectedFile.forEach((file) => {
       if (file) {
@@ -105,14 +108,11 @@ const CreateTest = () => {
       }
     });
 
-    console.log(formData.getAll('test'));
-    console.log(formData.getAll('part_recording'));
-    console.log(formData.getAll('part_images'));
+    console.log(formData);
 
-    const response = await fetch(`/api/tests/create`, {
+    const response = await fetch(`/api/tests`, {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json',
         Authorization: `Bearer ${token}`,
       },
       body: formData,
@@ -217,10 +217,10 @@ const CreateTest = () => {
         // Construct new file name
         const newFileName =
           type == 'audio'
-            ? `question_group_recording_${partIndex + 1}_${
+            ? `question_group_recording-${partIndex + 1}-${
                 questionGroupIndex + 1
               }.${fileExtension}`
-            : `question_group_image_${partIndex + 1}_${
+            : `question_group_image-${partIndex + 1}-${
                 questionGroupIndex + 1
               }-1.${fileExtension}`;
         // Create a new File object with the new name
@@ -261,10 +261,10 @@ const CreateTest = () => {
         // Construct new file name
         const newFileName =
           type === 'audio'
-            ? `question_recording_${partIndex + 1}_${questionGroupIndex + 1}_${
+            ? `question_recording-${partIndex + 1}-${questionGroupIndex + 1}-${
                 questionIndex + 1
               }.${fileExtension}`
-            : `question_image_${partIndex + 1}_${questionGroupIndex + 1}_${
+            : `question_image-${partIndex + 1}-${questionGroupIndex + 1}-${
                 questionIndex + 1
               }-1.${fileExtension}`;
         // Create a new File object with the new name
@@ -391,12 +391,16 @@ const CreateTest = () => {
                 part_number: 1,
                 part_duration: null,
                 part_prompt: '',
+                part_recording: null,
+                part_image_urls: [],
                 question_groups: [
                   {
                     is_single_question: true,
                     question_groups_info: {
                       question_groups_duration: null,
                       question_groups_prompt: '',
+                      question_group_recording: null,
+                      question_group_image_urls: [],
                     },
                     questions: [
                       {
@@ -405,6 +409,8 @@ const CreateTest = () => {
                         question_prompt: '',
                         question_duration: null,
                         question_preparation_time: null,
+                        question_recording: null,
+                        question_image_urls: [],
                       },
                     ],
                   },
