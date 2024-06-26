@@ -90,7 +90,11 @@ export const POST = async function createTest(req: Request) {
               );
               const partIndex = parseInt(partImage.name.split('-')[1]) - 1;
 
-              test.parts[partIndex].part_image_urls.push(downloadUrl);
+              const part = test.parts[partIndex];
+              if (!Array.isArray(part.part_image_urls)) {
+                part.part_image_urls = [];
+              }
+              part.part_image_urls.push(downloadUrl);
             })()
           );
         }
@@ -137,9 +141,13 @@ export const POST = async function createTest(req: Request) {
               const questionGroupIndex =
                 parseInt(questionGroupImage.name.split('-')[2]) - 1;
 
-              test.parts[partIndex].question_groups[
-                questionGroupIndex
-              ].question_groups_info.question_group_image_urls.push(
+              const questionGroup =
+                test.parts[partIndex].question_groups[questionGroupIndex];
+              if (!Array.isArray(questionGroup.question_group_images)) {
+                questionGroup.question_groups_info.question_groups_image_urls =
+                  [];
+              }
+              questionGroup.question_groups_info.question_groups_image_urls.push(
                 downloadUrl
               );
             })()
@@ -192,9 +200,14 @@ export const POST = async function createTest(req: Request) {
               const questionIndex =
                 parseInt(questionImage.name.split('-')[3]) - 1;
 
-              test.parts[partIndex].question_groups[
-                questionGroupIndex
-              ].questions[questionIndex].question_image_urls.push(downloadUrl);
+              const question =
+                test.parts[partIndex].question_groups[questionGroupIndex]
+                  .questions[questionIndex];
+
+              if (!Array.isArray(question.question_image_urls)) {
+                question.question_image_urls = [];
+              }
+              question.question_image_urls.push(downloadUrl);
             })()
           );
         }
