@@ -80,6 +80,7 @@ const UserTestPractice = ({
   const [testData, setTestData] = useState<QuestionGroup[] | null>(null);
   const [answers, setAnswers] = useState<Answer[]>([]);
   const [currentPart, setCurrentPart] = useState(0);
+  const [loading, setIsloading] = useState(false);
   const router = useRouter();
   const user = auth.currentUser;
 
@@ -130,6 +131,7 @@ const UserTestPractice = ({
   };
 
   const submitHandler = async () => {
+    setIsloading(true);
     const structuredAnswers = {
       test_id: data._id,
       parts: data.parts.map((part: Part) => ({
@@ -194,7 +196,7 @@ const UserTestPractice = ({
     setTestData(data.parts[previousPart].question_groups);
   };
 
-  if (isLoading) return <Spin size="large" />;
+  if (isLoading || loading) return <Spin size="large" />;
 
   return (
     <div className={styles.container}>

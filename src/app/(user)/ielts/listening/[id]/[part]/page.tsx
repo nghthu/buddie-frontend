@@ -78,6 +78,7 @@ const ListeningPractice = ({
   const [testData, setTestData] = useState<QuestionGroup[] | null>(null);
   const [answers, setAnswers] = useState<Answer[]>([]);
   const [currentPart, setCurrentPart] = useState(0);
+  const [loading, setLoading] = useState(false);
   const router = useRouter();
   const user = auth.currentUser;
 
@@ -126,6 +127,7 @@ const ListeningPractice = ({
   };
 
   const submitHandler = async () => {
+    setLoading(true);
     const structuredAnswers = {
       test_id: data._id,
       parts: data.parts.map((part: Part, index: number) => ({
@@ -191,14 +193,11 @@ const ListeningPractice = ({
     setTestData(data.parts[previousPart].question_groups);
   };
 
-  if (isLoading) return <Spin size="large" />;
+  if (isLoading || loading) return <Spin size="large" />;
 
   return (
     <>
-      <AudioPlayer
-        audioUrl={data?.test_recording}
-        disableStopButton
-      />
+      <AudioPlayer audioUrl={data?.test_recording} />
 
       <TextCard
         width="100%"
@@ -212,6 +211,7 @@ const ListeningPractice = ({
             {group.question_groups_info.question_groups_image_urls?.map(
               (imageUrl, imageIndex) => (
                 <img
+                  className={styles.images}
                   key={imageIndex}
                   src={imageUrl}
                   alt={`Question ${index + 1}`}
@@ -225,6 +225,7 @@ const ListeningPractice = ({
                 </p>
                 {question.question_image_urls?.map((imageUrl, imageIndex) => (
                   <img
+                    className={styles.images}
                     key={imageIndex}
                     src={imageUrl}
                     alt={`Question ${question.question_number}`}
