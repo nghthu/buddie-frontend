@@ -47,7 +47,7 @@ const fetcher = async ({ url, user }: FetchArgs) => {
   return response.data;
 };
 const { Search } = Input;
-
+const LIMIT = 10;
 export default function TestSelector(props: {
   pageLoading: boolean;
   setPageLoading: React.Dispatch<SetStateAction<boolean>>;
@@ -62,7 +62,7 @@ export default function TestSelector(props: {
   const [selectedSkill, setSelectedSkill] = useState('');
   const scrollRef = useRef<HTMLDivElement>(null);
 
-  const apiUrl = `/api/tests?page=${totalPage}&test_type=${selectedSkill}&search=${searchValue}&isbuddie=true`;
+  const apiUrl = `/api/tests?page=${totalPage}&test_type=${selectedSkill}&search=${searchValue}&limit=${LIMIT}&isbuddie=true`;
   const user = auth.currentUser;
   const {
     data: rawTests,
@@ -172,7 +172,7 @@ export default function TestSelector(props: {
   );
   const hasMore = rawTests && totalPage < rawTests.pagination.total_count / 10;
   const handleInfScroll = () => {
-    setTotalPage((prev) => prev + 1);
+    setTotalPage((prev) => prev + LIMIT);
   };
   return (
     <div className={styles.container}>
