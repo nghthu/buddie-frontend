@@ -1,5 +1,6 @@
 import { initializeApp, FirebaseOptions, getApps } from 'firebase/app';
 import { getAuth } from 'firebase/auth';
+import { getStorage, ref, getDownloadURL, uploadBytes } from 'firebase/storage';
 
 const firebaseConfig: FirebaseOptions = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
@@ -15,3 +16,16 @@ if (!getApps().length) {
 }
 
 export const auth = getAuth();
+
+const storage = getStorage();
+
+export const uploadBuffer = async (
+  buffer: Buffer,
+  filePath: string
+): Promise<string> => {
+  const fileRef = ref(storage, filePath);
+  const uploadResult = await uploadBytes(fileRef, buffer);
+  const downloadUrl = await getDownloadURL(uploadResult.ref);
+
+  return downloadUrl;
+};

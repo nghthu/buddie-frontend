@@ -128,7 +128,6 @@ export default function IeltsPart({
 
   const [resultPage, setResultPage] = useState(false);
 
-  const [chatTopic, setChatTopic] = useState('');
   const [chatVisible, setChatVisible] = useState(false);
   const [isChatProcessing, setIsChatProcessing] = useState(false);
   const [selection, setSelection] = useState<string>('');
@@ -316,18 +315,34 @@ export default function IeltsPart({
     return data;
   };
 
-  const callParaphraseAPI = async (topic: string, content: string) => {
+  const callParaphraseAPI = async (content: string) => {
     const token = await user?.getIdToken();
 
-    const response = await fetch('/api/ai/paraphrase-writing/', {
+    const response = await fetch('/api/ai/paraphrase-reading/', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         authorization: `Bearer ${token}`,
       },
       body: JSON.stringify({
-        type: 'essay',
-        topic: topic,
+        content: content,
+      }),
+    });
+
+    const data = await response.json();
+    return data;
+  };
+
+  const callGenerateHeadingAPI = async (content: string) => {
+    const token = await user?.getIdToken();
+
+    const response = await fetch('/api/ai/generate-heading/', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({
         content: content,
       }),
     });
@@ -369,7 +384,7 @@ export default function IeltsPart({
     }
 
     if (message === 'Viết lại') {
-      apiResponse = await callParaphraseAPI(chatTopic, selection);
+      apiResponse = await callParaphraseAPI(selection);
       request.response = apiResponse.data.paraphrased;
       setIsChatProcessing(false);
     }
@@ -377,6 +392,12 @@ export default function IeltsPart({
     if (message === 'Từ đồng nghĩa') {
       apiResponse = await callSynonymsAPI(selection);
       request.response = apiResponse.data.synonyms.join(', ');
+      setIsChatProcessing(false);
+    }
+
+    if (message === 'Tạo tiêu đề') {
+      apiResponse = await callGenerateHeadingAPI(selection);
+      request.response = apiResponse.data.heading;
       setIsChatProcessing(false);
     }
 
@@ -444,13 +465,14 @@ export default function IeltsPart({
             chatRequests={chatRequests}
             answers={answers}
             onContextMenu={showMenu}
-            setChatTopic={setChatTopic}
             setAnswer={setAnswers}
             setChatVisible={setChatVisible}
             setChatRequests={setChatRequests}
             setIsChatProcessing={setIsChatProcessing}
             setResultPage={setResultPage}
             setFetchedData={setFetchedData}
+            testId={params.id}
+            part={params.part}
           />
         )}
         <ReadingFunctionMenu

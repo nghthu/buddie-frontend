@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
-import CountdownClock from '@/components/CountdownClock';
+// import CountdownClock from '@/components/CountdownClock';
 import styles from '@/styles/pages/writing/Writing.module.scss';
 import WritingFunctionMenu from '@/components/WritingFunctionMenu';
 import Link from 'next/link';
@@ -9,6 +9,7 @@ import BuddieSupport from '@/components/BuddieSupport';
 import { CloseChatContext } from '@/components/CloseChatContext';
 import { auth } from '@/lib';
 import { Spin } from 'antd';
+import { useRouter } from 'next/navigation';
 
 interface QuestionInfo {
   question_number: number;
@@ -67,6 +68,7 @@ export default function PracticePage({
   const [isChatProcessing, setIsChatProcessing] = useState(false);
   const [isDataLoading, setIsDataLoading] = useState(false);
   const user = auth.currentUser;
+  const router = useRouter();
 
   const getPartData = async () => {
     const token = await user?.getIdToken();
@@ -108,13 +110,14 @@ export default function PracticePage({
     };
 
     fetchPartData();
-  }, [part]);
+  }, [part, getPartData]);
 
   useEffect(() => {
     localStorage.setItem('resultData', JSON.stringify(resultData));
   }, [resultData]);
 
-  const handleDoneButtonClick = () => {
+  const handleDoneButtonClick = async () => {
+    const userAnswer = textareaRef.current?.value || '';
     if (question && textareaRef.current) {
       setResultData((prevResults) => [
         ...prevResults,
@@ -124,6 +127,41 @@ export default function PracticePage({
         },
       ]);
     }
+    const submittedAnswers = {
+      test_id: params.id,
+      parts: partData?.question_groups.map((group) => ({
+        _id: group._id,
+        part_number: part,
+        question_groups: [
+          {
+            _id: group._id,
+            questions: group.questions.map((q) => ({
+              _id: q._id,
+              answer_result: {
+                user_answer: userAnswer,
+              },
+            })),
+          },
+        ],
+      })),
+    };
+
+    console.log('submit', submittedAnswers);
+    const token = await user?.getIdToken();
+
+    const response: Response = await fetch(`/api/test-submissions`, {
+      method: 'POST',
+      headers: {
+        authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(submittedAnswers),
+    });
+
+    const responseData = await response.json();
+    router.push(
+      `/result?writing=true&testId=${params.id}&testSubmissionId=${responseData._id}&part=${params.part}`
+    );
   };
 
   const showMenu = (event: React.MouseEvent) => {
@@ -303,7 +341,7 @@ export default function PracticePage({
                     {question?.question_prompt.split('.')[0]}
                   </p>
                 </div>
-                <CountdownClock />
+                {/* <CountdownClock /> */}
               </div>
               <div className={styles.answerContainer}>
                 <p className={styles.textPracticing}>Trả lời:</p>
@@ -323,22 +361,12 @@ export default function PracticePage({
                   <button className={styles.redButton}>Thoát</button>
                 </Link>
 
-                <Link
-                  href={
-                    part === 'all'
-                      ? `/ielts/writing/${params.id}/2`
-                      : {
-                          pathname: '/ielts/writing/result',
-                        }
-                  }
+                <button
+                  className={styles.primaryButton}
+                  onClick={handleDoneButtonClick}
                 >
-                  <button
-                    className={styles.primaryButton}
-                    onClick={handleDoneButtonClick}
-                  >
-                    Xong
-                  </button>
-                </Link>
+                  Xong
+                </button>
               </div>
             </div>
 

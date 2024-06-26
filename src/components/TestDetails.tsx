@@ -1,6 +1,6 @@
 'use client';
 import styles from '@/styles/components/TestDetails.module.scss';
-import { Modal, Rate } from 'antd';
+import { Modal, Rate, notification } from 'antd';
 import { useState } from 'react';
 import { auth } from '@/lib';
 
@@ -13,26 +13,51 @@ export default function TestDetails({
   user_name,
   rating,
   rating_count,
-  update_date,
+  create_date,
   submission_count,
   test_id,
+  handleRefresh,
 }: {
   user_name: string;
   rating: number;
   rating_count: number;
-  update_date: string;
+  create_date: string;
   submission_count: number;
   test_id: string;
+  handleRefresh: (rate: number) => void;
 }) {
   const user = auth.currentUser;
 
   const [isModalOpen, setIsModalOpen] = useState(false);
-
+  const [api, contextHolder] = notification.useNotification();
+  const [userRating, setUserRating] = useState<number>(0);
   const showModal = () => {
     setIsModalOpen(true);
   };
 
-  const handleOk = () => {
+  const handleOk = async (rate: number) => {
+    const token = await user?.getIdToken();
+
+    const res = await fetch(`/api/rate`, {
+      method: 'POST',
+      headers: {
+        authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({
+        test_id: test_id,
+        user_id: user?.uid,
+        star: userRating,
+      }),
+    });
+    const data = await res.json();
+    if (data.status === 'error') {
+      api.open({
+        message: 'Lỗi',
+        description: data.error.message,
+      });
+    } else {
+      handleRefresh(rate);
+    }
     setIsModalOpen(false);
   };
 
@@ -40,56 +65,48 @@ export default function TestDetails({
     setIsModalOpen(false);
   };
   const handleChange = async (rating: number) => {
-    const token = await user?.getIdToken();
-
-    await fetch(`/api/rate`, {
-      method: 'POST',
-      headers: {
-        authorization: `Bearer ${token}`,
-      },
-      body: JSON.stringify({
-        test_id: test_id,
-        star: rating,
-      }),
-    });
+    setUserRating(rating);
   };
   return (
-    <div className={styles.wrapper}>
-      <div className={styles.items}>Đăng bởi: {user_name}</div>
-      <div className={styles.items}>
-        <div>{rating}</div>
-        <div
-          onClick={showModal}
-          style={{ cursor: 'pointer' }}
-        >
-          <Rate
-            disabled
-            allowHalf
-            defaultValue={rating}
-          />
-        </div>
-        <Modal
-          title="Đánh giá đề thi"
-          open={isModalOpen}
-          onOk={handleOk}
-          onCancel={handleCancel}
-        >
-          <div className={styles.rate}>
+    <>
+      {contextHolder}
+      <div className={styles.wrapper}>
+        <div className={styles.items}>Đăng bởi: {user_name}</div>
+        <div className={styles.items}>
+          <div>{rating}</div>
+          <div
+            onClick={showModal}
+            style={{ cursor: 'pointer' }}
+          >
             <Rate
-              defaultValue={0}
-              tooltips={desc}
-              onChange={(e) => handleChange(e)}
+              disabled
+              allowHalf
+              value={rating}
             />
           </div>
-        </Modal>
-        <div>({rating_count}) lượt đánh giá</div>
+          <Modal
+            title="Đánh giá đề thi"
+            open={isModalOpen}
+            onOk={() => handleOk(userRating)}
+            onCancel={handleCancel}
+          >
+            <div className={styles.rate}>
+              <Rate
+                defaultValue={0}
+                tooltips={desc}
+                onChange={(e) => handleChange(e)}
+              />
+            </div>
+          </Modal>
+          <div>({rating_count}) lượt đánh giá</div>
+        </div>
+        <div className={styles.items}>
+          <div>Ngày cập nhật: {getDate(create_date)}</div>
+        </div>
+        <div className={styles.items}>
+          <div>{submission_count} lượt thi</div>
+        </div>
       </div>
-      <div className={styles.items}>
-        <div>Ngày cập nhật: {getDate(update_date)}</div>
-      </div>
-      <div className={styles.items}>
-        <div>{submission_count} lượt thi</div>
-      </div>
-    </div>
+    </>
   );
 }
