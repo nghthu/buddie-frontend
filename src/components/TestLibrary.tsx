@@ -49,7 +49,7 @@ const fetcher = async ({ url, user }: FetchArgs) => {
   return response.data;
 };
 const { Search } = Input;
-
+const LIMIT = 10;
 export default function TestLibrary(props: {
   pageLoading: boolean;
   setPageLoading: React.Dispatch<SetStateAction<boolean>>;
@@ -62,7 +62,7 @@ export default function TestLibrary(props: {
   const scrollRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
 
-  const apiUrl = `/api/tests?page=${totalPage}&search=${searchValue}&isbuddie=false`;
+  const apiUrl = `/api/tests?page=${totalPage}&search=${searchValue}&limit=${LIMIT}&isbuddie=false`;
   const user = auth.currentUser;
   const {
     data: rawTests,
@@ -164,7 +164,7 @@ export default function TestLibrary(props: {
   });
   const handleInfScroll = () => {
     if (totalPage < rawTests?.pagination.total_count / 10) {
-      setTotalPage((prev) => prev + 1);
+      setTotalPage((prev) => prev + LIMIT);
     }
   };
 
