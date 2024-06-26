@@ -62,8 +62,6 @@ const CreateTest = () => {
 
   const callCreateTestAPI = async () => {
     const token = await user?.getIdToken();
-    console.log(token);
-    console.log(form.getFieldsValue());
 
     const formData = new FormData();
     formData.append('test', JSON.stringify(form.getFieldsValue()));
@@ -108,8 +106,6 @@ const CreateTest = () => {
       }
     });
 
-    console.log(formData);
-
     const response = await fetch(`/api/tests`, {
       method: 'POST',
       headers: {
@@ -123,7 +119,6 @@ const CreateTest = () => {
     }
 
     const result = await response.json();
-    console.log(result);
     return result;
   };
 
@@ -135,6 +130,7 @@ const CreateTest = () => {
       setCurrentTab('2');
     } else {
       await form.validateFields();
+      router.push('/tests');
       callCreateTestAPI();
     }
   };
@@ -203,8 +199,6 @@ const CreateTest = () => {
         newUploadedFileNames[key] = file.name;
         setUploadedFileNames(newUploadedFileNames);
       }
-
-      console.log(form.getFieldsValue());
     };
 
   const handleFileChangeQuestionGroup =
@@ -474,6 +468,16 @@ const CreateTest = () => {
                       </div>
                     )}
 
+                    <Form.Item
+                      name={[field.name, 'part_recording']}
+                      hidden
+                    ></Form.Item>
+
+                    <Form.Item
+                      name={[field.name, 'part_image_urls']}
+                      hidden
+                    ></Form.Item>
+
                     <div className={styles.buttonsContainer}>
                       <input
                         type="file"
@@ -570,6 +574,24 @@ const CreateTest = () => {
                                   }
                                 </div>
                               )}
+
+                              <Form.Item
+                                name={[
+                                  subField.name,
+                                  'question_groups_info',
+                                  'question_group_recording',
+                                ]}
+                                hidden
+                              ></Form.Item>
+
+                              <Form.Item
+                                name={[
+                                  subField.name,
+                                  'question_groups_info',
+                                  'question_group_image_urls',
+                                ]}
+                                hidden
+                              ></Form.Item>
 
                               <div className={styles.buttonsContainer}>
                                 <input
@@ -757,6 +779,22 @@ const CreateTest = () => {
                                             }
                                           </div>
                                         )}
+
+                                        <Form.Item
+                                          name={[
+                                            questionField.name,
+                                            'question_recording',
+                                          ]}
+                                          hidden
+                                        ></Form.Item>
+
+                                        <Form.Item
+                                          name={[
+                                            questionField.name,
+                                            'question_image_urls',
+                                          ]}
+                                          hidden
+                                        ></Form.Item>
 
                                         <div
                                           className={styles.buttonsContainer}
