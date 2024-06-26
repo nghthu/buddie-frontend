@@ -29,5 +29,8 @@
   gap: 1rem;
   align-items: center;
   justify-content: center;
-  color:black;
+  color: black;
+  &:hover {
+    background-color: #6b5d865c;
+  }
 }

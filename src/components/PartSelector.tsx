@@ -15,7 +15,7 @@ export default function PartSelector({
       <div className={styles.partSelectorWrapper}>
         {parts.map((p, index) => (
           <Link
-            href={`tests/${testId}/${p.index}`}
+            href={`${testId}/${p.index}`}
             key={index}
           >
             <div className={styles.items}>
@@ -30,7 +30,7 @@ export default function PartSelector({
           </Link>
         ))}
       </div>
-      <Link href={`tests/${testId}/all`}>
+      <Link href={`${testId}/all`}>
         <Button type="primary">Làm tất cả</Button>
       </Link>
     </div>

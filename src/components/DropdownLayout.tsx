@@ -4,6 +4,7 @@ interface test_answer {
   test_id: string;
   parts: {
     _id: string;
+    part_number: number;
     question_groups: {
       _id: string;
       questions: {
@@ -51,8 +52,8 @@ export default function DropdownLayout(props: {
     });
   }
   if (props.options) {
-    const selecOptions = props.options.map((option: string) => {
-      return { label: option, value: option };
+    const selecOptions = props.options.map((option: string, index) => {
+      return { label: option, value: (index + 1).toString() };
     });
     const select = (
       <Select

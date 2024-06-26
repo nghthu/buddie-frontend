@@ -40,3 +40,51 @@ export const GET = async function getFile(req: NextRequest) {
     return NextResponse.json({ error });
   }
 };
+
+export const POST = async function createAudioFiles(req: Request) {
+  try {
+    const formData = await req.formData();
+
+    const sendData = new FormData();
+    formData.forEach((value, key) => {
+      if (key !== 'testId') {
+        sendData.append(key, value);
+      }
+    });
+
+    console.log('---------------', sendData, formData.get('testId'));
+    const response = await fetch(
+      `${process.env.API_BASE_URL}/api/v1/file/user-audios/tests/${formData.get('testId')}`,
+      {
+        method: 'POST',
+        headers: {
+          Authorization: req.headers.get('Authorization') ?? '',
+        },
+        body: sendData,
+      }
+    );
+
+    console.log(response);
+
+    let data = await response.json();
+    console.log('DATA---------------------------', data);
+    data = {
+      status: 'success',
+      data: [
+        {
+          key: 'user-audio/user-gVIadC2MMucZ21qLJX4cY6rwCSc2/test-66275c541f6241ccb6954c7c/part-1/audio-852d19b6-2862-4cd3-9d59-faa951fac6e6.mp3',
+          filename: 'myaudio-hometown-part1-2.mp3',
+        },
+        {
+          key: 'user-audio/user-gVIadC2MMucZ21qLJX4cY6rwCSc2/test-66275c541f6241ccb6954c7c/part-1/audio-969b2914-9a50-4aae-972b-0661e0ea802e.mp3',
+          filename: 'myaudio-hometown-part1-1.mp3',
+        },
+      ],
+      error: {},
+    };
+    return NextResponse.json(data.data);
+  } catch (error) {
+    console.error(error);
+    return NextResponse.json({ error });
+  }
+};

@@ -4,6 +4,7 @@ interface test_answer {
   test_id: string;
   parts: {
     _id: string;
+    part_number: number;
     question_groups: {
       _id: string;
       questions: {
@@ -28,22 +29,7 @@ export default function SingleChoiceLayout(props: {
   function handleSetAnswer(e: RadioChangeEvent) {
     props.setAnswer((prev) => {
       const temp = { ...prev };
-      // //search for the right part
-      // temp.parts.map((part: { _id: string, question_groups: object[] }) => {
-      //     if (part._id === props.partId) {
-      //         // search for the right question group
-      //         part.question_groups.map((question_group: { _id: string, questions: object[] }) => {
-      //             if (question_group._id === props.questionGroupsId) {
-      //                 // search for the right question
-      //                 question_group.questions.map((question: { _id: string, answer_result: { user_answer: string } }) => {
-      //                     if (question._id === props.questionId) {
-      //                         question.answer_result.user_answer = e.target.value;
-      //                     }
-      //                 });
-      //             }
-      //         });
-      //     }
-      // });
+
       const temp_part = temp['parts'].find(
         (part: { _id: string }) => part._id === props.partId
       );
@@ -61,7 +47,7 @@ export default function SingleChoiceLayout(props: {
     });
   }
   if (props.options) {
-    const singleChoiceOptions = props.options.map((option: string) => {
+    const singleChoiceOptions = props.options.map((option: string, index) => {
       return (
         <div
           key={option}
@@ -71,7 +57,7 @@ export default function SingleChoiceLayout(props: {
             key={option + '<div></div>'}
             className={styles.radio}
             name={props.question}
-            value={option}
+            value={(index + 1).toString()}
           >
             {' '}
             {option}

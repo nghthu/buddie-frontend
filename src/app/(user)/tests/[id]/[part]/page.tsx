@@ -2,14 +2,16 @@
 
 import TextCard from '@/components/TextCard';
 import { Input, Radio, Button, Spin } from 'antd';
-import styles from '@/styles/pages/listening/Practice.module.scss';
+import styles from '@/styles/pages/UserTest.module.scss';
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import AudioPlayer from '@/components/AudioPlayer';
+// import AudioPlayer from '@/components/AudioPlayer';
 import useSWR from 'swr';
 import { auth } from '@/lib';
 import { User } from 'firebase/auth';
 import { DoubleLeftOutlined, DoubleRightOutlined } from '@ant-design/icons';
+
+const { TextArea } = Input;
 
 interface Part {
   part_duration: number;
@@ -70,7 +72,7 @@ const fetcher = async ({ url, user }: { url: string; user: User | null }) => {
   return response.data;
 };
 
-const ListeningPractice = ({
+const UserTestPractice = ({
   params,
 }: {
   params: { id: string; part: string };
@@ -78,7 +80,7 @@ const ListeningPractice = ({
   const [testData, setTestData] = useState<QuestionGroup[] | null>(null);
   const [answers, setAnswers] = useState<Answer[]>([]);
   const [currentPart, setCurrentPart] = useState(0);
-  const [loading, setLoading] = useState(false);
+  const [loading, setIsloading] = useState(false);
   const router = useRouter();
   const user = auth.currentUser;
 
@@ -95,6 +97,8 @@ const ListeningPractice = ({
       if (params.part !== 'all') {
         setTestData(data.parts[Number(params.part) - 1].question_groups);
       } else {
+        console.log(data);
+
         setCurrentPart(0);
         setTestData(data.parts[0].question_groups);
       }
@@ -127,11 +131,10 @@ const ListeningPractice = ({
   };
 
   const submitHandler = async () => {
-    setLoading(true);
+    setIsloading(true);
     const structuredAnswers = {
       test_id: data._id,
-      parts: data.parts.map((part: Part, index: number) => ({
-        part_number: index + 1,
+      parts: data.parts.map((part: Part) => ({
         _id: part._id,
         question_groups: part.question_groups.map(
           (questionGroup: QuestionGroup) => ({
@@ -196,18 +199,21 @@ const ListeningPractice = ({
   if (isLoading || loading) return <Spin size="large" />;
 
   return (
-    <>
-      <AudioPlayer audioUrl={data?.test_recording} />
-
+    <div className={styles.container}>
+      {/* <AudioPlayer
+        audioUrl={data?.test_recording}
+        disableStopButton
+      /> */}
+      <h2 className={styles.part}>Phần {currentPart + 1}:</h2>
       <TextCard
         width="100%"
         height="auto"
       >
         {testData?.map((group: QuestionGroup, index: number) => (
           <div key={index}>
-            <h3 className={styles['question-prompt']}>
+            <h4 className={styles['question-prompt']}>
               {group.question_groups_info.question_groups_prompt}
-            </h3>
+            </h4>
             {group.question_groups_info.question_groups_image_urls?.map(
               (imageUrl, imageIndex) => (
                 <img
@@ -231,7 +237,22 @@ const ListeningPractice = ({
                     alt={`Question ${question.question_number}`}
                   />
                 ))}
-                {question.question_type === 'completion' ? (
+                {question.question_type === 'writing' ? (
+                  <TextArea
+                    showCount
+                    maxLength={100}
+                    onChange={(e) =>
+                      answerChangehandler(question._id, e.target.value)
+                    }
+                    placeholder="Nhập câu trả lời"
+                    style={{
+                      height: 220,
+                      resize: 'none',
+                      marginBottom: '20px',
+                      marginTop: '20px',
+                    }}
+                  />
+                ) : question.question_type === 'completion' ? (
                   <Input
                     placeholder="Nhập câu trả lời"
                     onChange={(e) =>
@@ -265,7 +286,7 @@ const ListeningPractice = ({
       <div className={styles['action-btn']}>
         <Button
           className={styles['exit-btn']}
-          onClick={() => router.push('/ielts')}
+          onClick={() => router.push('/tests')}
         >
           Thoát
         </Button>
@@ -286,8 +307,8 @@ const ListeningPractice = ({
           )}
         </div>
       </div>
-    </>
+    </div>
   );
 };
 
-export default ListeningPractice;
+export default UserTestPractice;

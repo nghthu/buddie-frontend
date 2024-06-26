@@ -16,12 +16,9 @@ import { auth } from '@/lib';
 import { User } from 'firebase/auth';
 import { Spin } from 'antd';
 import useSWR from 'swr';
-// import { createFFmpeg, fetchFile } from '@ffmpeg/ffmpeg';
 import { DoubleRightOutlined } from '@ant-design/icons';
 
 const mimeType: string = 'audio/webm';
-// const mimeType: string = 'audio/mpeg';
-// const ffmpeg = createFFmpeg({ log: true });
 
 const fetcher = async ({ url, user }: { url: string; user: User | null }) => {
   const token = await user?.getIdToken();
@@ -46,6 +43,7 @@ interface QuestionInfo {
   question_duration: number;
   options: string[];
   answer: string;
+  _id: string;
 }
 
 interface QuestionGroupInfo {
@@ -59,7 +57,27 @@ interface QuestionGroup {
   is_single_question: boolean;
   question_groups_info: QuestionGroupInfo;
   questions: QuestionInfo[];
+  _id: string;
 }
+
+// interface Part {
+//   part_duration: number;
+//   part_image_urls: string[];
+//   part_number: number;
+//   part_prompt: string;
+//   part_recording: string;
+//   _id: string;
+//   question_groups: QuestionGroup[];
+// }
+
+// interface AnswerResult {
+//   user_answer: string;
+// }
+
+// interface Answer {
+//   _id: string;
+//   answer_result: AnswerResult;
+// }
 
 const PracticeSpeaking = ({
   params,
@@ -80,7 +98,9 @@ const PracticeSpeaking = ({
   const [instruction, setInstruction] = useState(true);
   const [wantToSubmit, setWantToSubmit] = useState(false);
   const [testData, setTestData] = useState<QuestionGroup | null>(null);
-  // const [mp3audio, setMp3Audio] = useState<string | null>(null);
+  const [disable, setDisable] = useState(false);
+  // const [submitAnswers, setSubmitAnswers] = useState<Answer[]>([]);
+
   const router = useRouter();
   const user = auth.currentUser;
   let finalPart = 0;
@@ -113,27 +133,9 @@ const PracticeSpeaking = ({
     setTestData(dataOfTest);
   }
 
-  // async function convertWebmToMp3(webmBlob: Blob): Promise<Blob> {
-  //   const ffmpeg = createFFmpeg({ log: false });
-  //   await ffmpeg.load();
-
-  //   const inputName = 'input.webm';
-  //   const outputName = 'output.mp3';
-
-  //   const arrayBuffer = await new Response(webmBlob).arrayBuffer();
-
-  //   ffmpeg.FS('writeFile', inputName, new Uint8Array(arrayBuffer));
-
-  //   await ffmpeg.run('-i', inputName, outputName);
-
-  //   const outputData = ffmpeg.FS('readFile', outputName);
-  //   const outputBlob = new Blob([outputData.buffer], { type: 'audio/mp3' });
-
-  //   return outputBlob;
-  // }
-
   const startRecording = async (streamData: MediaStream) => {
     setRecordingStatus('recording');
+    setDisable(true);
     if (streamData) {
       const media = new MediaRecorder(streamData, { mimeType });
       mediaRecorder.current = media;
@@ -149,6 +151,8 @@ const PracticeSpeaking = ({
   };
 
   const stopRecording = () => {
+    setDisable(false);
+    SpeechRecognition.stopListening();
     setRecordingStatus('inactive');
     if (mediaRecorder.current && mediaRecorder.current.state === 'recording') {
       mediaRecorder.current.stop();
@@ -225,63 +229,88 @@ const PracticeSpeaking = ({
       setCurrentQuestion(1);
       setInstruction(false);
     } else {
-      if (currentAnswer && wantToSubmit) {
-        console.log('logcheck2');
-        setAnswers((prevAnswers) => [...prevAnswers, currentAnswer]);
+      if (testData) {
+        if (currentAnswer && wantToSubmit) {
+          setAnswers((prevAnswers) => [...prevAnswers, currentAnswer]);
+          console.log('logcheck2', answers);
+        }
+        if (currentQuestion < testData.questions.length - 1) {
+          console.log('logcheck', currentQuestion);
+          setCurrentQuestion((prevQuestion) => prevQuestion + 1);
+        } else if (currentQuestion === testData.questions.length - 1) {
+          // handle submit
+          console.log('submit');
+          const token = await user?.getIdToken();
+          const formData = new FormData();
 
-        // send test api
-        const token = await user?.getIdToken();
+          answers.forEach((answer, index) => {
+            formData.append(`audios`, answer, `file{${index}.webm`);
+          });
+          console.log(currentPart);
+          formData.append('part', (currentPart + 1).toString());
+          formData.append('testId', params.id);
 
-        // const mp3Blob = await convertWebmToMp3(currentAnswer);
-
-        const formData = new FormData();
-
-        // --------- start uncomment the following-------------------------------
-        // formData.append('speaking_audio', currentAnswer, 'answer.webm');
-        // formData.append('speaking_part', '1');
-        // formData.append('audio_type', 'mp3');
-        // formData.append(
-        //   'question',
-        //   testData.questions[currentQuestion].question_prompt
-        // );
-        //------------------end uncomment-------------------------------------------
-
-        await fetch(`/api/ai/assess-speaking`, {
-          method: 'POST',
-          headers: {
-            authorization: `Bearer ${token}`,
-          },
-          body: formData,
-        });
+          await fetch(`/api/file`, {
+            method: 'POST',
+            headers: {
+              authorization: `Bearer ${token}`,
+            },
+            body: formData,
+          });
+        }
       }
-      // --------- start uncomment the following-------------------------------
-      // if (currentQuestion < testData.questions.length - 1) {
-      //   console.log('logcheck', currentQuestion);
-      //   setCurrentQuestion((prevQuestion) => prevQuestion + 1);
-      // } else if (currentQuestion === testData.questions.length - 1) {
-      //   // handle submit
-      //   console.log('submit');
-      // }
-      //------------------end uncomment-------------------------------------------
-
-      setCurrentAnswer(null);
-      setAudio(null);
-      resetTranscript();
     }
+    setAudio(null);
+    setCurrentAnswer(null);
+    resetTranscript();
   };
 
-  const nextPartHandler = () => {
+  const nextPartHandler = async () => {
     const nextPart = currentPart + 1;
     setCurrentPart((prevPart) => prevPart + 1);
     setTestData(data.parts[nextPart].question_groups[0]);
     setCurrentQuestion(0);
+    // handle submit
+    console.log('submit');
+    // const token = await user?.getIdToken();
+    const formData = new FormData();
+
+    answers.forEach((answer, index) => {
+      formData.append(`audios`, answer, `file{${index}.webm`);
+    });
+    console.log(currentPart);
+    formData.append('part', (currentPart + 1).toString());
+    formData.append('testId', params.id);
+
+    // const response = await fetch(`/api/file`, {
+    //   method: 'POST',
+    //   headers: {
+    //     authorization: `Bearer ${token}`,
+    //   },
+    //   body: formData,
+    // });
+
+    // const responseData = response.json();
+    // const submissionResponse: Response = await fetch(`/api/test-submissions`, {
+    //   method: 'POST',
+    //   headers: {
+    //     authorization: `Bearer ${token}`,
+    //     'Content-Type': 'application/json',
+    //   },
+    //   body: JSON.stringify(submittedAnswers),
+    // });
+
+    // const submissionData = await submissionResponse.json();
+    // router.push(
+    //   `/result?testId=${params.id}&testSubmissionId=${submissionData._id}&part=${params.part}`
+    // );
   };
 
   const setSubmitHandler: CheckboxProps['onChange'] = (e) => {
     setWantToSubmit(e.target.checked);
   };
 
-  const submitHandler = () => {
+  const submitHandler = async () => {
     console.log(answers);
   };
 
@@ -338,7 +367,7 @@ const PracticeSpeaking = ({
             {recordingStatus === 'recording' && <EllipsisOutlined />}
           </Button>
           {audio ? (
-            <div className="audio-container">
+            <div className={styles['audio-container']}>
               <audio
                 src={audio}
                 controls
@@ -361,18 +390,31 @@ const PracticeSpeaking = ({
               )}
 
             {currentQuestion !== 0 && !isLastQuestionOfPart && (
-              <Button onClick={nextHandler}>
+              <Button
+                onClick={nextHandler}
+                disabled={disable}
+              >
                 <DoubleRightOutlined />
               </Button>
             )}
 
             {isLastQuestionOfPart && isAllPart && (
-              <Button onClick={nextPartHandler}>Phần thi tiếp theo</Button>
+              <Button
+                onClick={nextPartHandler}
+                disabled={disable}
+              >
+                Phần thi tiếp theo
+              </Button>
             )}
 
             {isLastQuestionOfPart &&
               (!isAllPart || (isAllPart && isFinalPart)) && (
-                <Button onClick={submitHandler}>Nộp bài</Button>
+                <Button
+                  onClick={submitHandler}
+                  disabled={disable}
+                >
+                  Nộp bài
+                </Button>
               )}
           </div>
         </>

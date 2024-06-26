@@ -1,0 +1,57 @@
+.wrapper {
+    display: flex;
+    align-items: flex-start;
+    justify-content:space-around;
+    height: 100%;
+    width:100%;
+    padding: 3rem;
+    gap: 5rem;
+}
+.button {
+    width: 20rem;
+    padding:1rem;
+}
+.buttons {
+    display: flex;
+    gap: 2rem;
+    width:100%;
+    justify-content: space-between;
+}
+.buttonsEnd {
+    display:flex;
+    gap:2rem;
+    width:100%;
+    justify-content: flex-end;
+}
+.overView {
+    display:flex;
+    flex-direction:column;
+    width: 50%;
+    align-items: flex-start;
+    gap: 2rem;
+}
+.detail {
+    display: flex;
+    flex-direction: column;
+    width: 50%;
+    align-items: flex-start;
+    gap: 2rem;
+}
+.question {
+    display:flex;
+    justify-content: space-between;
+    font-size: 2rem;
+}
+.answerDetail {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+.correct {
+    color: green;
+    font-weight: bold;
+}
+.wrong {
+    color: red;
+    font-weight: bold;
+}

@@ -48,7 +48,7 @@
 }
 .control {
   display: flex;
-  justify-content: flex-start;
+  justify-content: space-between;
   align-items: center;
   width: 100%;
   border-radius: 15px;
@@ -56,4 +56,19 @@
   padding-left: 4rem;
   padding-right: 4rem;
   gap: 1.5rem;
+}
+
+.create-question-btn {
+  background-color: #6b5d86;
+  border: none;
+  width: 100px;
+  height: 40px;
+  border-radius: 7px;
+  color: white;
+  font-weight: bold;
+  margin-left: auto;
+  display: block;
+  &:hover {
+    cursor: pointer;
+  }
 }

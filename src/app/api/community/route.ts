@@ -26,6 +26,7 @@ export async function GET(request: NextRequest) {
 export async function POST(req: NextRequest) {
   try {
     const formData = await req.formData();
+    console.log(formData);
     const response = await fetch(
       `${process.env.API_BASE_URL}/api/v1/questions`,
       {
