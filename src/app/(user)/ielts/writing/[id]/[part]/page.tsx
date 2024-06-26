@@ -130,7 +130,7 @@ export default function PracticePage({
     const submittedAnswers = {
       test_id: params.id,
       parts: partData?.question_groups.map((group) => ({
-        _id: 'group_id_placeholder',
+        _id: group._id,
         part_number: part,
         question_groups: [
           {
@@ -160,7 +160,7 @@ export default function PracticePage({
 
     const responseData = await response.json();
     router.push(
-      `/result?testId=${params.id}&testSubmissionId=${responseData._id}&part=${params.part}`
+      `/result?writing=true&testId=${params.id}&testSubmissionId=${responseData._id}&part=${params.part}`
     );
   };
 
