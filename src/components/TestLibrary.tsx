@@ -12,6 +12,8 @@ import styles from '@/styles/components/TestSelector.module.scss';
 import { Input } from 'antd';
 import type { SearchProps } from 'antd/es/input/Search';
 import InfiniteScroll from 'react-infinite-scroll-component';
+import { useRouter } from 'next/navigation';
+
 interface FetchArgs {
   url: string;
   user: User | null;
@@ -47,6 +49,7 @@ export default function TestLibrary(props: {
   const [filteredTests, setFilteredTests] = useState([]);
   const [searchValue, setSearchValue] = useState('');
   const scrollRef = useRef<HTMLDivElement>(null);
+  const router = useRouter();
 
   const apiUrl = `/api/tests?page=${totalPage}&search=${searchValue}&isbuddie=false`;
   const user = auth.currentUser;
@@ -154,6 +157,11 @@ export default function TestLibrary(props: {
       setTotalPage((prev) => prev + 1);
     }
   };
+
+  const createTest = () => {
+    router.push('/tests/create');
+  };
+
   return (
     <div className={styles.container}>
       {contextHolder}
@@ -164,6 +172,12 @@ export default function TestLibrary(props: {
           onSearch={onSearch}
           style={{ width: 300 }}
         />
+        <button
+          className={styles['create-question-btn']}
+          onClick={createTest}
+        >
+          Tạo đề thi
+        </button>
       </div>
       <div
         className={styles.wrapper}

@@ -215,6 +215,7 @@ const UserTestPractice = ({
             {group.question_groups_info.question_groups_image_urls?.map(
               (imageUrl, imageIndex) => (
                 <img
+                  className={styles.images}
                   key={imageIndex}
                   src={imageUrl}
                   alt={`Question ${index + 1}`}
@@ -228,6 +229,7 @@ const UserTestPractice = ({
                 </p>
                 {question.question_image_urls?.map((imageUrl, imageIndex) => (
                   <img
+                    className={styles.images}
                     key={imageIndex}
                     src={imageUrl}
                     alt={`Question ${question.question_number}`}
@@ -247,6 +249,13 @@ const UserTestPractice = ({
                       marginBottom: '20px',
                       marginTop: '20px',
                     }}
+                  />
+                ) : question.question_type === 'completion' ? (
+                  <Input
+                    placeholder="Nhập câu trả lời"
+                    onChange={(e) =>
+                      answerChangehandler(question._id, e.target.value)
+                    }
                   />
                 ) : (
                   <Radio.Group
