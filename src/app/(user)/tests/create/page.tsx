@@ -1,6 +1,6 @@
 'use client';
 
-import styles from '@/styles/pages/tests/create/Create.module.scss';
+import styles from '@/styles/pages/tests/create/create.module.scss';
 import { Button, Card, Checkbox, InputNumber, Radio, Space, Tabs } from 'antd';
 import { useState, useRef, useEffect } from 'react';
 import {
