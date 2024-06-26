@@ -66,8 +66,23 @@ export const POST = async function createAudioFiles(req: Request) {
 
     console.log(response);
 
-    const data = await response.json();
-    return NextResponse.json(data);
+    let data = await response.json();
+    console.log('DATA---------------------------', data);
+    data = {
+      status: 'success',
+      data: [
+        {
+          key: 'user-audio/user-gVIadC2MMucZ21qLJX4cY6rwCSc2/test-66275c541f6241ccb6954c7c/part-1/audio-852d19b6-2862-4cd3-9d59-faa951fac6e6.mp3',
+          filename: 'myaudio-hometown-part1-2.mp3',
+        },
+        {
+          key: 'user-audio/user-gVIadC2MMucZ21qLJX4cY6rwCSc2/test-66275c541f6241ccb6954c7c/part-1/audio-969b2914-9a50-4aae-972b-0661e0ea802e.mp3',
+          filename: 'myaudio-hometown-part1-1.mp3',
+        },
+      ],
+      error: {},
+    };
+    return NextResponse.json(data.data);
   } catch (error) {
     console.error(error);
     return NextResponse.json({ error });

@@ -451,6 +451,8 @@ export default function IeltsPart({
             setIsChatProcessing={setIsChatProcessing}
             setResultPage={setResultPage}
             setFetchedData={setFetchedData}
+            testId={params.id}
+            part={params.part}
           />
         )}
         <ReadingFunctionMenu

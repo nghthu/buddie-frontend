@@ -43,6 +43,7 @@ interface QuestionInfo {
   question_duration: number;
   options: string[];
   answer: string;
+  _id: string;
 }
 
 interface QuestionGroupInfo {
@@ -56,7 +57,27 @@ interface QuestionGroup {
   is_single_question: boolean;
   question_groups_info: QuestionGroupInfo;
   questions: QuestionInfo[];
+  _id: string;
 }
+
+// interface Part {
+//   part_duration: number;
+//   part_image_urls: string[];
+//   part_number: number;
+//   part_prompt: string;
+//   part_recording: string;
+//   _id: string;
+//   question_groups: QuestionGroup[];
+// }
+
+// interface AnswerResult {
+//   user_answer: string;
+// }
+
+// interface Answer {
+//   _id: string;
+//   answer_result: AnswerResult;
+// }
 
 const PracticeSpeaking = ({
   params,
@@ -78,6 +99,8 @@ const PracticeSpeaking = ({
   const [wantToSubmit, setWantToSubmit] = useState(false);
   const [testData, setTestData] = useState<QuestionGroup | null>(null);
   const [disable, setDisable] = useState(false);
+  // const [submitAnswers, setSubmitAnswers] = useState<Answer[]>([]);
+
   const router = useRouter();
   const user = auth.currentUser;
   let finalPart = 0;
@@ -129,6 +152,7 @@ const PracticeSpeaking = ({
 
   const stopRecording = () => {
     setDisable(false);
+    SpeechRecognition.stopListening();
     setRecordingStatus('inactive');
     if (mediaRecorder.current && mediaRecorder.current.state === 'recording') {
       mediaRecorder.current.stop();
@@ -220,7 +244,7 @@ const PracticeSpeaking = ({
           const formData = new FormData();
 
           answers.forEach((answer, index) => {
-            formData.append(`audios[${index}]`, answer);
+            formData.append(`audios`, answer, `file{${index}.webm`);
           });
           console.log(currentPart);
           formData.append('part', (currentPart + 1).toString());
@@ -248,30 +272,45 @@ const PracticeSpeaking = ({
     setCurrentQuestion(0);
     // handle submit
     console.log('submit');
-    const token = await user?.getIdToken();
+    // const token = await user?.getIdToken();
     const formData = new FormData();
 
     answers.forEach((answer, index) => {
-      formData.append(`audios[${index}]`, answer);
+      formData.append(`audios`, answer, `file{${index}.webm`);
     });
     console.log(currentPart);
     formData.append('part', (currentPart + 1).toString());
     formData.append('testId', params.id);
 
-    await fetch(`/api/file`, {
-      method: 'POST',
-      headers: {
-        authorization: `Bearer ${token}`,
-      },
-      body: formData,
-    });
+    // const response = await fetch(`/api/file`, {
+    //   method: 'POST',
+    //   headers: {
+    //     authorization: `Bearer ${token}`,
+    //   },
+    //   body: formData,
+    // });
+
+    // const responseData = response.json();
+    // const submissionResponse: Response = await fetch(`/api/test-submissions`, {
+    //   method: 'POST',
+    //   headers: {
+    //     authorization: `Bearer ${token}`,
+    //     'Content-Type': 'application/json',
+    //   },
+    //   body: JSON.stringify(submittedAnswers),
+    // });
+
+    // const submissionData = await submissionResponse.json();
+    // router.push(
+    //   `/result?testId=${params.id}&testSubmissionId=${submissionData._id}&part=${params.part}`
+    // );
   };
 
   const setSubmitHandler: CheckboxProps['onChange'] = (e) => {
     setWantToSubmit(e.target.checked);
   };
 
-  const submitHandler = () => {
+  const submitHandler = async () => {
     console.log(answers);
   };
 
