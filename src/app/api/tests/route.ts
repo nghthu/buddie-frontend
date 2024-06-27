@@ -263,7 +263,7 @@ export const POST = async function createTest(req: Request) {
         'Content-Type': 'application/json',
         Authorization: req.headers.get('Authorization') || '',
       },
-      body: JSON.stringify({}),
+      body: JSON.stringify({test}),
     });
     const data = await response.json();
     return NextResponse.json(data);
