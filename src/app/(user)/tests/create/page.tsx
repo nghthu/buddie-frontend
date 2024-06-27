@@ -123,13 +123,13 @@ const CreateTest = () => {
   };
 
   const handleOk = async () => {
+    await form.validateFields();
+    const values = form.getFieldsValue();
+
     if (currentTab === '1') {
-      await form.validateFields();
-      const values = form.getFieldsValue();
       form.setFieldsValue({ tags: values.tags ? values.tags.split(' ') : [] });
       setCurrentTab('2');
     } else {
-      await form.validateFields();
       router.push('/tests');
       callCreateTestAPI();
     }
@@ -146,30 +146,6 @@ const CreateTest = () => {
   const handleTabChange = (key: string) => {
     setCurrentTab(key);
   };
-
-  // type Part = {
-  //   part_number: number;
-  //   part_duration: number | null;
-  //   part_prompt: string;
-  //   question_groups: Array<QuestionGroup>;
-  // };
-
-  // type QuestionGroup = {
-  //   is_single_question: boolean;
-  //   question_groups_info: {
-  //     question_groups_duration: number | null;
-  //     question_groups_prompt: string;
-  //   };
-  //   questions: Array<Question>;
-  // };
-
-  // type Question = {
-  //   question_number: number;
-  //   question_type: string;
-  //   question_prompt: string;
-  //   question_duration: number | null;
-  //   question_preparation_time: number | null;
-  // };
 
   const handleFileChangePart =
     (partIndex: number, type: string) =>
