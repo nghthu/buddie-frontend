@@ -60,24 +60,30 @@ interface QuestionGroup {
   _id: string;
 }
 
-// interface Part {
-//   part_duration: number;
-//   part_image_urls: string[];
-//   part_number: number;
-//   part_prompt: string;
-//   part_recording: string;
-//   _id: string;
-//   question_groups: QuestionGroup[];
-// }
+interface Part {
+  part_duration: number;
+  part_image_urls: string[];
+  part_number: number;
+  part_prompt: string;
+  part_recording: string;
+  _id: string;
+  question_groups: QuestionGroup[];
+}
 
-// interface AnswerResult {
-//   user_answer: string;
-// }
+interface AnswerResult {
+  user_answer: string;
+}
 
-// interface Answer {
-//   _id: string;
-//   answer_result: AnswerResult;
-// }
+interface Answer {
+  _id: string;
+  answer_result: AnswerResult;
+  audio: Blob;
+}
+
+interface AudioResponse {
+  key: string;
+  filename: string;
+}
 
 const PracticeSpeaking = ({
   params,
@@ -94,12 +100,11 @@ const PracticeSpeaking = ({
   const { transcript, resetTranscript } = useSpeechRecognition();
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [currentAnswer, setCurrentAnswer] = useState<Blob | null>(null);
-  const [answers, setAnswers] = useState<Blob[]>([]);
   const [instruction, setInstruction] = useState(true);
   const [wantToSubmit, setWantToSubmit] = useState(false);
   const [testData, setTestData] = useState<QuestionGroup | null>(null);
   const [disable, setDisable] = useState(false);
-  // const [submitAnswers, setSubmitAnswers] = useState<Answer[]>([]);
+  const [submitAnswers, setSubmitAnswers] = useState<Answer[]>([]);
 
   const router = useRouter();
   const user = auth.currentUser;
@@ -231,8 +236,16 @@ const PracticeSpeaking = ({
     } else {
       if (testData) {
         if (currentAnswer && wantToSubmit) {
-          setAnswers((prevAnswers) => [...prevAnswers, currentAnswer]);
-          console.log('logcheck2', answers);
+          console.log('kkk', testData), currentQuestion;
+          setSubmitAnswers((prevAnswers) => [
+            ...prevAnswers,
+            {
+              _id: testData.questions[currentQuestion]._id,
+              answer_result: { user_answer: '' },
+              audio: currentAnswer,
+            },
+          ]);
+          console.log('logcheck2', submitAnswers, submitAnswers);
         }
         if (currentQuestion < testData.questions.length - 1) {
           console.log('logcheck', currentQuestion);
@@ -243,8 +256,8 @@ const PracticeSpeaking = ({
           const token = await user?.getIdToken();
           const formData = new FormData();
 
-          answers.forEach((answer, index) => {
-            formData.append(`audios`, answer, `file{${index}.webm`);
+          submitAnswers.forEach((answer) => {
+            formData.append(`audios`, answer.audio, `{${answer._id}.webm`);
           });
           console.log(currentPart);
           formData.append('part', (currentPart + 1).toString());
@@ -272,38 +285,77 @@ const PracticeSpeaking = ({
     setCurrentQuestion(0);
     // handle submit
     console.log('submit');
-    // const token = await user?.getIdToken();
+    const token = await user?.getIdToken();
     const formData = new FormData();
 
-    answers.forEach((answer, index) => {
-      formData.append(`audios`, answer, `file{${index}.webm`);
+    submitAnswers.forEach((answer) => {
+      formData.append(`audios`, answer.audio, `{${answer._id}.webm`);
     });
     console.log(currentPart);
     formData.append('part', (currentPart + 1).toString());
     formData.append('testId', params.id);
 
-    // const response = await fetch(`/api/file`, {
-    //   method: 'POST',
-    //   headers: {
-    //     authorization: `Bearer ${token}`,
-    //   },
-    //   body: formData,
-    // });
+    const response = await fetch(`/api/file`, {
+      method: 'POST',
+      headers: {
+        authorization: `Bearer ${token}`,
+      },
+      body: formData,
+    });
 
-    // const responseData = response.json();
-    // const submissionResponse: Response = await fetch(`/api/test-submissions`, {
-    //   method: 'POST',
-    //   headers: {
-    //     authorization: `Bearer ${token}`,
-    //     'Content-Type': 'application/json',
-    //   },
-    //   body: JSON.stringify(submittedAnswers),
-    // });
+    const responseData: AudioResponse[] =
+      (await response.json()) as AudioResponse[];
 
-    // const submissionData = await submissionResponse.json();
-    // router.push(
-    //   `/result?testId=${params.id}&testSubmissionId=${submissionData._id}&part=${params.part}`
-    // );
+    submitAnswers.forEach((answer) => {
+      const answerId = answer._id;
+
+      responseData.forEach((item) => {
+        const filename = item.filename;
+        if (filename.includes(answerId)) {
+          // Perform your logic here if filename matches
+          console.log(
+            `Match found for answer ID ${answerId} with filename ${filename}`
+          );
+          // Example logic: Update UI or perform additional actions
+        }
+      });
+    });
+
+    const structuredAnswers = {
+      test_id: data._id,
+      parts: data.parts.map((part: Part, index: number) => ({
+        part_number: index + 1,
+        _id: part._id,
+        question_groups: part.question_groups.map(
+          (questionGroup: QuestionGroup) => ({
+            _id: questionGroup._id,
+            questions: questionGroup.questions.map((question) => {
+              const userAnswer = submitAnswers.find(
+                (answer) => answer._id === question._id
+              );
+              let audioKey = '';
+              if (userAnswer) {
+                responseData.forEach((item) => {
+                  const filename = item.filename;
+                  if (filename.includes(userAnswer._id)) {
+                    audioKey = item.key;
+                  }
+                });
+              }
+
+              return {
+                _id: question._id,
+                answer_result: {
+                  user_answer: audioKey ? audioKey : '',
+                },
+              };
+            }),
+          })
+        ),
+      })),
+    };
+
+    console.log('ddd', structuredAnswers);
   };
 
   const setSubmitHandler: CheckboxProps['onChange'] = (e) => {
@@ -311,7 +363,7 @@ const PracticeSpeaking = ({
   };
 
   const submitHandler = async () => {
-    console.log(answers);
+    console.log(submitAnswers);
   };
 
   if (isLoading) return <Spin size="large" />;

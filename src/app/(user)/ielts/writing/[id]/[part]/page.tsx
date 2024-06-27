@@ -8,7 +8,7 @@ import Link from 'next/link';
 import BuddieSupport from '@/components/BuddieSupport';
 import { CloseChatContext } from '@/components/CloseChatContext';
 import { auth } from '@/lib';
-import { Spin } from 'antd';
+import { Button, Spin } from 'antd';
 import { useRouter } from 'next/navigation';
 
 interface QuestionInfo {
@@ -67,6 +67,7 @@ export default function PracticePage({
   >([]);
   const [isChatProcessing, setIsChatProcessing] = useState(false);
   const [isDataLoading, setIsDataLoading] = useState(false);
+  const [loading, setLoading] = useState(false);
   const user = auth.currentUser;
   const router = useRouter();
 
@@ -117,6 +118,7 @@ export default function PracticePage({
   }, [resultData]);
 
   const handleDoneButtonClick = async () => {
+    setLoading(true);
     const userAnswer = textareaRef.current?.value || '';
     if (question && textareaRef.current) {
       setResultData((prevResults) => [
@@ -297,7 +299,7 @@ export default function PracticePage({
     <>
       <div className={styles.container}>
         <h2 className={styles.title}>
-          IETLS Writing Task {partData?.part_number}
+          IELTS Writing Task {partData?.part_number}
         </h2>
 
         {isDataLoading ? (
@@ -361,12 +363,12 @@ export default function PracticePage({
                   <button className={styles.redButton}>Thoát</button>
                 </Link>
 
-                <button
-                  className={styles.primaryButton}
+                <Button
                   onClick={handleDoneButtonClick}
+                  loading={loading}
                 >
                   Xong
-                </button>
+                </Button>
               </div>
             </div>
 
