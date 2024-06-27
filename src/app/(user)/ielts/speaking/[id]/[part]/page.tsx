@@ -78,6 +78,7 @@ interface Answer {
   _id: string;
   answer_result: AnswerResult;
   audio: Blob;
+  transcript: string;
 }
 
 interface AudioResponse {
@@ -243,6 +244,7 @@ const PracticeSpeaking = ({
               _id: testData.questions[currentQuestion]._id,
               answer_result: { user_answer: '' },
               audio: currentAnswer,
+              transcript: transcript,
             },
           ]);
           console.log('logcheck2', submitAnswers, submitAnswers);
@@ -282,7 +284,7 @@ const PracticeSpeaking = ({
     const nextPart = currentPart + 1;
     setCurrentPart((prevPart) => prevPart + 1);
     setTestData(data.parts[nextPart].question_groups[0]);
-    setCurrentQuestion(0);
+    setCurrentQuestion(1);
     // handle submit
     console.log('submit');
     const token = await user?.getIdToken();
@@ -363,12 +365,90 @@ const PracticeSpeaking = ({
   };
 
   const submitHandler = async () => {
-    console.log(submitAnswers);
+    if (currentAnswer && wantToSubmit && testData) {
+      console.log('kkk', testData), currentQuestion;
+      setSubmitAnswers((prevAnswers) => [
+        ...prevAnswers,
+        {
+          _id: testData.questions[currentQuestion]._id,
+          answer_result: { user_answer: '' },
+          audio: currentAnswer,
+          transcript: transcript,
+        },
+      ]);
+      console.log('logcheck2', submitAnswers, submitAnswers);
+      console.log('submit');
+      const token = await user?.getIdToken();
+      const formData = new FormData();
+
+      formData.append('part', '2');
+      formData.append('testId', params.id);
+      formData.append('audios', currentAnswer);
+
+      const response = await fetch(`/api/file`, {
+        method: 'POST',
+        headers: {
+          authorization: `Bearer ${token}`,
+        },
+        body: formData,
+      });
+
+      const responseData: AudioResponse[] =
+        (await response.json()) as AudioResponse[];
+
+      const structuredAnswers = {
+        test_id: data._id,
+        parts: data.parts
+          .map((part: Part, index: number) => ({
+            part_number: index + 1,
+            _id: part._id,
+            question_groups: part.question_groups.map(
+              (questionGroup: QuestionGroup) => ({
+                _id: questionGroup._id,
+                questions: {
+                  _id: testData.questions[currentQuestion]._id,
+                  answer_result: {
+                    user_answer: responseData[0].key,
+                    transcript: transcript,
+                  },
+                },
+              })
+            ),
+          }))
+          .filter((part: Part) => part.part_number === 2),
+      };
+
+      const submissionResponse: Response = await fetch(
+        `/api/test-submissions`,
+        {
+          method: 'POST',
+          headers: {
+            authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(structuredAnswers),
+        }
+      );
+
+      const submissionData = await submissionResponse.json();
+      router.push(
+        `/result?testId=${params.id}&testSubmissionId=${submissionData._id}&part=${params.part}`
+      );
+
+      console.log('Send Answer: ', structuredAnswers);
+    }
+
+    // console.log(submitAnswers);
   };
 
   if (isLoading) return <Spin size="large" />;
 
   const isAllPart = params.part === 'all';
+  // console.log(
+  //   testData?.questions,
+  //   testData?.questions.length - 1,
+  //   currentQuestion
+  // );
   const isLastQuestionOfPart =
     currentQuestion === (testData?.questions && testData.questions.length - 1);
   const isFinalPart = currentPart === finalPart;
@@ -400,7 +480,7 @@ const PracticeSpeaking = ({
               src="/images/logo/main.svg"
             />
             <p className={styles['question-prompt']}>
-              {testData?.questions[currentQuestion].question_prompt}
+              {testData?.questions[currentQuestion]?.question_prompt}
             </p>
             {currentQuestion > 0 && (
               <Checkbox

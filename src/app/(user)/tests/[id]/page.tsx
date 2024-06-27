@@ -205,7 +205,7 @@ export default function TestLanding({ params }: { params: { id: string } }) {
   return (
     <div className={styles.pageWrapper}>
       {contextHolder}
-      <SkillHeader title={test.test_name} />
+      <SkillHeader title={test?.test_name} />
       <TextCard
         width={'90%'}
         height={'auto'}
