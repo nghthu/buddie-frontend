@@ -123,13 +123,13 @@ const CreateTest = () => {
   };
 
   const handleOk = async () => {
+    await form.validateFields();
+    const values = form.getFieldsValue();
+
     if (currentTab === '1') {
-      await form.validateFields();
-      const values = form.getFieldsValue();
       form.setFieldsValue({ tags: values.tags ? values.tags.split(' ') : [] });
       setCurrentTab('2');
     } else {
-      await form.validateFields();
       router.push('/tests');
       callCreateTestAPI();
     }
