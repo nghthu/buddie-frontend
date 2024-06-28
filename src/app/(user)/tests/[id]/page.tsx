@@ -1,6 +1,6 @@
 'use client';
 import SkillHeader from '@/components/SkillHeader';
-import { Spin, Button, notification, Empty, Input } from 'antd';
+import { Spin, Button, notification, Empty, Input, Typography } from 'antd';
 import styles from '@/styles/pages/TestLanding.module.scss';
 import { User } from 'firebase/auth';
 import { auth } from '@/lib';
@@ -205,7 +205,7 @@ export default function TestLanding({ params }: { params: { id: string } }) {
   return (
     <div className={styles.pageWrapper}>
       {contextHolder}
-      <SkillHeader title={test.test_name} />
+      <SkillHeader title={test?.test_name} />
       <TextCard
         width={'90%'}
         height={'auto'}
@@ -227,8 +227,13 @@ export default function TestLanding({ params }: { params: { id: string } }) {
           className={styles.commentWrapper}
           ref={scrollRef}
         >
+          <p>Bình luận:</p>
           {isLoadingComment && <Spin size="large" />}
-          {!isLoadingComment && commentSection.length === 0 ? <Empty /> : null}
+          {!isLoadingComment && commentSection.length === 0 ? (
+            <Empty
+              description={<Typography.Text>Chưa có bình luận</Typography.Text>}
+            />
+          ) : null}
           {!isLoadingComment && commentSection.length > 0
             ? commentSection
             : null}
@@ -242,7 +247,7 @@ export default function TestLanding({ params }: { params: { id: string } }) {
             />
             <div className={styles.inputAndSendBtn}>
               <TextArea
-                placeholder="Viết comment"
+                placeholder="Viết bình luận"
                 className={styles.inputComment}
                 autoSize
                 value={comment}

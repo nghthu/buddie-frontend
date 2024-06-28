@@ -18,6 +18,7 @@ import BuddieSupport from './BuddieSupport';
 import { CloseChatContext } from './CloseChatContext';
 import Link from 'next/link';
 import { auth } from '@/lib';
+import { useRouter } from 'next/navigation';
 
 interface test_answer {
   test_id: string;
@@ -109,6 +110,8 @@ interface Props {
   answers: test_answer;
   chatVisible: boolean;
   isChatProcessing: boolean;
+  testId: string;
+  part: string;
   chatRequests: Array<chatRequests>;
   onContextMenu: (e: React.MouseEvent<HTMLDivElement>) => void;
   setAnswer: React.Dispatch<React.SetStateAction<test_answer>>;
@@ -126,6 +129,8 @@ export default function ReadingLayout({
   chatVisible,
   isChatProcessing,
   chatRequests,
+  testId,
+  part,
   onContextMenu,
   setAnswer,
   setChatVisible,
@@ -137,6 +142,7 @@ export default function ReadingLayout({
   const user = auth.currentUser;
   const [currentQuestionGroup, setCurrentQuestionGroup] = useState(1);
   const [isDisabled, setIsDisabled] = useState(false);
+  const router = useRouter();
 
   const maxGroup = data['question_groups'].length;
   const questionGroups = (data['question_groups'] as questiongroup[]).map(
@@ -274,7 +280,11 @@ export default function ReadingLayout({
     });
     const res = await response.json();
     setFetchedData(res);
-    setResultPage(true);
+    setResultPage(false);
+
+    router.push(
+      `/result?testId=${testId}&testSubmissionId=${res._id}&part=${part}`
+    );
   };
   const display = (
     <div className={questionLayouts.readingLayout}>
