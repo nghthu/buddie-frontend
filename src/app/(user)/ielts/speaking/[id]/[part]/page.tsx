@@ -106,6 +106,7 @@ const PracticeSpeaking = ({
   const [testData, setTestData] = useState<QuestionGroup | null>(null);
   const [disable, setDisable] = useState(false);
   const [submitAnswers, setSubmitAnswers] = useState<Answer[]>([]);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const router = useRouter();
   const user = auth.currentUser;
@@ -365,8 +366,8 @@ const PracticeSpeaking = ({
   };
 
   const submitHandler = async () => {
+    setIsSubmitting(true);
     if (currentAnswer && wantToSubmit && testData) {
-      console.log('kkk', testData), currentQuestion;
       setSubmitAnswers((prevAnswers) => [
         ...prevAnswers,
         {
@@ -376,14 +377,12 @@ const PracticeSpeaking = ({
           transcript: transcript,
         },
       ]);
-      console.log('logcheck2', submitAnswers, submitAnswers);
-      console.log('submit');
       const token = await user?.getIdToken();
       const formData = new FormData();
 
-      formData.append('part', '2');
+      formData.append('part', params.part);
       formData.append('testId', params.id);
-      formData.append('audios', currentAnswer);
+      formData.append('audios', currentAnswer, 'answer.webm');
 
       const response = await fetch(`/api/file`, {
         method: 'POST',
@@ -405,13 +404,15 @@ const PracticeSpeaking = ({
             question_groups: part.question_groups.map(
               (questionGroup: QuestionGroup) => ({
                 _id: questionGroup._id,
-                questions: {
-                  _id: testData.questions[currentQuestion]._id,
-                  answer_result: {
-                    user_answer: responseData[0].key,
-                    transcript: transcript,
+                questions: [
+                  {
+                    _id: testData.questions[currentQuestion]._id,
+                    answer_result: {
+                      user_answer: responseData[0].key,
+                      transcript: transcript,
+                    },
                   },
-                },
+                ],
               })
             ),
           }))
@@ -432,13 +433,11 @@ const PracticeSpeaking = ({
 
       const submissionData = await submissionResponse.json();
       router.push(
-        `/result?testId=${params.id}&testSubmissionId=${submissionData._id}&part=${params.part}`
+        `/result?speaking=true&testId=${params.id}&testSubmissionId=${submissionData._id}&part=${params.part}`
       );
 
       console.log('Send Answer: ', structuredAnswers);
     }
-
-    // console.log(submitAnswers);
   };
 
   if (isLoading) return <Spin size="large" />;
@@ -462,7 +461,14 @@ const PracticeSpeaking = ({
               className={styles.logo}
               src="/images/logo/main.svg"
             />
-            <p>{testData?.question_groups_info.question_groups_prompt}</p>
+            {testData?.question_groups_info.question_groups_prompt ? (
+              <p>{testData?.question_groups_info.question_groups_prompt}</p>
+            ) : (
+              <p>
+                Please remember not to reveal any personal information during
+                the speaking test.
+              </p>
+            )}
           </div>
           <Button
             className={styles.next}
@@ -543,7 +549,8 @@ const PracticeSpeaking = ({
               (!isAllPart || (isAllPart && isFinalPart)) && (
                 <Button
                   onClick={submitHandler}
-                  disabled={disable}
+                  disabled={disable || !(currentAnswer && wantToSubmit)}
+                  loading={isSubmitting}
                 >
                   Nộp bài
                 </Button>
