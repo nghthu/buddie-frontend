@@ -8,7 +8,7 @@ import Link from 'next/link';
 import BuddieSupport from '@/components/BuddieSupport';
 import { CloseChatContext } from '@/components/CloseChatContext';
 import { auth } from '@/lib';
-import { Spin } from 'antd';
+import { Button, Spin } from 'antd';
 import { useRouter } from 'next/navigation';
 
 interface QuestionInfo {
@@ -67,6 +67,7 @@ export default function PracticePage({
   >([]);
   const [isChatProcessing, setIsChatProcessing] = useState(false);
   const [isDataLoading, setIsDataLoading] = useState(false);
+  const [loading, setLoading] = useState(false);
   const user = auth.currentUser;
   const router = useRouter();
 
@@ -89,8 +90,9 @@ export default function PracticePage({
     ];
 
   useEffect(() => {
+    setIsDataLoading(true);
+
     const fetchPartData = async () => {
-      setIsDataLoading(true);
       const data = await getPartData();
       let partData;
       if (data && data.parts) {
@@ -110,13 +112,14 @@ export default function PracticePage({
     };
 
     fetchPartData();
-  }, [part, getPartData]);
+  }, [part]);
 
   useEffect(() => {
     localStorage.setItem('resultData', JSON.stringify(resultData));
   }, [resultData]);
 
   const handleDoneButtonClick = async () => {
+    setLoading(true);
     const userAnswer = textareaRef.current?.value || '';
     if (question && textareaRef.current) {
       setResultData((prevResults) => [
@@ -127,11 +130,13 @@ export default function PracticePage({
         },
       ]);
     }
-    const submittedAnswers = {
-      test_id: params.id,
-      parts: partData?.question_groups.map((group) => ({
+
+    let submittedAnswers;
+
+    if (part == 'all'){
+      const part1Answer = partData?.question_groups.map((group) => ({
         _id: group._id,
-        part_number: part,
+        part_number: 1,
         question_groups: [
           {
             _id: group._id,
@@ -143,25 +148,95 @@ export default function PracticePage({
             })),
           },
         ],
-      })),
-    };
+      }));
 
-    console.log('submit', submittedAnswers);
-    const token = await user?.getIdToken();
+      localStorage.setItem('part1Answer', JSON.stringify(part1Answer));
 
-    const response: Response = await fetch(`/api/test-submissions`, {
-      method: 'POST',
-      headers: {
-        authorization: `Bearer ${token}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(submittedAnswers),
-    });
-
-    const responseData = await response.json();
-    router.push(
-      `/result?writing=true&testId=${params.id}&testSubmissionId=${responseData._id}&part=${params.part}`
-    );
+      router.push(`/ielts/writing/${params.id}/2`);
+    } else {
+      if (part == '1') {
+        submittedAnswers = {
+          test_id: params.id,
+          parts: partData?.question_groups.map((group) => ({
+            _id: group._id,
+            part_number: part,
+            question_groups: [
+              {
+                _id: group._id,
+                questions: group.questions.map((q) => ({
+                  _id: q._id,
+                  answer_result: {
+                    user_answer: userAnswer,
+                  },
+                })),
+              },
+            ],
+          })),
+        };
+      } else if (part == '2') {
+        const part1Answer = JSON.parse(localStorage.getItem('part1Answer') || '[]');
+  
+        if (part1Answer.length == 0) {
+          submittedAnswers = {
+            test_id: params.id,
+            parts: partData?.question_groups.map((group) => ({
+              _id: group._id,
+              part_number: part,
+              question_groups: [
+                {
+                  _id: group._id,
+                  questions: group.questions.map((q) => ({
+                    _id: q._id,
+                    answer_result: {
+                      user_answer: userAnswer,
+                    },
+                  })),
+                },
+              ],
+            })),
+          };
+        } else {
+          submittedAnswers = {
+            test_id: params.id,
+            parts: [
+              ...part1Answer,
+              {
+                _id: partData?.question_groups[0]._id,
+                part_number: part,
+                question_groups: [
+                  {
+                    _id: partData?.question_groups[0]._id,
+                    questions: partData?.question_groups[0].questions.map((q) => ({
+                      _id: q._id,
+                      answer_result: {
+                        user_answer: userAnswer,
+                      },
+                    })),
+                  },
+                ],
+              },
+            ],
+          };
+        }
+      }
+  
+      console.log('submit', submittedAnswers);
+        const token = await user?.getIdToken();
+    
+        const response: Response = await fetch(`/api/test-submissions`, {
+          method: 'POST',
+          headers: {
+            authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(submittedAnswers),
+        });
+    
+        const responseData = await response.json();
+        router.push(
+          `/result?writing=true&testId=${params.id}&testSubmissionId=${responseData._id}&part=${params.part}`
+        );
+    } 
   };
 
   const showMenu = (event: React.MouseEvent) => {
@@ -297,7 +372,7 @@ export default function PracticePage({
     <>
       <div className={styles.container}>
         <h2 className={styles.title}>
-          IETLS Writing Task {partData?.part_number}
+          IELTS Writing Task {partData?.part_number}
         </h2>
 
         {isDataLoading ? (
@@ -314,7 +389,7 @@ export default function PracticePage({
                 className={styles.task}
                 onContextMenu={showMenu}
               >
-                {question?.question_prompt}
+                {question?.question_prompt.split('.').slice(1).join('.')}
               </div>
 
               {part !== '2' && (
@@ -361,12 +436,12 @@ export default function PracticePage({
                   <button className={styles.redButton}>Thoát</button>
                 </Link>
 
-                <button
-                  className={styles.primaryButton}
+                <Button
                   onClick={handleDoneButtonClick}
+                  loading={loading}
                 >
                   Xong
-                </button>
+                </Button>
               </div>
             </div>
 

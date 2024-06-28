@@ -29,7 +29,7 @@ const LoginForm = () => {
 
   useEffect(() => {
     if (signInUser) {
-      router.push('/profile');
+      router.push('/ielts');
     }
   }, [signInUser, router]);
 

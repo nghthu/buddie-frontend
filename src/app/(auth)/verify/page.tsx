@@ -26,7 +26,7 @@ const Verify = () => {
 
   useEffect(() => {
     if (verified) {
-      router.push('/profile');
+      router.push('/ielts');
     }
   }, [router, verified]);
 

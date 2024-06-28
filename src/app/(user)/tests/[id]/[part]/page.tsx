@@ -134,8 +134,9 @@ const UserTestPractice = ({
     setIsloading(true);
     const structuredAnswers = {
       test_id: data._id,
-      parts: data.parts.map((part: Part) => ({
+      parts: data.parts.map((part: Part, index: number) => ({
         _id: part._id,
+        part_number: index + 1,
         question_groups: part.question_groups.map(
           (questionGroup: QuestionGroup) => ({
             _id: questionGroup._id,
@@ -196,7 +197,7 @@ const UserTestPractice = ({
     setTestData(data.parts[previousPart].question_groups);
   };
 
-  if (isLoading || loading) return <Spin size="large" />;
+  if (isLoading) return <Spin size="large" />;
 
   return (
     <div className={styles.container}>
@@ -303,7 +304,12 @@ const UserTestPractice = ({
           )}
           {((currentPart === finalPart && params.part === 'all') ||
             params.part !== 'all') && (
-            <Button onClick={submitHandler}>Nộp bài</Button>
+            <Button
+              onClick={submitHandler}
+              loading={loading}
+            >
+              Nộp bài
+            </Button>
           )}
         </div>
       </div>

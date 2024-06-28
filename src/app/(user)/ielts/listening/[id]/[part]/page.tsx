@@ -193,7 +193,7 @@ const ListeningPractice = ({
     setTestData(data.parts[previousPart].question_groups);
   };
 
-  if (isLoading || loading) return <Spin size="large" />;
+  if (isLoading) return <Spin size="large" />;
 
   return (
     <>
@@ -282,7 +282,12 @@ const ListeningPractice = ({
           )}
           {((currentPart === finalPart && params.part === 'all') ||
             params.part !== 'all') && (
-            <Button onClick={submitHandler}>Nộp bài</Button>
+            <Button
+              onClick={submitHandler}
+              loading={loading}
+            >
+              Nộp bài
+            </Button>
           )}
         </div>
       </div>

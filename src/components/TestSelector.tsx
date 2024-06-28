@@ -16,7 +16,22 @@ interface FetchArgs {
   url: string;
   user: User | null;
 }
-
+interface user {
+  user_id: string;
+  display_name: string;
+  photo_url: string;
+}
+interface test {
+  _id: string;
+  test_name: string;
+  test_type: string;
+  user: user;
+  review: { star: number; count: number };
+  duration: number;
+  tags: string[];
+  test_recording?: string;
+  parts?: { _id: string }[];
+}
 const fetcher = async ({ url, user }: FetchArgs) => {
   const token = await user?.getIdToken();
   const response = await fetch(url, {
@@ -32,7 +47,7 @@ const fetcher = async ({ url, user }: FetchArgs) => {
   return response.data;
 };
 const { Search } = Input;
-
+const LIMIT = 10;
 export default function TestSelector(props: {
   pageLoading: boolean;
   setPageLoading: React.Dispatch<SetStateAction<boolean>>;
@@ -42,12 +57,12 @@ export default function TestSelector(props: {
   // TODO: Implement infinite scroll and fetch more data and use setTotalPage
   const [totalPage, setTotalPage] = useState(1);
   // const tests = useRef([]);
-  const [filteredTests, setFilteredTests] = useState([]);
+  const [filteredTests, setFilteredTests] = useState<test[]>([]);
   const [searchValue, setSearchValue] = useState('');
   const [selectedSkill, setSelectedSkill] = useState('');
   const scrollRef = useRef<HTMLDivElement>(null);
 
-  const apiUrl = `/api/tests?page=${totalPage}&test_type=${selectedSkill}&search=${searchValue}&isbuddie=true`;
+  const apiUrl = `/api/tests?page=${totalPage}&test_type=${selectedSkill}&search=${searchValue}&limit=${LIMIT}&isbuddie=true`;
   const user = auth.currentUser;
   const {
     data: rawTests,
@@ -67,8 +82,17 @@ export default function TestSelector(props: {
   useEffect(() => {
     if (rawTests) {
       //tests.current = [...new Set([...tests.current, ...rawTests.tests])];
-      setFilteredTests(rawTests.tests);
-      // handleFilterTests();
+      setFilteredTests((prev) => {
+        const seen = new Set();
+        const returnRes = [...prev, ...(rawTests.tests ?? [])].filter(
+          (test) => {
+            if (seen.has(test._id)) return false;
+            seen.add(test._id);
+            return true;
+          }
+        );
+        return returnRes;
+      }); // handleFilterTests();
       // setTests((prev) => [...prev, ...rawTests.tests]);
     }
   }, [rawTests]);
@@ -148,7 +172,7 @@ export default function TestSelector(props: {
   );
   const hasMore = rawTests && totalPage < rawTests.pagination.total_count / 10;
   const handleInfScroll = () => {
-    setTotalPage((prev) => prev + 1);
+    setTotalPage((prev) => prev + LIMIT);
   };
   return (
     <div className={styles.container}>

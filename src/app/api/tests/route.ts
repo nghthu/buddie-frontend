@@ -18,6 +18,8 @@ export async function GET(request: NextRequest) {
     const encodedSearch = encodeURIComponent(search);
     queryString += `&keyword=${encodedSearch}`;
   }
+  //const queryString = `${process.env.API_BASE_URL}/api/v1/tests/661b5d4b0d4e11e6b2817f1b`;
+  //console.log(queryString);
 
   try {
     const response = await fetch(queryString, {
@@ -30,6 +32,30 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error });
   }
 }
+
+type Part = {
+  part_number: number;
+  part_duration: number | null;
+  part_prompt: string;
+  question_groups: Array<QuestionGroup>;
+};
+
+type QuestionGroup = {
+  is_single_question: boolean;
+  question_groups_info: {
+    question_groups_duration: number | null;
+    question_groups_prompt: string;
+  };
+  questions: Array<Question>;
+};
+
+type Question = {
+  question_number: number;
+  question_type: string;
+  question_prompt: string;
+  question_duration: number | null;
+  question_preparation_time: number | null;
+};
 
 export const POST = async function createTest(req: Request) {
   try {
@@ -48,6 +74,22 @@ export const POST = async function createTest(req: Request) {
       'question_recording'
     ) as File[];
     const questionImages = reqData.getAll('question_images') as File[];
+
+    test.duration = test.duration ? test.duration * 60 : null;
+    test.parts.forEach((part: Part) => {
+      part.question_groups.forEach((questionGroup: QuestionGroup) => {
+        questionGroup.questions.forEach((question: Question) => {
+          question.question_duration = question.question_duration
+            ? question.question_duration * 60
+            : null;
+        });
+        questionGroup.question_groups_info.question_groups_duration =
+          questionGroup.question_groups_info.question_groups_duration
+            ? questionGroup.question_groups_info.question_groups_duration * 60
+            : null;
+      });
+      part.part_duration = part.part_duration ? part.part_duration * 60 : null;
+    });
 
     if (testRecordingFile) {
       const downloadUrl = await uploadBuffer(
@@ -221,7 +263,7 @@ export const POST = async function createTest(req: Request) {
         'Content-Type': 'application/json',
         Authorization: req.headers.get('Authorization') || '',
       },
-      body: JSON.stringify(test),
+      body: JSON.stringify({ test }),
     });
     const data = await response.json();
     return NextResponse.json(data);

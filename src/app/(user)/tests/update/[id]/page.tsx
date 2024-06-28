@@ -1,6 +1,6 @@
 'use client';
 
-import styles from '@/styles/pages/tests/create/create.module.scss';
+import styles from '@/styles/pages/tests/create/Create.module.scss';
 import { Button, Card, Checkbox, InputNumber, Radio, Space, Tabs } from 'antd';
 import { useState, useRef, useEffect } from 'react';
 import {
@@ -13,41 +13,23 @@ import {
   SoundOutlined,
 } from '@ant-design/icons';
 import { Form, Input, Select } from 'antd';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { auth } from '@/lib';
 
 const { Option } = Select;
 
-const CreateTest = () => {
+const UpdateTest = (
+    {params} : { params: { id: string } }
+) => {
   const [currentTab, setCurrentTab] = useState('1');
   const [form] = Form.useForm();
 
   const fileInputRefPart = useRef<HTMLInputElement>(null);
   const audioFileInputRefPart = useRef<HTMLInputElement>(null);
-  const [partSelectedFile, setPartSelectedFile] = useState<Array<File | null>>([
-    null,
-  ]);
-  const [partSelectedAudioFile, setPartSelectedAudioFile] = useState<
-    Array<File | null>
-  >([null]);
-
   const fileInputRefQuestionGroup = useRef<HTMLInputElement>(null);
   const audioFileInputRefQuestionGroup = useRef<HTMLInputElement>(null);
-  const [questionGroupSelectedFile, setQuestionGroupSelectedFile] = useState<
-    Array<File | null>
-  >([null]);
-  const [questionGroupSelectedAudioFile, setQuestionGroupSelectedAudioFile] =
-    useState<Array<File | null>>([null]);
-
   const fileInputRefQuestion = useRef<HTMLInputElement>(null);
   const audioFileInputRefQuestion = useRef<HTMLInputElement>(null);
-  const [questionSelectedFile, setQuestionSelectedFile] = useState<
-    Array<File | null>
-  >([null]);
-  const [questionSelectedAudioFile, setQuestionSelectedAudioFile] = useState<
-    Array<File | null>
-  >([null]);
-
   const [uploadedFileNames, setUploadedFileNames] = useState<{
     [key: string]: string | null;
   }>({});
@@ -60,78 +42,62 @@ const CreateTest = () => {
   const router = useRouter();
   const user = auth.currentUser;
 
-  const callCreateTestAPI = async () => {
+  const getTestById = async () => {
     const token = await user?.getIdToken();
+    console.log(params.id);
+    const response = await fetch(`/api/tests/${params.id}`, {
+      headers: {
+        authorization: `Bearer ${token}`,
+      },
+    });
 
-    const formData = new FormData();
-    formData.append('test', JSON.stringify(form.getFieldsValue()));
+    const result = await response.json();
+    console.log(result);
+    return result.data;
+  }
 
-    if (form.getFieldValue('test_recording')) {
-      formData.append('test_recording', form.getFieldValue('test_recording'));
+  useEffect(() => {
+    const fetchTest = async () => {
+      const test : Test = await getTestById();
+      form.setFieldsValue(test);
+      form.setFieldValue('tags', test.tags.join(' '));
     }
 
-    partSelectedFile.forEach((file) => {
-      if (file) {
-        formData.append(`part_images`, file);
-      }
-    });
+    fetchTest();
+  }, []);
 
-    partSelectedAudioFile.forEach((file) => {
-      if (file) {
-        formData.append(`part_recording`, file);
-      }
-    });
+  const callUpdateTestAPI = async () => {
+    const token = await user?.getIdToken();
+    console.log(token);
+    console.log(form.getFieldsValue());
 
-    questionGroupSelectedFile.forEach((file) => {
-      if (file) {
-        formData.append(`question_group_images`, file);
-      }
-    });
-
-    questionGroupSelectedAudioFile.forEach((file) => {
-      if (file) {
-        formData.append(`question_group_recording`, file);
-      }
-    });
-
-    questionSelectedFile.forEach((file) => {
-      if (file) {
-        formData.append(`question_images`, file);
-      }
-    });
-
-    questionSelectedAudioFile.forEach((file) => {
-      if (file) {
-        formData.append(`question_recording`, file);
-      }
-    });
-
-    const response = await fetch(`/api/tests`, {
-      method: 'POST',
+    const response = await fetch(`/api/tests/update?testId=${params.id}`, {
+      method: 'PUT',
       headers: {
+        'Content-Type': 'application/json',
         Authorization: `Bearer ${token}`,
       },
-      body: formData,
+      body: JSON.stringify(form.getFieldsValue()),
     });
 
     if (!response.ok) {
-      throw new Error('Failed to create test');
+      throw new Error('Failed to update test');
     }
 
     const result = await response.json();
+    console.log(result);
     return result;
   };
 
   const handleOk = async () => {
-    await form.validateFields();
-    const values = form.getFieldsValue();
-
     if (currentTab === '1') {
+      await form.validateFields();
+      const values = form.getFieldsValue();
       form.setFieldsValue({ tags: values.tags ? values.tags.split(' ') : [] });
       setCurrentTab('2');
     } else {
-      router.push('/tests');
-      callCreateTestAPI();
+      await form.validateFields();
+      callUpdateTestAPI();
     }
   };
 
@@ -147,89 +113,113 @@ const CreateTest = () => {
     setCurrentTab(key);
   };
 
-  // type Part = {
-  //   part_number: number;
-  //   part_duration: number | null;
-  //   part_prompt: string;
-  //   question_groups: Array<QuestionGroup>;
-  // };
+  type Test = {
+    test_name: string;
+    test_type: string;
+    access: string;
+    duration: number;
+    is_buddie_test: boolean;
+    tags: Array<string>;
+    test_recording: string | null;
+    parts: Array<Part>;
+  };
 
-  // type QuestionGroup = {
-  //   is_single_question: boolean;
-  //   question_groups_info: {
-  //     question_groups_duration: number | null;
-  //     question_groups_prompt: string;
-  //   };
-  //   questions: Array<Question>;
-  // };
+  type Part = {
+    part_number: number;
+    part_duration: number | null;
+    part_recording: string | null;
+    part_prompt: string;
+    part_image_urls: string;
+    question_groups: Array<QuestionGroup>;
+  };
 
-  // type Question = {
-  //   question_number: number;
-  //   question_type: string;
-  //   question_prompt: string;
-  //   question_duration: number | null;
-  //   question_preparation_time: number | null;
-  // };
+  type QuestionGroup = {
+    is_single_question: boolean;
+    question_groups_info: {
+      question_groups_duration: number | null;
+      question_groups_prompt: string;
+      question_groups_recording: string | null;
+      question_groups_image_urls: string;
+    };
+    questions: Array<Question>;
+  };
+
+  type Question = {
+    question_number: number;
+    question_type: string;
+    question_prompt: string;
+    question_image_urls: string;
+    question_duration: number | null;
+    question_preparation_time: number | null;
+    question_recording: string | null;
+  };
 
   const handleFileChangePart =
     (partIndex: number, type: string) =>
     (event: React.ChangeEvent<HTMLInputElement>) => {
-      const originalFile = event.target.files?.[0];
-      if (originalFile) {
-        // Extract file extension
-        const fileExtension = originalFile.name.split('.').pop();
-        // Construct new file name
-        const newFileName =
-          type == 'audio'
-            ? `part_recording-${partIndex + 1}.${fileExtension}`
-            : `part_image-${partIndex + 1}-1.${fileExtension}`;
-        // Create a new File object with the new name
-        const file = new File([originalFile], newFileName, {
-          type: originalFile.type,
+      const file = event.target.files?.[0];
+      if (file) {
+        form.setFieldsValue({
+          parts: form
+            .getFieldsValue()
+            .parts.map((part: Part, index: number) => {
+              if (index === partIndex) {
+                return type === 'audio'
+                  ? { ...part, part_recording: file }
+                  : { ...part, part_image_urls: file };
+              }
+              return part;
+            }),
         });
-
-        if (type === 'audio') {
-          setPartSelectedAudioFile([...partSelectedAudioFile, file]);
-        } else {
-          setPartSelectedFile([...partSelectedFile, file]);
-        }
 
         const newUploadedFileNames = { ...uploadedFileNames };
         const key = `part_${partIndex + 1}_${type}`;
         newUploadedFileNames[key] = file.name;
         setUploadedFileNames(newUploadedFileNames);
       }
+
+      console.log(form.getFieldsValue());
     };
 
   const handleFileChangeQuestionGroup =
     (partIndex: number, questionGroupIndex: number, type: string) =>
     (event: React.ChangeEvent<HTMLInputElement>) => {
-      const originalFile = event.target.files?.[0];
-      if (originalFile) {
-        // Extract file extension
-        const fileExtension = originalFile.name.split('.').pop();
-        // Construct new file name
-        const newFileName =
-          type == 'audio'
-            ? `question_group_recording-${partIndex + 1}-${
-                questionGroupIndex + 1
-              }.${fileExtension}`
-            : `question_group_image-${partIndex + 1}-${
-                questionGroupIndex + 1
-              }-1.${fileExtension}`;
-        // Create a new File object with the new name
-        const file = new File([originalFile], newFileName, {
-          type: originalFile.type,
+      const file = event.target.files?.[0];
+      if (file) {
+        form.setFieldsValue({
+          parts: form
+            .getFieldsValue()
+            .parts.map((part: Part, index: number) => {
+              if (index === partIndex) {
+                return {
+                  ...part,
+                  question_groups: part.question_groups.map(
+                    (questionGroup: QuestionGroup, i: number) => {
+                      if (i === questionGroupIndex) {
+                        return type === 'audio'
+                          ? {
+                              ...questionGroup,
+                              question_groups_info: {
+                                ...questionGroup.question_groups_info,
+                                question_groups_recording: file,
+                              },
+                            }
+                          : {
+                              ...questionGroup,
+                              question_groups_info: {
+                                ...questionGroup.question_groups_info,
+                                question_groups_image_urls: file,
+                              },
+                            };
+                      }
+                      return questionGroup;
+                    }
+                  ),
+                };
+              }
+              return part;
+            }),
         });
-
-        if (type === 'audio') {
-          setQuestionGroupSelectedAudioFile([
-            ...questionGroupSelectedAudioFile,
-            file,
-          ]);
-        } else {
-          setQuestionGroupSelectedFile([...questionGroupSelectedFile, file]);
-        }
 
         const newUploadedFileNames = { ...uploadedFileNames };
         const key = `part_${partIndex + 1}_question_group_${
@@ -248,29 +238,40 @@ const CreateTest = () => {
       type: string
     ) =>
     (event: React.ChangeEvent<HTMLInputElement>) => {
-      const originalFile = event.target.files?.[0];
-      if (originalFile) {
-        // Extract file extension
-        const fileExtension = originalFile.name.split('.').pop();
-        // Construct new file name
-        const newFileName =
-          type === 'audio'
-            ? `question_recording-${partIndex + 1}-${questionGroupIndex + 1}-${
-                questionIndex + 1
-              }.${fileExtension}`
-            : `question_image-${partIndex + 1}-${questionGroupIndex + 1}-${
-                questionIndex + 1
-              }-1.${fileExtension}`;
-        // Create a new File object with the new name
-        const file = new File([originalFile], newFileName, {
-          type: originalFile.type,
+      const file = event.target.files?.[0];
+      if (file) {
+        form.setFieldsValue({
+          parts: form
+            .getFieldsValue()
+            .parts.map((part: Part, index: number) => {
+              if (index === partIndex) {
+                return {
+                  ...part,
+                  question_groups: part.question_groups.map(
+                    (questionGroup: QuestionGroup, i: number) => {
+                      if (i === questionGroupIndex) {
+                        return {
+                          ...questionGroup,
+                          questions: questionGroup.questions.map(
+                            (question: Question, j: number) => {
+                              if (j === questionIndex) {
+                                return type === 'audio'
+                                  ? { ...question, question_recording: file }
+                                  : { ...question, question_image_urls: file };
+                              }
+                              return question;
+                            }
+                          ),
+                        };
+                      }
+                      return questionGroup;
+                    }
+                  ),
+                };
+              }
+              return part;
+            }),
         });
-
-        if (type === 'audio') {
-          setQuestionSelectedAudioFile([...questionSelectedAudioFile, file]);
-        } else {
-          setQuestionSelectedFile([...questionSelectedFile, file]);
-        }
 
         const newUploadedFileNames = { ...uploadedFileNames };
         const key = `part_${partIndex + 1}_question_group_${
@@ -321,7 +322,7 @@ const CreateTest = () => {
             label="Tên bài thi"
             rules={[{ required: true, message: 'Vui lòng nhập tên bài thi!' }]}
           >
-            <Input placeholder="Tên bài thi..." />
+            <Input/>
           </Form.Item>
 
           <Form.Item
@@ -367,6 +368,14 @@ const CreateTest = () => {
           >
             <Input />
           </Form.Item>
+
+          <Form.Item
+            name="test_recording"
+            initialValue={null}
+            hidden
+          >
+            <Input type="hidden" />
+          </Form.Item>
         </Form>
       ),
     },
@@ -384,27 +393,27 @@ const CreateTest = () => {
               {
                 part_number: 1,
                 part_duration: null,
-                part_prompt: '',
                 part_recording: null,
-                part_image_urls: [],
+                part_prompt: '',
+                part_image_urls: null,
                 question_groups: [
                   {
                     is_single_question: true,
                     question_groups_info: {
                       question_groups_duration: null,
                       question_groups_prompt: '',
-                      question_group_recording: null,
-                      question_group_image_urls: [],
+                      question_groups_recording: null,
+                      question_groups_image_urls: null,
                     },
                     questions: [
                       {
                         question_number: 1,
                         question_type: '',
                         question_prompt: '',
+                        question_image_urls: null,
                         question_duration: null,
                         question_preparation_time: null,
                         question_recording: null,
-                        question_image_urls: [],
                       },
                     ],
                   },
@@ -468,39 +477,33 @@ const CreateTest = () => {
                       </div>
                     )}
 
-                    <Form.Item
-                      name={[field.name, 'part_recording']}
-                      hidden
-                    ></Form.Item>
-
-                    <Form.Item
-                      name={[field.name, 'part_image_urls']}
-                      hidden
-                    ></Form.Item>
-
                     <div className={styles.buttonsContainer}>
-                      <input
-                        type="file"
-                        ref={audioFileInputRefPart}
-                        style={{ display: 'none' }}
-                        onChange={handleFileChangePart(index, 'audio')}
-                      />
-                      <Button
-                        type="text"
-                        icon={<SoundOutlined />}
-                        onClick={() => audioFileInputRefPart.current?.click()}
-                      ></Button>
-                      <input
-                        type="file"
-                        ref={fileInputRefPart}
-                        style={{ display: 'none' }}
-                        onChange={handleFileChangePart(index, 'image')}
-                      />
-                      <Button
-                        type="text"
-                        icon={<PictureOutlined />}
-                        onClick={() => fileInputRefPart.current?.click()}
-                      />
+                      <Form.Item name={[field.name, 'part_recording']}>
+                        <input
+                          type="file"
+                          ref={audioFileInputRefPart}
+                          style={{ display: 'none' }}
+                          onChange={handleFileChangePart(index, 'audio')}
+                        />
+                        <Button
+                          type="text"
+                          icon={<SoundOutlined />}
+                          onClick={() => audioFileInputRefPart.current?.click()}
+                        ></Button>
+                      </Form.Item>
+                      <Form.Item name={[field.name, 'part_image_urls']}>
+                        <input
+                          type="file"
+                          ref={fileInputRefPart}
+                          style={{ display: 'none' }}
+                          onChange={handleFileChangePart(index, 'image')}
+                        />
+                        <Button
+                          type="text"
+                          icon={<PictureOutlined />}
+                          onClick={() => fileInputRefPart.current?.click()}
+                        />
+                      </Form.Item>
                     </div>
                     <Form.Item
                       label="Thời gian làm bài (phút)"
@@ -575,60 +578,55 @@ const CreateTest = () => {
                                 </div>
                               )}
 
-                              <Form.Item
-                                name={[
-                                  subField.name,
-                                  'question_groups_info',
-                                  'question_group_recording',
-                                ]}
-                                hidden
-                              ></Form.Item>
-
-                              <Form.Item
-                                name={[
-                                  subField.name,
-                                  'question_groups_info',
-                                  'question_group_image_urls',
-                                ]}
-                                hidden
-                              ></Form.Item>
-
                               <div className={styles.buttonsContainer}>
-                                <input
-                                  type="file"
-                                  ref={audioFileInputRefQuestionGroup}
-                                  style={{ display: 'none' }}
-                                  onChange={handleFileChangeQuestionGroup(
-                                    index,
+                                <Form.Item
+                                  name={[
                                     subField.name,
-                                    'audio'
-                                  )}
-                                />
-                                <Button
-                                  type="text"
-                                  icon={<SoundOutlined />}
-                                  onClick={() =>
-                                    audioFileInputRefQuestionGroup.current?.click()
-                                  }
-                                />
-
-                                <input
-                                  type="file"
-                                  ref={fileInputRefQuestionGroup}
-                                  style={{ display: 'none' }}
-                                  onChange={handleFileChangeQuestionGroup(
-                                    index,
+                                    'question_groups_recording',
+                                  ]}
+                                >
+                                  <input
+                                    type="file"
+                                    ref={audioFileInputRefQuestionGroup}
+                                    style={{ display: 'none' }}
+                                    onChange={handleFileChangeQuestionGroup(
+                                      index,
+                                      subField.name,
+                                      'audio'
+                                    )}
+                                  />
+                                  <Button
+                                    type="text"
+                                    icon={<SoundOutlined />}
+                                    onClick={() =>
+                                      audioFileInputRefQuestionGroup.current?.click()
+                                    }
+                                  />
+                                </Form.Item>
+                                <Form.Item
+                                  name={[
                                     subField.name,
-                                    'image'
-                                  )}
-                                />
-                                <Button
-                                  type="text"
-                                  icon={<PictureOutlined />}
-                                  onClick={() =>
-                                    fileInputRefQuestionGroup.current?.click()
-                                  }
-                                />
+                                    'question_groups_image_urls',
+                                  ]}
+                                >
+                                  <input
+                                    type="file"
+                                    ref={fileInputRefQuestionGroup}
+                                    style={{ display: 'none' }}
+                                    onChange={handleFileChangeQuestionGroup(
+                                      index,
+                                      subField.name,
+                                      'image'
+                                    )}
+                                  />
+                                  <Button
+                                    type="text"
+                                    icon={<PictureOutlined />}
+                                    onClick={() =>
+                                      fileInputRefQuestionGroup.current?.click()
+                                    }
+                                  />
+                                </Form.Item>
                               </div>
 
                               <Form.Item
@@ -780,62 +778,59 @@ const CreateTest = () => {
                                           </div>
                                         )}
 
-                                        <Form.Item
-                                          name={[
-                                            questionField.name,
-                                            'question_recording',
-                                          ]}
-                                          hidden
-                                        ></Form.Item>
-
-                                        <Form.Item
-                                          name={[
-                                            questionField.name,
-                                            'question_image_urls',
-                                          ]}
-                                          hidden
-                                        ></Form.Item>
-
                                         <div
                                           className={styles.buttonsContainer}
                                         >
-                                          <input
-                                            type="file"
-                                            ref={audioFileInputRefQuestion}
-                                            style={{ display: 'none' }}
-                                            onChange={handleFileChangeQuestion(
-                                              index,
-                                              subField.name,
+                                          <Form.Item
+                                            name={[
                                               questionField.name,
-                                              'audio'
-                                            )}
-                                          />
-                                          <Button
-                                            type="text"
-                                            icon={<SoundOutlined />}
-                                            onClick={() =>
-                                              audioFileInputRefQuestion.current?.click()
-                                            }
-                                          />
-
-                                          <input
-                                            type="file"
-                                            ref={fileInputRefQuestion}
-                                            style={{ display: 'none' }}
-                                            onChange={handleFileChangeQuestion(
-                                              index,
-                                              subField.name,
-                                              questionField.name,
-                                              'image'
-                                            )}
-                                          />
-                                          <Button
-                                            type="text"
-                                            icon={<PictureOutlined />}
-                                            onClick={() =>
-                                              fileInputRefQuestion.current?.click()
-                                            }
-                                          />
+                                              'question_recording',
+                                            ]}
+                                          >
+                                            <input
+                                              type="file"
+                                              ref={audioFileInputRefQuestion}
+                                              style={{ display: 'none' }}
+                                              onChange={handleFileChangeQuestion(
+                                                index,
+                                                subField.name,
+                                                questionField.name,
+                                                'audio'
+                                              )}
+                                            />
+                                            <Button
+                                              type="text"
+                                              icon={<SoundOutlined />}
+                                              onClick={() =>
+                                                audioFileInputRefQuestion.current?.click()
+                                              }
+                                            />
+                                          </Form.Item>
+                                          <Form.Item
+                                            name={[
+                                              field.name,
+                                              'question_image_urls',
+                                            ]}
+                                          >
+                                            <input
+                                              type="file"
+                                              ref={fileInputRefQuestion}
+                                              style={{ display: 'none' }}
+                                              onChange={handleFileChangeQuestion(
+                                                index,
+                                                subField.name,
+                                                questionField.name,
+                                                'image'
+                                              )}
+                                            />
+                                            <Button
+                                              type="text"
+                                              icon={<PictureOutlined />}
+                                              onClick={() =>
+                                                fileInputRefQuestion.current?.click()
+                                              }
+                                            />
+                                          </Form.Item>
                                         </div>
 
                                         <Form.Item
@@ -1266,7 +1261,7 @@ const CreateTest = () => {
         currentTab === '1' ? styles.tabOneContainer : styles.tabTwoContainer
       }
     >
-      <h1 className={styles.title}>Tạo bài thi</h1>
+      <h1 className={styles.title}>Cập nhật Đề thi</h1>
 
       <Tabs
         activeKey={currentTab}
@@ -1284,11 +1279,11 @@ const CreateTest = () => {
           {currentTab === '1' ? 'Hủy' : 'Quay lại'}
         </Button>
         <Button onClick={handleOk}>
-          {currentTab === '1' ? 'Tiếp theo' : 'Tạo bài thi'}
+          {currentTab === '1' ? 'Tiếp theo' : 'Cập nhật'}
         </Button>
       </div>
     </div>
   );
 };
 
-export default CreateTest;
+export default UpdateTest;

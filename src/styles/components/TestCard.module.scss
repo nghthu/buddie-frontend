@@ -78,3 +78,22 @@
   -webkit-line-clamp: 2;
   overflow: hidden;
 }
+
+.buttonContainer {
+  display: flex;
+  gap: 1rem;
+}
+
+.red-btn {
+  border-radius: 8px;
+  border: solid 1px #f35454;
+  padding: 5px 10px 5px 10px;
+  background-color: white;
+  font-weight: bold;
+  color: #f35454;
+  &:hover {
+    background-color: #f35454;
+    cursor: pointer;
+    color: white;
+  }
+}

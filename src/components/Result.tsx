@@ -182,20 +182,23 @@ const Result = (props: Props) => {
                       <div
                         className={`${styles['radio-button']} ${
                           question.answer_result.is_correct
-                            ? question.answer === String(oIndex + 1)
+                            ? question.options?.indexOf(question.answer) ===
+                              oIndex
                               ? styles['green']
                               : ''
                             : (oIndex + 1).toString() ===
                                 question.answer_result.user_answer.toString()
                               ? styles['red']
-                              : (oIndex + 1).toString() === question.answer &&
+                              : question.options?.indexOf(question.answer) ===
+                                    oIndex &&
                                   question.answer_result.user_answer.toString() !==
                                     ''
                                 ? styles['green']
-                                : (oIndex + 1).toString() === question.answer &&
+                                : question.options?.indexOf(question.answer) ===
+                                      oIndex &&
                                     question.answer_result.user_answer.toString() ===
                                       ''
-                                  ? styles['red']
+                                  ? styles['gray']
                                   : ''
                         }`}
                       ></div>
@@ -355,22 +358,25 @@ const Result = (props: Props) => {
                           <div
                             className={`${styles['radio-button']} ${
                               question.answer_result.is_correct
-                                ? question.answer === String(index + 1)
+                                ? question.options?.indexOf(question.answer) ===
+                                  index
                                   ? styles['green']
                                   : ''
                                 : (index + 1).toString() ===
                                     question.answer_result.user_answer.toString()
                                   ? styles['red']
-                                  : (index + 1).toString() ===
-                                        question.answer &&
+                                  : question.options?.indexOf(
+                                        question.answer
+                                      ) === index &&
                                       question.answer_result.user_answer.toString() !==
                                         ''
                                     ? styles['green']
-                                    : (index + 1).toString() ===
-                                          question.answer &&
+                                    : question.options?.indexOf(
+                                          question.answer
+                                        ) === index &&
                                         question.answer_result.user_answer.toString() ===
                                           ''
-                                      ? styles['red']
+                                      ? styles['gray']
                                       : ''
                             }`}
                           ></div>
