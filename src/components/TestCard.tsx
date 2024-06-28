@@ -25,7 +25,7 @@ export default function TestCard(props: {
   partIds: string[];
 }) {
   const [isModalOpen, setIsModalOpen] = useState(false);
-  
+
   const [isAdmin, setIsAdmin] = useState(false);
 
   useEffect(() => {
@@ -36,7 +36,7 @@ export default function TestCard(props: {
     }
 
     fetchAdminStatus();
-  }, [])
+  }, []);
 
   const showModal = () => {
     setIsModalOpen(true);
@@ -105,23 +105,18 @@ export default function TestCard(props: {
               );
             })}
           </div>
-          
+
           {isAdmin ? (
-            <div className={styles.buttonContainer}>           
-              <Link
-              href={`tests/update/${props.testId}`}
-              >
-                <Button
-                >
-                  Cập nhật
-                </Button>
+            <div className={styles.buttonContainer}>
+              <Link href={`tests/update/${props.testId}`}>
+                <Button>Cập nhật</Button>
               </Link>
-              <Button
+              <button
+                className={styles['red-btn']}
                 onClick={handleDelete}
-                danger
               >
                 Xóa
-              </Button>
+              </button>
             </div>
           ) : (
             <Button
@@ -152,33 +147,26 @@ export default function TestCard(props: {
           </div>
           {isAdmin ? (
             <div className={styles.buttonContainer}>
-              <Link
-              href={`tests/update/${props.testId}`}
-              >
-                <Button
-                >
-                  Cập nhật
-                </Button>
+              <Link href={`tests/update/${props.testId}`}>
+                <Button>Cập nhật</Button>
               </Link>
-              <Button
+              <button
+                className={styles['red-btn']}
                 onClick={handleDelete}
-                danger
-                ghost
               >
                 Xóa
-              </Button>
+              </button>
             </div>
           ) : (
             <Link href={`tests/${props.testId}`}>
-            <Button
-              className={styles.button}
-              onClick={() => props.setPageLoading(true)}
-            >
-              Chi tiết
-            </Button>
-          </Link>
+              <Button
+                className={styles.button}
+                onClick={() => props.setPageLoading(true)}
+              >
+                Chi tiết
+              </Button>
+            </Link>
           )}
-          
         </>
       )}
       <Modal
