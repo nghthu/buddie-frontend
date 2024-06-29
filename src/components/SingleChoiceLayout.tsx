@@ -47,7 +47,7 @@ export default function SingleChoiceLayout(props: {
     });
   }
   if (props.options) {
-    const singleChoiceOptions = props.options.map((option: string, index) => {
+    const singleChoiceOptions = props.options.map((option: string) => {
       return (
         <div
           key={option}
@@ -57,7 +57,7 @@ export default function SingleChoiceLayout(props: {
             key={option + '<div></div>'}
             className={styles.radio}
             name={props.question}
-            value={(index + 1).toString()}
+            value={option}
           >
             {' '}
             {option}
