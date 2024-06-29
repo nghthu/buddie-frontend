@@ -390,7 +390,7 @@ export default function PracticePage({
                 className={styles.task}
                 onContextMenu={showMenu}
               >
-                {question?.question_prompt.split(/\.:|:/).slice(1).join('.')}
+                {question?.question_prompt.split('.').slice(1).join('.')}
               </div>
 
               {part !== '2' && (
@@ -414,7 +414,7 @@ export default function PracticePage({
                     alt=""
                   />
                   <p className={styles.textPracticing}>
-                    {question?.question_prompt.split(/\.:|:/)[0]}
+                    {question?.question_prompt.split('.')[0]}
                   </p>
                 </div>
                 {/* <CountdownClock /> */}
