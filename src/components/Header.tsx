@@ -64,7 +64,7 @@ const Header = (props: Props) => {
   useEffect(() => {
     if (pathname.includes('/home')) {
       setActiveTab('home');
-    } else if (pathname.includes('/tests') || pathname.includes('/result')) {
+    } else if (pathname.includes('/tests')) {
       setActiveTab('exams');
     } else if (pathname.includes('/community')) {
       setActiveTab('community');
