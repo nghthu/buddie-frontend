@@ -175,8 +175,9 @@ export default function PracticePage({
         };
       } else if (part == '2') {
         const part1Answer = JSON.parse(localStorage.getItem('part1Answer') || '[]');
+        console.log('part1Answer', part1Answer);
   
-        if (part1Answer.length == 0) {
+        if (part1Answer[0].question_groups[0].questions[0].answer_result.user_answer === '') {
           submittedAnswers = {
             test_id: params.id,
             parts: partData?.question_groups.map((group) => ({
