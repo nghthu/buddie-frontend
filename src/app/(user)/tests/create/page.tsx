@@ -119,6 +119,7 @@ const CreateTest = () => {
     }
 
     const result = await response.json();
+    console.log(result);
     return result;
   };
 
@@ -393,8 +394,8 @@ const CreateTest = () => {
                     question_groups_info: {
                       question_groups_duration: null,
                       question_groups_prompt: '',
-                      question_group_recording: null,
-                      question_group_image_urls: [],
+                      question_groups_recording: null,
+                      question_groups_image_urls: [],
                     },
                     questions: [
                       {
