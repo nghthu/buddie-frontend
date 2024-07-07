@@ -131,8 +131,8 @@ const CreateTest = () => {
       form.setFieldsValue({ tags: values.tags ? values.tags.split(' ') : [] });
       setCurrentTab('2');
     } else {
-      router.push('/tests');
       callCreateTestAPI();
+      router.push('/tests');
     }
   };
 
@@ -451,10 +451,10 @@ const CreateTest = () => {
                     </Form.Item>
                     <Form.Item
                       className={styles.prompt}
-                      label="Tiêu đề Phần thi"
+                      label="Nội dung Phần thi"
                       name={[field.name, 'part_prompt']}
                     >
-                      <Input.TextArea placeholder="Tiêu đề Phần thi" />
+                      <Input.TextArea placeholder="Nội dung Phần thi" />
                     </Form.Item>
 
                     {uploadedFileNames[`part_${index + 1}_audio`] && (
@@ -534,14 +534,14 @@ const CreateTest = () => {
 
                               <Form.Item
                                 className={styles.prompt}
-                                label="Tiêu đề Nhóm câu hỏi"
+                                label="Nội dung Nhóm câu hỏi"
                                 name={[
                                   subField.name,
                                   'question_groups_info',
                                   'question_groups_prompt',
                                 ]}
                               >
-                                <Input.TextArea placeholder="Tiêu đề Nhóm câu hỏi..." />
+                                <Input.TextArea placeholder="Nội dung Nhóm câu hỏi..." />
                               </Form.Item>
 
                               {uploadedFileNames[
