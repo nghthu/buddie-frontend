@@ -60,6 +60,18 @@ const CreateTest = () => {
   const router = useRouter();
   const user = auth.currentUser;
 
+  const [isAdmin, setIsAdmin] = useState(false);
+
+  useEffect(() => {
+    async function fetchAdminStatus() {
+      const tokenResult = await user?.getIdTokenResult();
+      const isAdmin = tokenResult?.claims.admin;
+      setIsAdmin(!!isAdmin);
+    }
+
+    fetchAdminStatus();
+  }, []);
+
   const callCreateTestAPI = async () => {
     const token = await user?.getIdToken();
 
@@ -128,6 +140,9 @@ const CreateTest = () => {
     const values = form.getFieldsValue();
 
     if (currentTab === '1') {
+      if (!isAdmin) {
+        form.setFieldsValue({ test_type: 'custom' });
+      }
       form.setFieldsValue({ tags: values.tags ? values.tags.split(' ') : [] });
       setCurrentTab('2');
     } else {
@@ -325,13 +340,27 @@ const CreateTest = () => {
             <Input placeholder="Tên bài thi..." />
           </Form.Item>
 
-          <Form.Item
-            name="test_type"
-            initialValue="custom"
-            hidden
-          >
-            <Input type="hidden" />
-          </Form.Item>
+          {isAdmin ? (
+            <Form.Item
+              name="test_type"
+              label="Loại bài thi"
+              rules={[{ required: true, message: 'Vui lòng chọn loại bài thi!' }]}
+            >
+              <Select>
+                <Select.Option value="ielts_reading">IELTS Reading</Select.Option>
+                <Select.Option value="ielts_listening">IELTS Listening</Select.Option>
+                <Select.Option value="ielts_speaking">IELTS Speaking</Select.Option>
+                <Select.Option value="ielts_writing">IELTS Writing</Select.Option>
+              </Select>
+            </Form.Item>
+          ) : (
+            <Form.Item
+              name="test_type"
+              hidden
+            >
+              <Input type="hidden" />
+            </Form.Item>
+          )}
 
           <Form.Item
             name="access"
