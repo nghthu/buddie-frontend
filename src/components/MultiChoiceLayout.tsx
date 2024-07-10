@@ -4,6 +4,7 @@ interface test_answer {
   test_id: string;
   parts: {
     _id: string;
+    part_number: number;
     question_groups: {
       _id: string;
       questions: {
@@ -63,12 +64,15 @@ export default function MultiChoiceLayout(props: {
     });
   }
   if (props.options) {
+    const formattedOptions = props.options.map((option: string, index) => {
+      return { label: option, value: (index + 1).toString() };
+    });
     const multiChoiceGroup = (
       <Checkbox.Group
         onChange={(checkedValues: string[]) => {
           handleSetAnswer(checkedValues);
         }}
-        options={props.options}
+        options={formattedOptions}
         className={styles.multiChoiceGroup}
         defaultValue={props.userAnswer as string[] | undefined}
       ></Checkbox.Group>

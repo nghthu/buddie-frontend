@@ -27,7 +27,7 @@ const ForgotPasswordForm = () => {
 
   useEffect(() => {
     if (authStateUser) {
-      router.replace('/profile');
+      router.replace('/ielts');
     }
   }, [authStateUser, router]);
 

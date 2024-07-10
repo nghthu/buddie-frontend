@@ -1,10 +1,11 @@
 'use client';
 import { ClockCircleOutlined } from '@ant-design/icons';
 import styles from '@/styles/components/TestCard.module.scss';
-import { Button, Modal, Rate, Select } from 'antd';
-import { SetStateAction, useState } from 'react';
+import { Button, Modal, Rate, Select, Space } from 'antd';
+import { SetStateAction, useState, useEffect } from 'react';
 
 import Link from 'next/link';
+import { auth } from '@/lib';
 interface user {
   user_id: string;
   display_name: string;
@@ -25,6 +26,18 @@ export default function TestCard(props: {
 }) {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
+  const [isAdmin, setIsAdmin] = useState(false);
+
+  useEffect(() => {
+    async function fetchAdminStatus() {
+      const tokenResult = await auth.currentUser?.getIdTokenResult();
+      const isAdmin = tokenResult?.claims.admin;
+      setIsAdmin(!!isAdmin);
+    }
+
+    fetchAdminStatus();
+  }, []);
+
   const showModal = () => {
     setIsModalOpen(true);
   };
@@ -42,6 +55,10 @@ export default function TestCard(props: {
   // TODO: handle timer
   const handleSelectChange = (value: string) => {
     console.log(value);
+  };
+
+  const handleDelete = () => {
+    // You need to define this function
   };
 
   const skill = props.testSkill?.split('_')[1];
@@ -88,18 +105,35 @@ export default function TestCard(props: {
               );
             })}
           </div>
-          <Button
-            onClick={handleClick}
-            className={styles.button}
-          >
-            Chi tiết
-          </Button>
+
+          {isAdmin ? (
+            <div className={styles.buttonContainer}>
+              <Link href={`tests/update/${props.testId}`}>
+                <Button>Cập nhật</Button>
+              </Link>
+              <button
+                className={styles['red-btn']}
+                onClick={handleDelete}
+              >
+                Xóa
+              </button>
+            </div>
+          ) : (
+            <Button
+              onClick={handleClick} // Existing click handler for "Chi tiết"
+              className={styles.button}
+            >
+              Chi tiết
+            </Button>
+          )}
         </>
       )}
       {props.isUserTest && (
         <>
           <div style={{ display: 'flex', flexWrap: 'wrap' }}>
-            Đăng bởi: <p>{props.user?.display_name}</p>
+            Đăng bởi:
+            <Space />
+            {props.user?.display_name}
           </div>
           <div>
             <Rate
@@ -111,14 +145,28 @@ export default function TestCard(props: {
           <div>
             Lượt làm bài: {props.submissionCount ? props.submissionCount : 0}
           </div>
-          <Link href={`tests/${props.testId}`}>
-            <Button
-              className={styles.button}
-              onClick={() => props.setPageLoading(true)}
-            >
-              Chi tiết
-            </Button>
-          </Link>
+          {isAdmin ? (
+            <div className={styles.buttonContainer}>
+              <Link href={`tests/update/${props.testId}`}>
+                <Button>Cập nhật</Button>
+              </Link>
+              <button
+                className={styles['red-btn']}
+                onClick={handleDelete}
+              >
+                Xóa
+              </button>
+            </div>
+          ) : (
+            <Link href={`tests/${props.testId}`}>
+              <Button
+                className={styles.button}
+                onClick={() => props.setPageLoading(true)}
+              >
+                Chi tiết
+              </Button>
+            </Link>
+          )}
         </>
       )}
       <Modal

@@ -1,3 +1,9 @@
+.test-name {
+  margin: auto;
+  width: fit-content;
+  margin-bottom: 20px;
+}
+
 .result-board {
   display: flex;
   justify-content: space-evenly;
@@ -71,6 +77,10 @@
 
 .red {
   background-color: #e06760;
+}
+
+.gray {
+  background-color: #9c9797;
 }
 
 .answer-field {

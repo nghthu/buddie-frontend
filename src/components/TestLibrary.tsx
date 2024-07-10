@@ -11,6 +11,9 @@ import { LoadingOutlined } from '@ant-design/icons';
 import styles from '@/styles/components/TestSelector.module.scss';
 import { Input } from 'antd';
 import type { SearchProps } from 'antd/es/input/Search';
+import InfiniteScroll from 'react-infinite-scroll-component';
+import { useRouter } from 'next/navigation';
+
 interface FetchArgs {
   url: string;
   user: User | null;
@@ -19,6 +22,17 @@ interface user {
   user_id: string;
   display_name: string;
   photo_url: string;
+}
+interface test {
+  _id: string;
+  test_name: string;
+  test_type: string;
+  user: user;
+  review: { star: number; count: number };
+  duration: number;
+  tags: string[];
+  test_recording?: string;
+  parts?: { _id: string }[];
 }
 const fetcher = async ({ url, user }: FetchArgs) => {
   const token = await user?.getIdToken();
@@ -35,20 +49,20 @@ const fetcher = async ({ url, user }: FetchArgs) => {
   return response.data;
 };
 const { Search } = Input;
-
+const LIMIT = 10;
 export default function TestLibrary(props: {
   pageLoading: boolean;
   setPageLoading: React.Dispatch<SetStateAction<boolean>>;
   text?: string;
 }) {
   // TODO: Implement infinite scroll and fetch more data and use setTotalPage
-  const [totalPage] = useState(1);
-  // const tests = useRef([]);
-  const [filteredTests, setFilteredTests] = useState([]);
+  const [totalPage, setTotalPage] = useState(1);
+  const [filteredTests, setFilteredTests] = useState<test[]>([]);
   const [searchValue, setSearchValue] = useState('');
   const scrollRef = useRef<HTMLDivElement>(null);
+  const router = useRouter();
 
-  const apiUrl = `/api/tests?page=${totalPage}&search=${searchValue}&isbuddie=false`;
+  const apiUrl = `/api/tests?page=${totalPage}&search=${searchValue}&limit=${LIMIT}&isbuddie=false`;
   const user = auth.currentUser;
   const {
     data: rawTests,
@@ -68,7 +82,18 @@ export default function TestLibrary(props: {
   useEffect(() => {
     if (rawTests) {
       //tests.current = [...new Set([...tests.current, ...rawTests.tests])];
-      setFilteredTests(rawTests.tests);
+
+      setFilteredTests((prev) => {
+        const seen = new Set();
+        const returnRes = [...prev, ...(rawTests.tests ?? [])].filter(
+          (test) => {
+            if (seen.has(test._id)) return false;
+            seen.add(test._id);
+            return true;
+          }
+        );
+        return returnRes;
+      });
       // handleFilterTests();
       // setTests((prev) => [...prev, ...rawTests.tests]);
     }
@@ -117,38 +142,36 @@ export default function TestLibrary(props: {
   if ((isLoading && filteredTests.length === 0) || props.pageLoading) {
     return <Spin size="default" />;
   }
-  const testComponent = filteredTests.map(
-    (test: {
-      _id: string;
-      test_name: string;
-      test_type: string;
-      user: user;
-      review: { star: number; count: number };
-      duration: number;
-      tags: string[];
-      test_recording?: string;
-      parts?: { _id: string }[];
-    }) => {
-      const partIds = test.parts
-        ? test.parts.map((part: { _id: string }) => part._id)
-        : [];
-      return (
-        <TestCard
-          setPageLoading={props.setPageLoading}
-          key={test._id}
-          testName={test.test_name}
-          testDuration={test.duration.toString()}
-          testTags={test.tags}
-          testSkill={test.test_type}
-          testId={test._id}
-          partIds={partIds}
-          isUserTest={true}
-          user={test.user}
-          review={test.review}
-        />
-      );
+  const testComponent = filteredTests.map((test) => {
+    const partIds = test.parts
+      ? test.parts.map((part: { _id: string }) => part._id)
+      : [];
+    return (
+      <TestCard
+        setPageLoading={props.setPageLoading}
+        key={test._id}
+        testName={test.test_name}
+        testDuration={test.duration.toString()}
+        testTags={test.tags}
+        testSkill={test.test_type}
+        testId={test._id}
+        partIds={partIds}
+        isUserTest={true}
+        user={test.user}
+        review={test.review}
+      />
+    );
+  });
+  const handleInfScroll = () => {
+    if (totalPage < rawTests?.pagination.total_count / 10) {
+      setTotalPage((prev) => prev + LIMIT);
     }
-  );
+  };
+
+  const createTest = () => {
+    router.push('/tests/create');
+  };
+
   return (
     <div className={styles.container}>
       {contextHolder}
@@ -159,12 +182,29 @@ export default function TestLibrary(props: {
           onSearch={onSearch}
           style={{ width: 300 }}
         />
+        <button
+          className={styles['create-question-btn']}
+          onClick={createTest}
+        >
+          Tạo đề thi
+        </button>
       </div>
       <div
         className={styles.wrapper}
         ref={scrollRef}
+        id="scrollableDiv"
       >
-        {testComponent}
+        <InfiniteScroll
+          scrollThreshold={0.9}
+          scrollableTarget="scrollableDiv"
+          dataLength={testComponent.length}
+          next={handleInfScroll}
+          hasMore={totalPage < rawTests?.pagination.total_count / 10}
+          loader={<h4>Loading...</h4>}
+          className={styles.wrapper}
+        >
+          {testComponent}
+        </InfiniteScroll>
         {testComponent.length === 0 && (
           <Empty
             image={Empty.PRESENTED_IMAGE_SIMPLE}

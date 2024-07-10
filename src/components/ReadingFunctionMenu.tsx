@@ -27,6 +27,7 @@ const ReadingFunctionMenu: React.FC<MenuProps> = ({
       <p onClick={() => onMenuItemClick('Dịch')}>Dịch</p>
       <p onClick={() => onMenuItemClick('Viết lại')}>Viết lại</p>
       <p onClick={() => onMenuItemClick('Từ đồng nghĩa')}>Từ đồng nghĩa</p>
+      <p onClick={() => onMenuItemClick('Tạo tiêu đề')}>Tạo tiêu đề</p>
     </div>
   );
 };

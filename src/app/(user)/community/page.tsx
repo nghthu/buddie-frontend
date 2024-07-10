@@ -12,8 +12,6 @@ import { User } from 'firebase/auth';
 import { auth } from '@/lib';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import type { SearchProps } from 'antd/es/input/Search';
-
-//import InfiniteScroll from 'react-infinite-scroll-component';
 const { TextArea } = Input;
 interface FetchArgs {
   url: string;
@@ -98,7 +96,7 @@ const Community = () => {
 
   useEffect(() => {
     if (questions) {
-      if (offset + LIMIT >= questions.pagination.total_count) {
+      if (offset + LIMIT >= questions?.pagination?.total_count) {
         setHasMoreQuestions(false);
       } else {
         setHasMoreQuestions(true);
@@ -108,9 +106,20 @@ const Community = () => {
 
   useEffect(() => {
     if (questions) {
-      setTotalQuestions((prev) => [...prev, ...questions.questions]);
+      setTotalQuestions((prev) => {
+        const seen = new Set();
+        const returnRes = [...prev, ...(questions.questions ?? [])].filter(
+          (question) => {
+            if (seen.has(question._id)) return false;
+            seen.add(question._id);
+            return true;
+          }
+        );
+        return returnRes;
+      });
     }
   }, [questions]);
+
   const handleLoadMoreComments = () => {
     if (!questions) return;
     setOffset((prev) => prev + LIMIT);
@@ -134,13 +143,24 @@ const Community = () => {
     }
     formData.append('text', newPostValue);
 
-    await fetch(`/api/questions`, {
+    const res = await fetch(`/api/questions`, {
       method: 'POST',
       headers: {
         authorization: `Bearer ${token}`,
       },
       body: formData,
+    }).then((res) => res.json());
+    console.log(res);
+    setTotalQuestions((prev) => {
+      const seen = new Set();
+      const returnRes = [res ?? {}, ...prev].filter((question) => {
+        if (seen.has(question._id)) return false;
+        seen.add(question._id);
+        return true;
+      });
+      return returnRes;
     });
+    setOffset((prev) => prev + 1);
     handleCancelCreate();
     setLoadingCreate(false);
   };
@@ -150,6 +170,7 @@ const Community = () => {
     setSelectedFile(null);
     setSelectedAudioFile(null);
     setNewPostValue('');
+    hideCreateModal();
   };
 
   const handleFileSelect = (
@@ -170,7 +191,26 @@ const Community = () => {
   const hideCreateModal = () => {
     setOpenCreatePost(false);
   };
-
+  const refresh = async () => {
+    const token = await user?.getIdToken();
+    const res = await fetch(
+      `/api/community?offset=${offset}&limit=${LIMIT}&text=${search}`,
+      {
+        headers: {
+          authorization: `Bearer ${token}`,
+        },
+      }
+    ).then((res) => res.json());
+    setTotalQuestions(() => {
+      const seen = new Set();
+      const returnRes = [...(res.data.questions ?? [])].filter((question) => {
+        if (seen.has(question._id)) return false;
+        seen.add(question._id);
+        return true;
+      });
+      return returnRes;
+    });
+  };
   const onSearch: SearchProps['onSearch'] = (value) => {
     // split the search value into an array of words, delimiter is space
     const searchWords = encodeURIComponent(value.trim());
@@ -184,24 +224,19 @@ const Community = () => {
         key={question._id}
         postData={question}
         comments={question.answers.length}
+        onClose={refresh}
       />
     );
   });
-
-  if (isLoading) {
-    return <Spin size="default" />;
-  }
-
-  hasMoreQuestions
+  hasMoreQuestions && !isLoading
     ? postData.push(
         <Empty
-          description={<></>}
           key="empty"
           style={{ height: '200px' }}
+          description={<p>Kéo xuống tiếp để tải thêm câu hỏi</p>}
         />
       )
     : null;
-
   return (
     <>
       {contextHolder}
@@ -226,17 +261,22 @@ const Community = () => {
               Tạo câu hỏi
             </button>
           </div>
-          <InfiniteScroll
-            dataLength={postData.length}
-            next={() => {
-              handleLoadMoreComments();
-            }}
-            hasMore={hasMoreQuestions}
-            loader={<h4>Loading...</h4>}
-            scrollThreshold={1}
-          >
-            {postData}
-          </InfiniteScroll>
+          {postData.length === 0 && !isLoading && (
+            <Empty description={<h2>Không có câu hỏi nào</h2>} />
+          )}
+          {postData.length >= 0 && (
+            <InfiniteScroll
+              dataLength={postData.length}
+              next={() => {
+                handleLoadMoreComments();
+              }}
+              hasMore={hasMoreQuestions}
+              loader={<Spin size="small" />}
+              scrollThreshold={1}
+            >
+              {postData}
+            </InfiniteScroll>
+          )}
         </Card>
       </div>
       <Modal

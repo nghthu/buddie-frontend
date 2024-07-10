@@ -114,6 +114,7 @@ const Result = (props: Props) => {
 
   useEffect(() => {
     if (test && testSubmission && testResultData === null) {
+      console.log(test);
       const mergedData = merge({}, test, testSubmission);
       if (props.part === 'all') setTestResultData(mergedData);
       else {
@@ -141,10 +142,12 @@ const Result = (props: Props) => {
         .map((questionGroup) => questionGroup.questions)
         .flat();
 
+      console.log(allQuestionsInfo);
+
       allQuestionsInfo.forEach((question) => {
-        if (question.answer_result.is_correct) {
+        if (question.answer_result?.is_correct) {
           resultInfo.right++;
-        } else if (question.answer_result.user_answer === undefined) {
+        } else if (question.answer_result?.user_answer === undefined) {
           resultInfo.skipped++;
         } else {
           resultInfo.wrong++;
@@ -179,20 +182,23 @@ const Result = (props: Props) => {
                       <div
                         className={`${styles['radio-button']} ${
                           question.answer_result.is_correct
-                            ? question.answer === String(oIndex + 1)
+                            ? question.options?.indexOf(question.answer) ===
+                              oIndex
                               ? styles['green']
                               : ''
                             : (oIndex + 1).toString() ===
                                 question.answer_result.user_answer.toString()
                               ? styles['red']
-                              : (oIndex + 1).toString() === question.answer &&
+                              : question.options?.indexOf(question.answer) ===
+                                    oIndex &&
                                   question.answer_result.user_answer.toString() !==
                                     ''
                                 ? styles['green']
-                                : (oIndex + 1).toString() === question.answer &&
+                                : question.options?.indexOf(question.answer) ===
+                                      oIndex &&
                                     question.answer_result.user_answer.toString() ===
                                       ''
-                                  ? styles['red']
+                                  ? styles['gray']
                                   : ''
                         }`}
                       ></div>
@@ -204,7 +210,7 @@ const Result = (props: Props) => {
                       width="fit-content"
                       height="30px"
                       className={`${styles['answer-field']} ${
-                        question.answer_result.is_correct
+                        question.answer_result?.is_correct
                           ? styles['green-border']
                           : styles['red-border']
                       }`}
@@ -268,6 +274,7 @@ const Result = (props: Props) => {
 
   return (
     <>
+      <h2 className={styles['test-name']}>{test.test_name}</h2>
       <div className={styles['result-board']}>
         <TextCard
           width="150px"
@@ -316,26 +323,29 @@ const Result = (props: Props) => {
                     {questionGroup.question_groups_info.question_groups_prompt}
                   </p>
                   {questionGroup.question_groups_info
-                    .question_groups_image_urls && (
-                    <img
-                      className={styles.img}
-                      src={
-                        questionGroup.question_groups_info
-                          .question_groups_image_urls[0]
-                      }
-                      alt="question"
-                    />
-                  )}
+                    .question_groups_image_urls &&
+                    questionGroup.question_groups_info
+                      .question_groups_image_urls.length !== 0 && (
+                      <img
+                        className={styles.img}
+                        src={
+                          questionGroup.question_groups_info
+                            .question_groups_image_urls[0]
+                        }
+                        alt="question"
+                      />
+                    )}
                   <p className={styles['question-prompt']}>
                     {question.question_prompt}
                   </p>
-                  {question.question_image_urls && (
-                    <img
-                      className={styles.img}
-                      src={question.question_image_urls[0]}
-                      alt="question"
-                    />
-                  )}
+                  {question.question_image_urls &&
+                    question.question_image_urls.length !== 0 && (
+                      <img
+                        className={styles.img}
+                        src={question.question_image_urls[0]}
+                        alt="question"
+                      />
+                    )}
                   <div className={clsx(styles['answer-options'])}>
                     {(question.question_type === 'single_choice' ||
                       question.question_type === 'selection') &&
@@ -348,22 +358,25 @@ const Result = (props: Props) => {
                           <div
                             className={`${styles['radio-button']} ${
                               question.answer_result.is_correct
-                                ? question.answer === String(index + 1)
+                                ? question.options?.indexOf(question.answer) ===
+                                  index
                                   ? styles['green']
                                   : ''
                                 : (index + 1).toString() ===
                                     question.answer_result.user_answer.toString()
                                   ? styles['red']
-                                  : (index + 1).toString() ===
-                                        question.answer &&
+                                  : question.options?.indexOf(
+                                        question.answer
+                                      ) === index &&
                                       question.answer_result.user_answer.toString() !==
                                         ''
                                     ? styles['green']
-                                    : (index + 1).toString() ===
-                                          question.answer &&
+                                    : question.options?.indexOf(
+                                          question.answer
+                                        ) === index &&
                                         question.answer_result.user_answer.toString() ===
                                           ''
-                                      ? styles['red']
+                                      ? styles['gray']
                                       : ''
                             }`}
                           ></div>

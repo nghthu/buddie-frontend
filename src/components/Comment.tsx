@@ -21,6 +21,16 @@ export default function Comment({
   function handleClamping() {
     setIsClamping(!isClamping);
   }
+  const newDate = new Date(createdDate);
+
+  const formattedDate =
+    (newDate.getDate() < 10 ? '0' + newDate.getDate() : newDate.getDate()) +
+    '/' +
+    (newDate.getMonth() + 1 < 10
+      ? '0' + newDate.getMonth()
+      : newDate.getMonth()) +
+    '/' +
+    newDate.getFullYear();
   return (
     <div className={styles.wrapper}>
       <img
@@ -31,7 +41,7 @@ export default function Comment({
       <div className={styles.contentWrapper}>
         <div className={styles.upper}>
           <div className={styles.userName}>{userName}</div>
-          <div>{createdDate}</div>
+          <div>{formattedDate}</div>
         </div>
         <div
           onClick={() => handleClamping()}

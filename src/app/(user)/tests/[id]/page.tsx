@@ -1,6 +1,6 @@
 'use client';
 import SkillHeader from '@/components/SkillHeader';
-import { Spin, Button, notification, Empty, Input } from 'antd';
+import { Spin, Button, notification, Empty, Input, Typography } from 'antd';
 import styles from '@/styles/pages/TestLanding.module.scss';
 import { User } from 'firebase/auth';
 import { auth } from '@/lib';
@@ -26,12 +26,17 @@ import { SendOutlined } from '@ant-design/icons';
 //     }[];
 //   }[];
 // }
+interface userComment {
+  user_id: string;
+  display_name: string;
+  photo_url: string;
+}
 interface comment {
   _id: string;
   test_id: string;
-  user_id: string;
   comment: string;
   created_at: string;
+  user: userComment;
 }
 interface FetchArgs {
   url: string;
@@ -57,9 +62,12 @@ const { TextArea } = Input;
 
 export default function TestLanding({ params }: { params: { id: string } }) {
   // TODO: Implement infinite scroll and fetch more data and use setTotalPage
+  const [isFetching, setIsFetching] = useState(false);
   const [totalPage] = useState(1);
   const [totalComments, setComments] = useState([] as comment[]);
   const [comment, setComment] = useState('');
+  const [rating, setRating] = useState(0);
+  const [totalRating, setTotalRating] = useState(0);
   const scrollRef = useRef<HTMLDivElement>(null);
   const user = auth.currentUser;
   const {
@@ -113,11 +121,23 @@ export default function TestLanding({ params }: { params: { id: string } }) {
   useEffect(() => {
     if (comments) {
       setComments((prev) => {
-        const tempSet = new Set([...prev, ...comments.test_comments]);
-        return Array.from(tempSet);
+        const tempSet = [...prev, ...comments.test_comments];
+        const seen = new Set();
+        const uniqueComments = tempSet.filter((comment) => {
+          const isDuplicate = seen.has(comment._id);
+          seen.add(comment._id);
+          return !isDuplicate;
+        });
+        return Array.from(uniqueComments);
       });
     }
   }, [comments]);
+  useEffect(() => {
+    if (test && test.review) {
+      setRating(test.review.star);
+      setTotalRating(test.review.count);
+    }
+  }, [test]);
   if (isLoading) {
     return <Spin size="large" />;
   }
@@ -126,40 +146,12 @@ export default function TestLanding({ params }: { params: { id: string } }) {
     <Comment
       key={comment._id}
       id={comment._id}
-      userName={'lorem Ipsum'}
-      userPhotoURL={
-        'https://fastly.picsum.photos/id/1/200/300.jpg?hmac=jH5bDkLr6Tgy3oAg5khKCHeunZMHq0ehBZr6vGifPLY'
-      }
+      userName={comment.user.display_name}
+      userPhotoURL={comment.user.photo_url}
       createdDate={comment.created_at}
       content={comment.comment}
     />
   ));
-
-  commentSection.push(
-    <Comment
-      key={'acssasdsad'}
-      id={'as'}
-      userName={'lorem Ipsum'}
-      userPhotoURL="https://fastly.picsum.photos/id/1/200/300.jpg?hmac=jH5bDkLr6Tgy3oAg5khKCHeunZMHq0ehBZr6vGifPLY"
-      createdDate={'1-1-1970'}
-      content={
-        'lmaasd ksadj alksdj lkasjd lsaj dlksajd lkasjd alksjd oiasj daslid jlsak dhsalkd jalsdj alksdjo lmaasd ksadj alksdj lkasjd lsaj dlksajd lkasjd alksjd oiasj daslid jlsak dhsalkd jalsdj alksdjo lmaasd ksadj alksdj lkasjd lsaj dlksajd lkasjd alksjd oiasj daslid jlsak dhsalkd jalsdj alksdjo lmaasd ksadj alksdj lkasjd lsaj dlksajd lkasjd alksjd oiasj daslid jlsak dhsalkd jalsdj alksdjo lmaasd ksadj alksdj lkasjd lsaj dlksajd lkasjd alksjd oiasj daslid jlsak dhsalkd jalsdj alksdjolmaasd ksadj alksdj lkasjd lsaj dlksajd lkasjd alksjd oiasj daslid jlsak dhsalkd jalsdj alksdjolmaasd ksadj alksdj lkasjd lsaj dlksajd lkasjd alksjd oiasj daslid jlsak dhsalkd jalsdj alksdjolmaasd ksadj alksdj lkasjd lsaj dlksajd lkasjd alksjd oiasj daslid jlsak dhsalkd jalsdj alksdjo'
-      }
-    />
-  );
-
-  commentSection.push(
-    <Comment
-      key={'acssasdsad2'}
-      id={'as'}
-      userName={'lorem Ipsum'}
-      userPhotoURL="https://fastly.picsum.photos/id/1/200/300.jpg?hmac=jH5bDkLr6Tgy3oAg5khKCHeunZMHq0ehBZr6vGifPLY"
-      createdDate={'1-1-1970'}
-      content={
-        'lmaasd ksadj alksdj lkasjd lsaj dlksajd lkasjd alksjd oiasj daslid jlsak dhsalkd jalsdj alksdjo lmaasd ksadj alksdj lkasjd lsaj dlksajd lkasjd alksjd oiasj daslid jlsak dhsalkd jalsdj alksdjo lmaasd ksadj alksdj lkasjd lsaj dlksajd lkasjd alksjd oiasj daslid jlsak'
-      }
-    />
-  );
 
   const parts =
     test?.parts.map((part: { part_duration: number }, index: number) => {
@@ -167,6 +159,7 @@ export default function TestLanding({ params }: { params: { id: string } }) {
     }) || [];
 
   const handleSendComment = async () => {
+    setIsFetching(true);
     const token = await user?.getIdToken();
 
     const response = await fetch(`/api/comment/${params.id}`, {
@@ -182,23 +175,49 @@ export default function TestLanding({ params }: { params: { id: string } }) {
     });
     setComment('');
     const data = await response.json();
-    return data;
+    if (data.status === 'error') {
+      notificationApi.error({
+        message: 'Error',
+        description: data.error.message,
+      });
+    } else {
+      setComments((prev) => {
+        const tempSet = new Set([...prev, data.data]);
+        return Array.from(tempSet);
+      });
+    }
+    setIsFetching(false);
   };
-
+  const handleRefresh = (rate: number) => {
+    // const token = await user?.getIdToken();
+    setRating((prev) => {
+      const totalRate = totalRating;
+      return (prev * totalRate + rate) / (totalRate + 1);
+    });
+    setTotalRating((prev) => prev + 1);
+    // const newTest = await fetch(`/api/tests/${params.id}`, {
+    //   headers: {
+    //     authorization: `Bearer ${token}`,
+    //   },
+    // }).then((res) => res.json());
+    // await mutate(`/api/tests/${params.id}`, newTest.data, true);
+  };
   return (
     <div className={styles.pageWrapper}>
       {contextHolder}
-      <SkillHeader title={test.test_name} />
+      <SkillHeader title={test?.test_name} />
       <TextCard
         width={'90%'}
         height={'auto'}
       >
         <TestDetails
           user_name={test?.user?.display_name || 'lorem ipsum'}
-          rating={test?.review.star || 3.2}
-          rating_count={test?.review.count || 13}
-          update_date={test.updated_at || '2024-04-23T06:57:19.523Z'}
-          submission_count={test.submission_count || 100}
+          rating={rating || 0}
+          rating_count={totalRating || 0}
+          create_date={test.created_at || '2024-04-23T06:57:19.523Z'}
+          submission_count={test.submission_count || 0}
+          test_id={test._id}
+          handleRefresh={handleRefresh}
         />
         <PartSelector
           parts={parts}
@@ -208,8 +227,13 @@ export default function TestLanding({ params }: { params: { id: string } }) {
           className={styles.commentWrapper}
           ref={scrollRef}
         >
+          <p>Bình luận:</p>
           {isLoadingComment && <Spin size="large" />}
-          {!isLoadingComment && commentSection.length === 0 ? <Empty /> : null}
+          {!isLoadingComment && commentSection.length === 0 ? (
+            <Empty
+              description={<Typography.Text>Chưa có bình luận</Typography.Text>}
+            />
+          ) : null}
           {!isLoadingComment && commentSection.length > 0
             ? commentSection
             : null}
@@ -223,7 +247,7 @@ export default function TestLanding({ params }: { params: { id: string } }) {
             />
             <div className={styles.inputAndSendBtn}>
               <TextArea
-                placeholder="Viết comment"
+                placeholder="Viết bình luận"
                 className={styles.inputComment}
                 autoSize
                 value={comment}
@@ -237,6 +261,7 @@ export default function TestLanding({ params }: { params: { id: string } }) {
                 icon={<SendOutlined />}
                 size="large"
                 onClick={handleSendComment}
+                disabled={isFetching}
               />
             </div>
           </div>

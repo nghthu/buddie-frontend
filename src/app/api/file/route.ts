@@ -40,3 +40,38 @@ export const GET = async function getFile(req: NextRequest) {
     return NextResponse.json({ error });
   }
 };
+
+export const POST = async function createAudioFiles(req: Request) {
+  try {
+    const formData = await req.formData();
+
+    const sendData = new FormData();
+    formData.forEach((value, key) => {
+      if (key !== 'testId') {
+        sendData.append(key, value);
+      }
+    });
+
+    console.log('---------------', sendData, formData.get('testId'));
+    const response = await fetch(
+      `${process.env.API_BASE_URL}/api/v1/file/user-audios/tests/${formData.get('testId')}`,
+      {
+        method: 'POST',
+        headers: {
+          Authorization: req.headers.get('Authorization') ?? '',
+        },
+        body: sendData,
+      }
+    );
+
+    console.log(response);
+
+    const data = await response.json();
+    console.log('DATA---------------------------', data);
+
+    return NextResponse.json(data.data);
+  } catch (error) {
+    console.error(error);
+    return NextResponse.json({ error });
+  }
+};
