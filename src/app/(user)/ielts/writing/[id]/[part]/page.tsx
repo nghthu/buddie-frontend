@@ -159,7 +159,7 @@ export default function PracticePage({
           test_id: params.id,
           parts: partData?.question_groups.map((group) => ({
             _id: group._id,
-            part_number: part,
+            part_number: Number(part),
             question_groups: [
               {
                 _id: group._id,
@@ -183,7 +183,7 @@ export default function PracticePage({
             test_id: params.id,
             parts: partData?.question_groups.map((group) => ({
               _id: group._id,
-              part_number: part,
+              part_number: Number(part),
               question_groups: [
                 {
                   _id: group._id,
@@ -204,7 +204,7 @@ export default function PracticePage({
               ...part1Answer,
               {
                 _id: partData?.question_groups[0]._id,
-                part_number: part,
+                part_number: Number(part),
                 question_groups: [
                   {
                     _id: partData?.question_groups[0]._id,
@@ -397,19 +397,19 @@ export default function PracticePage({
                 {question?.question_prompt.split('.').slice(1).join('.')}
               </div>
 
-              {part !== '2' && (
-                <div className={styles.imgContainer}>
+              <div className={styles.imgContainer}>
+                {question?.question_image_urls[0] && (
                   <img
                     src={question?.question_image_urls[0]}
                     alt="IELTS Writing Task 1"
                   />
-                  <WritingFunctionMenu
-                    visible={menuVisible}
-                    position={menuPosition}
-                    onMenuItemClick={showChat}
-                  />
-                </div>
-              )}
+                )}
+                <WritingFunctionMenu
+                  visible={menuVisible}
+                  position={menuPosition}
+                  onMenuItemClick={showChat}
+                />
+              </div>
               <div className={styles.answerHeader}>
                 <div className={styles.instruction}>
                   <img
