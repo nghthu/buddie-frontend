@@ -28,6 +28,7 @@ const fetcher = async ({ url, user }: FetchArgs) => {
 };
 const Profile = () => {
   const user = auth.currentUser;
+  console.log(user);
   const {
     data: profile,
     error,

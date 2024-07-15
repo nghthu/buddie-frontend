@@ -186,8 +186,10 @@ const Result = (props: Props) => {
                               oIndex
                               ? styles['green']
                               : ''
-                            : (oIndex + 1).toString() ===
-                                question.answer_result.user_answer.toString()
+                            : oIndex ===
+                                question.options?.indexOf(
+                                  question.answer_result.user_answer
+                                )
                               ? styles['red']
                               : question.options?.indexOf(question.answer) ===
                                     oIndex &&
@@ -231,9 +233,10 @@ const Result = (props: Props) => {
                         className={`${styles['check-box-button']} ${
                           question.answer.includes(String(oIndex + 1))
                             ? styles['green']
-                            : question.answer_result.user_answer
-                                  .toString()
-                                  .includes(String(oIndex + 1))
+                            : oIndex ===
+                                question.options?.indexOf(
+                                  question.answer_result.user_answer
+                                )
                               ? styles['red']
                               : ''
                         }
@@ -362,8 +365,10 @@ const Result = (props: Props) => {
                                   index
                                   ? styles['green']
                                   : ''
-                                : (index + 1).toString() ===
-                                    question.answer_result.user_answer.toString()
+                                : index ===
+                                    question.options?.indexOf(
+                                      question.answer_result.user_answer
+                                    )
                                   ? styles['red']
                                   : question.options?.indexOf(
                                         question.answer
@@ -425,9 +430,10 @@ const Result = (props: Props) => {
                             className={`${styles['check-box-button']} ${
                               question.answer.includes(String(index + 1))
                                 ? styles['green']
-                                : question.answer_result.user_answer
-                                      .toString()
-                                      .includes(String(index + 1))
+                                : oIndex ===
+                                    question.options?.indexOf(
+                                      question.answer_result.user_answer
+                                    )
                                   ? styles['red']
                                   : ''
                             }
