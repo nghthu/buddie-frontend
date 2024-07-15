@@ -133,7 +133,7 @@ export default function PracticePage({
 
     let submittedAnswers;
 
-    if (part == 'all'){
+    if (part == 'all') {
       const part1Answer = partData?.question_groups.map((group) => ({
         _id: group._id,
         part_number: 1,
@@ -174,8 +174,10 @@ export default function PracticePage({
           })),
         };
       } else if (part == '2') {
-        const part1Answer = JSON.parse(localStorage.getItem('part1Answer') || '[]');
-  
+        const part1Answer = JSON.parse(
+          localStorage.getItem('part1Answer') || '[]'
+        );
+
         if (part1Answer.length == 0) {
           submittedAnswers = {
             test_id: params.id,
@@ -206,12 +208,14 @@ export default function PracticePage({
                 question_groups: [
                   {
                     _id: partData?.question_groups[0]._id,
-                    questions: partData?.question_groups[0].questions.map((q) => ({
-                      _id: q._id,
-                      answer_result: {
-                        user_answer: userAnswer,
-                      },
-                    })),
+                    questions: partData?.question_groups[0].questions.map(
+                      (q) => ({
+                        _id: q._id,
+                        answer_result: {
+                          user_answer: userAnswer,
+                        },
+                      })
+                    ),
                   },
                 ],
               },
@@ -219,24 +223,24 @@ export default function PracticePage({
           };
         }
       }
-  
+
       console.log('submit', submittedAnswers);
-        const token = await user?.getIdToken();
-    
-        const response: Response = await fetch(`/api/test-submissions`, {
-          method: 'POST',
-          headers: {
-            authorization: `Bearer ${token}`,
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(submittedAnswers),
-        });
-    
-        const responseData = await response.json();
-        router.push(
-          `/result?writing=true&testId=${params.id}&testSubmissionId=${responseData._id}&part=${params.part}`
-        );
-    } 
+      const token = await user?.getIdToken();
+
+      const response: Response = await fetch(`/api/test-submissions`, {
+        method: 'POST',
+        headers: {
+          authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(submittedAnswers),
+      });
+
+      const responseData = await response.json();
+      router.push(
+        `/result?writing=true&testId=${params.id}&testSubmissionId=${responseData._id}&part=${params.part}`
+      );
+    }
   };
 
   const showMenu = (event: React.MouseEvent) => {

@@ -3,10 +3,9 @@
 import TextCard from '@/components/TextCard';
 import { auth } from '@/lib';
 import styles from '@/styles/pages/Profile.module.scss';
-import { CameraOutlined } from '@ant-design/icons';
 import { Spin, notification } from 'antd';
 import { User } from 'firebase/auth';
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import useSWR from 'swr';
 
 interface FetchArgs {
@@ -41,7 +40,6 @@ const Profile = () => {
     fetcher
   );
   const [notificationApi, contextHolder] = notification.useNotification();
-  const [isHover, setIsHover] = useState(false);
   useEffect(() => {
     if (error) {
       notificationApi.error({
@@ -67,18 +65,13 @@ const Profile = () => {
         <div className={styles.user}>
           <div
             className={styles.avatarContainer}
-            onMouseEnter={() => setIsHover(true)}
-            onMouseLeave={() => setIsHover(false)}
             onClick={handleChangeAvatar}
           >
-            {!isHover && (
-              <img
-                src={user?.photoURL ?? ''}
-                alt="avatar"
-                className={styles.avatar}
-              />
-            )}
-            {isHover && <CameraOutlined className={styles.icon} />}
+            <img
+              src={user?.photoURL ?? ''}
+              alt="avatar"
+              className={styles.avatar}
+            />
           </div>
           <div>
             <h1>{user?.displayName}</h1>
