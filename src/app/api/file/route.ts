@@ -54,23 +54,23 @@ export const POST = async function createAudioFiles(req: Request) {
     });
 
     console.log('---------------', sendData, formData.get('testId'));
-    // const response = await fetch(
-    //   `${process.env.API_BASE_URL}/api/v1/file/user-audios/tests/${formData.get('testId')}`,
-    //   {
-    //     method: 'POST',
-    //     headers: {
-    //       Authorization: req.headers.get('Authorization') ?? '',
-    //     },
-    //     body: sendData,
-    //   }
-    // );
+    const response = await fetch(
+      `${process.env.API_BASE_URL}/api/v1/file/user-audios/tests/${formData.get('testId')}`,
+      {
+        method: 'POST',
+        headers: {
+          Authorization: req.headers.get('Authorization') ?? '',
+        },
+        body: sendData,
+      }
+    );
 
-    // console.log(response);
+    console.log(response);
 
-    // const data = await response.json();
-    // console.log('DATA---------------------------', data);
+    const data = await response.json();
+    console.log('DATA---------------------------', data);
 
-    // return NextResponse.json(data.data);
+    return NextResponse.json(data.data);
   } catch (error) {
     console.error(error);
     return NextResponse.json({ error });
