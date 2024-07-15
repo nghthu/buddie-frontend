@@ -65,10 +65,10 @@ export const POST = async function createTest(req: Request) {
     const partRecordingFiles = reqData.getAll('part_recording') as File[];
     const partImages = reqData.getAll('part_images') as File[];
     const questionGroupRecordingFiles = reqData.getAll(
-      'question_group_recording'
+      'question_groups_recording'
     ) as File[];
     const questionGroupImages = reqData.getAll(
-      'question_group_images'
+      'question_groups_images'
     ) as File[];
     const questionRecordingFiles = reqData.getAll(
       'question_recording'
@@ -161,7 +161,7 @@ export const POST = async function createTest(req: Request) {
 
               test.parts[partIndex].question_groups[
                 questionGroupIndex
-              ].question_groups_info.question_group_recording = downloadUrl;
+              ].question_groups_info.question_groups_recording = downloadUrl;
             })()
           );
         }
@@ -184,7 +184,7 @@ export const POST = async function createTest(req: Request) {
 
               const questionGroup =
                 test.parts[partIndex].question_groups[questionGroupIndex];
-              if (!Array.isArray(questionGroup.question_group_images)) {
+              if (!Array.isArray(questionGroup.question_groups_info.question_groups_image_urls)) {
                 questionGroup.question_groups_info.question_groups_image_urls =
                   [];
               }
@@ -257,13 +257,19 @@ export const POST = async function createTest(req: Request) {
 
     await Promise.all(uploadTasks);
 
+    console.log(test);
+
+    console.log(test.parts[0].question_groups[0]);
+
+    console.log(test.parts[0].question_groups[0].questions[0]);
+
     const response = await fetch(`${process.env.API_BASE_URL}/api/v1/tests`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         Authorization: req.headers.get('Authorization') || '',
       },
-      body: JSON.stringify({ test }),
+      body: JSON.stringify(test),
     });
     const data = await response.json();
     return NextResponse.json(data);

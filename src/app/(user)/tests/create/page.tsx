@@ -60,6 +60,18 @@ const CreateTest = () => {
   const router = useRouter();
   const user = auth.currentUser;
 
+  const [isAdmin, setIsAdmin] = useState(false);
+
+  useEffect(() => {
+    async function fetchAdminStatus() {
+      const tokenResult = await user?.getIdTokenResult();
+      const isAdmin = tokenResult?.claims.admin;
+      setIsAdmin(!!isAdmin);
+    }
+
+    fetchAdminStatus();
+  }, []);
+
   const callCreateTestAPI = async () => {
     const token = await user?.getIdToken();
 
@@ -119,6 +131,7 @@ const CreateTest = () => {
     }
 
     const result = await response.json();
+    console.log(result);
     return result;
   };
 
@@ -127,11 +140,14 @@ const CreateTest = () => {
     const values = form.getFieldsValue();
 
     if (currentTab === '1') {
+      if (!isAdmin) {
+        form.setFieldsValue({ test_type: 'custom' });
+      }
       form.setFieldsValue({ tags: values.tags ? values.tags.split(' ') : [] });
       setCurrentTab('2');
     } else {
-      router.push('/tests');
       callCreateTestAPI();
+      router.push('/tests');
     }
   };
 
@@ -324,13 +340,27 @@ const CreateTest = () => {
             <Input placeholder="Tên bài thi..." />
           </Form.Item>
 
-          <Form.Item
-            name="test_type"
-            initialValue="custom"
-            hidden
-          >
-            <Input type="hidden" />
-          </Form.Item>
+          {isAdmin ? (
+            <Form.Item
+              name="test_type"
+              label="Loại bài thi"
+              rules={[{ required: true, message: 'Vui lòng chọn loại bài thi!' }]}
+            >
+              <Select>
+                <Select.Option value="ielts_reading">IELTS Reading</Select.Option>
+                <Select.Option value="ielts_listening">IELTS Listening</Select.Option>
+                <Select.Option value="ielts_speaking">IELTS Speaking</Select.Option>
+                <Select.Option value="ielts_writing">IELTS Writing</Select.Option>
+              </Select>
+            </Form.Item>
+          ) : (
+            <Form.Item
+              name="test_type"
+              hidden
+            >
+              <Input type="hidden" />
+            </Form.Item>
+          )}
 
           <Form.Item
             name="access"
@@ -393,8 +423,8 @@ const CreateTest = () => {
                     question_groups_info: {
                       question_groups_duration: null,
                       question_groups_prompt: '',
-                      question_group_recording: null,
-                      question_group_image_urls: [],
+                      question_groups_recording: null,
+                      question_groups_image_urls: [],
                     },
                     questions: [
                       {
@@ -450,10 +480,10 @@ const CreateTest = () => {
                     </Form.Item>
                     <Form.Item
                       className={styles.prompt}
-                      label="Tiêu đề Phần thi"
+                      label="Nội dung Phần thi"
                       name={[field.name, 'part_prompt']}
                     >
-                      <Input.TextArea placeholder="Tiêu đề Phần thi" />
+                      <Input.TextArea placeholder="Nội dung Phần thi" />
                     </Form.Item>
 
                     {uploadedFileNames[`part_${index + 1}_audio`] && (
@@ -533,14 +563,14 @@ const CreateTest = () => {
 
                               <Form.Item
                                 className={styles.prompt}
-                                label="Tiêu đề Nhóm câu hỏi"
+                                label="Nội dung Nhóm câu hỏi"
                                 name={[
                                   subField.name,
                                   'question_groups_info',
                                   'question_groups_prompt',
                                 ]}
                               >
-                                <Input.TextArea placeholder="Tiêu đề Nhóm câu hỏi..." />
+                                <Input.TextArea placeholder="Nội dung Nhóm câu hỏi..." />
                               </Form.Item>
 
                               {uploadedFileNames[

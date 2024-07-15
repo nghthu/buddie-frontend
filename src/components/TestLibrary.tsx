@@ -105,6 +105,10 @@ export default function TestLibrary(props: {
       scrollRef.current?.style.setProperty('overflow-y', 'scroll');
     }
   }, [isLoading]);
+  
+  const refreshTests = () => {  
+    router.refresh();
+  }
 
   // const handleLoad = () => {
   //   setTotalPage((prev) => prev + 1);
@@ -139,6 +143,7 @@ export default function TestLibrary(props: {
   //     console.log([e.target.value]);
   //     setSearchValue([e.target.value]);
   // }
+
   if ((isLoading && filteredTests.length === 0) || props.pageLoading) {
     return <Spin size="default" />;
   }
@@ -159,6 +164,7 @@ export default function TestLibrary(props: {
         isUserTest={true}
         user={test.user}
         review={test.review}
+        refreshParent={refreshTests}
       />
     );
   });

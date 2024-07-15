@@ -23,6 +23,7 @@ export default function TestCard(props: {
   testSkill?: string;
   testId: string;
   partIds: string[];
+  refreshParent?: () => void;
 }) {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -57,8 +58,21 @@ export default function TestCard(props: {
     console.log(value);
   };
 
-  const handleDelete = () => {
-    // You need to define this function
+  const handleDelete = async () => {
+    const user = auth.currentUser;
+    const token = await user?.getIdToken();
+
+    const response = await fetch(`/api/tests/${props.testId}`, {
+      method: 'DELETE',
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    })
+
+    const result = await response.json();
+    console.log(result);
+
+    props.refreshParent?.();
   };
 
   const skill = props.testSkill?.split('_')[1];

@@ -70,6 +70,8 @@ const Header = (props: Props) => {
       setActiveTab('community');
     } else if (pathname.includes('/ielts')) {
       setActiveTab('ielts');
+    } else {
+      setActiveTab('');
     }
   }, [pathname]);
 
