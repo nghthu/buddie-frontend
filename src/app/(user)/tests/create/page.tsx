@@ -15,6 +15,7 @@ import {
 import { Form, Input, Select } from 'antd';
 import { useRouter } from 'next/navigation';
 import { auth } from '@/lib';
+import { mutate } from 'swr';
 
 const { Option } = Select;
 
@@ -147,6 +148,7 @@ const CreateTest = () => {
       setCurrentTab('2');
     } else {
       callCreateTestAPI();
+      mutate(`/api/tests?page=1&search=''&limit=10&isbuddie=false`);
       router.push('/tests');
     }
   };
@@ -344,13 +346,23 @@ const CreateTest = () => {
             <Form.Item
               name="test_type"
               label="Loại bài thi"
-              rules={[{ required: true, message: 'Vui lòng chọn loại bài thi!' }]}
+              rules={[
+                { required: true, message: 'Vui lòng chọn loại bài thi!' },
+              ]}
             >
               <Select>
-                <Select.Option value="ielts_reading">IELTS Reading</Select.Option>
-                <Select.Option value="ielts_listening">IELTS Listening</Select.Option>
-                <Select.Option value="ielts_speaking">IELTS Speaking</Select.Option>
-                <Select.Option value="ielts_writing">IELTS Writing</Select.Option>
+                <Select.Option value="ielts_reading">
+                  IELTS Reading
+                </Select.Option>
+                <Select.Option value="ielts_listening">
+                  IELTS Listening
+                </Select.Option>
+                <Select.Option value="ielts_speaking">
+                  IELTS Speaking
+                </Select.Option>
+                <Select.Option value="ielts_writing">
+                  IELTS Writing
+                </Select.Option>
               </Select>
             </Form.Item>
           ) : (
