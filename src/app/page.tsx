@@ -36,8 +36,9 @@ export default function Home() {
             thống và sự hỗ trợ mạnh mẽ của AI
           </p>
         </div>
-
-        <button className={styles['try-now-btn']}>Thử ngay nào!</button>
+        <Link href="/login">
+          <button className={styles['try-now-btn']}>Thử ngay nào!</button>
+        </Link>
 
         <div className={styles.featureList}>
           <p>

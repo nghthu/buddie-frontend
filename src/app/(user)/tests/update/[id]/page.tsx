@@ -13,7 +13,7 @@ import {
   SoundOutlined,
 } from '@ant-design/icons';
 import { Form, Input, Select } from 'antd';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import { auth } from '@/lib';
 
 const { Option } = Select;
@@ -26,10 +26,30 @@ const UpdateTest = (
 
   const fileInputRefPart = useRef<HTMLInputElement>(null);
   const audioFileInputRefPart = useRef<HTMLInputElement>(null);
+  const [partSelectedFile, setPartSelectedFile] = useState<Array<File | null>>([
+    null,
+  ]);
+  const [partSelectedAudioFile, setPartSelectedAudioFile] = useState<
+    Array<File | null>
+  >([null]);
+
   const fileInputRefQuestionGroup = useRef<HTMLInputElement>(null);
   const audioFileInputRefQuestionGroup = useRef<HTMLInputElement>(null);
+  const [questionGroupSelectedFile, setQuestionGroupSelectedFile] = useState<
+    Array<File | null>
+  >([null]);
+  const [questionGroupSelectedAudioFile, setQuestionGroupSelectedAudioFile] =
+    useState<Array<File | null>>([null]);
+
   const fileInputRefQuestion = useRef<HTMLInputElement>(null);
   const audioFileInputRefQuestion = useRef<HTMLInputElement>(null);
+  const [questionSelectedFile, setQuestionSelectedFile] = useState<
+    Array<File | null>
+  >([null]);
+  const [questionSelectedAudioFile, setQuestionSelectedAudioFile] = useState<
+    Array<File | null>
+  >([null]);
+
   const [uploadedFileNames, setUploadedFileNames] = useState<{
     [key: string]: string | null;
   }>({});
@@ -68,16 +88,56 @@ const UpdateTest = (
 
   const callUpdateTestAPI = async () => {
     const token = await user?.getIdToken();
-    console.log(token);
-    console.log(form.getFieldsValue());
 
-    const response = await fetch(`/api/tests/update?testId=${params.id}`, {
+    const formData = new FormData();
+    formData.append('test', JSON.stringify(form.getFieldsValue()));
+
+    if (form.getFieldValue('test_recording')) {
+      formData.append('test_recording', form.getFieldValue('test_recording'));
+    }
+
+    partSelectedFile.forEach((file) => {
+      if (file) {
+        formData.append(`part_images`, file);
+      }
+    });
+
+    partSelectedAudioFile.forEach((file) => {
+      if (file) {
+        formData.append(`part_recording`, file);
+      }
+    });
+
+    questionGroupSelectedFile.forEach((file) => {
+      if (file) {
+        formData.append(`question_group_images`, file);
+      }
+    });
+
+    questionGroupSelectedAudioFile.forEach((file) => {
+      if (file) {
+        formData.append(`question_group_recording`, file);
+      }
+    });
+
+    questionSelectedFile.forEach((file) => {
+      if (file) {
+        formData.append(`question_images`, file);
+      }
+    });
+
+    questionSelectedAudioFile.forEach((file) => {
+      if (file) {
+        formData.append(`question_recording`, file);
+      }
+    });
+
+    const response = await fetch(`/api/tests/${params.id}`, {
       method: 'PUT',
       headers: {
-        'Content-Type': 'application/json',
         Authorization: `Bearer ${token}`,
       },
-      body: JSON.stringify(form.getFieldsValue()),
+      body: formData,
     });
 
     if (!response.ok) {
@@ -98,6 +158,7 @@ const UpdateTest = (
     } else {
       await form.validateFields();
       callUpdateTestAPI();
+      router.back();
     }
   };
 
@@ -105,7 +166,7 @@ const UpdateTest = (
     if (currentTab === '2') {
       setCurrentTab('1');
     } else {
-      router.push('/tests');
+      router.back();
     }
   };
 
@@ -388,39 +449,6 @@ const UpdateTest = (
         <Form
           form={form}
           layout="vertical"
-          initialValues={{
-            parts: [
-              {
-                part_number: 1,
-                part_duration: null,
-                part_recording: null,
-                part_prompt: '',
-                part_image_urls: null,
-                question_groups: [
-                  {
-                    is_single_question: true,
-                    question_groups_info: {
-                      question_groups_duration: null,
-                      question_groups_prompt: '',
-                      question_groups_recording: null,
-                      question_groups_image_urls: null,
-                    },
-                    questions: [
-                      {
-                        question_number: 1,
-                        question_type: '',
-                        question_prompt: '',
-                        question_image_urls: null,
-                        question_duration: null,
-                        question_preparation_time: null,
-                        question_recording: null,
-                      },
-                    ],
-                  },
-                ],
-              },
-            ],
-          }}
         >
           <Form.List name="parts">
             {(fields, { add, remove }) => (
