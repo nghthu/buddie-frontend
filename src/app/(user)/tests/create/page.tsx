@@ -22,6 +22,7 @@ const { Option } = Select;
 const CreateTest = () => {
   const [currentTab, setCurrentTab] = useState('1');
   const [form] = Form.useForm();
+  const [loading, setLoading] = useState(false);
 
   const fileInputRefPart = useRef<HTMLInputElement>(null);
   const audioFileInputRefPart = useRef<HTMLInputElement>(null);
@@ -133,7 +134,11 @@ const CreateTest = () => {
 
     const result = await response.json();
     console.log(result);
-    return result;
+    mutate(`/api/tests?page=1&search=''&limit=10&isbuddie=false`);
+    setTimeout(() => {
+      setLoading(false);
+      router.push('/tests');
+    }, 5000);
   };
 
   const handleOk = async () => {
@@ -147,9 +152,8 @@ const CreateTest = () => {
       form.setFieldsValue({ tags: values.tags ? values.tags.split(' ') : [] });
       setCurrentTab('2');
     } else {
+      setLoading(true);
       callCreateTestAPI();
-      mutate(`/api/tests?page=1&search=''&limit=10&isbuddie=false`);
-      router.push('/tests');
     }
   };
 
@@ -1325,7 +1329,10 @@ const CreateTest = () => {
         >
           {currentTab === '1' ? 'Hủy' : 'Quay lại'}
         </Button>
-        <Button onClick={handleOk}>
+        <Button
+          onClick={handleOk}
+          loading={loading}
+        >
           {currentTab === '1' ? 'Tiếp theo' : 'Tạo bài thi'}
         </Button>
       </div>

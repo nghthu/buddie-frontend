@@ -79,10 +79,10 @@ const Header = (props: Props) => {
     <>
       {contextHolder}
       <div className={styles.header}>
-        <Link href="/home">
+        <Link href="/ielts">
           <div
             className={styles.logo}
-            onClick={() => tabClickHandler('home')}
+            onClick={() => tabClickHandler('ielts')}
           >
             <Image
               height={60}
@@ -97,14 +97,14 @@ const Header = (props: Props) => {
           </div>
         </Link>
         <div className={clsx(styles.navigator)}>
-          <Link
+          {/* <Link
             href="/home"
             onClick={() => tabClickHandler('home')}
           >
             <p className={clsx(activatedTab === 'home' && styles.activate)}>
               Trang chủ
             </p>
-          </Link>
+          </Link> */}
           <Link
             href="/tests"
             onClick={() => tabClickHandler('exams')}

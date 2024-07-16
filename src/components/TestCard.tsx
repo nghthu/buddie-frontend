@@ -6,6 +6,9 @@ import { SetStateAction, useState, useEffect } from 'react';
 
 import Link from 'next/link';
 import { auth } from '@/lib';
+import { mutate } from 'swr';
+import { useRouter } from 'next/navigation';
+
 interface user {
   user_id: string;
   display_name: string;
@@ -26,7 +29,7 @@ export default function TestCard(props: {
   refreshParent?: () => void;
 }) {
   const [isModalOpen, setIsModalOpen] = useState(false);
-
+  const router = useRouter();
   const [isAdmin, setIsAdmin] = useState(false);
 
   useEffect(() => {
@@ -67,12 +70,14 @@ export default function TestCard(props: {
       headers: {
         Authorization: `Bearer ${token}`,
       },
-    })
+    });
 
     const result = await response.json();
     console.log(result);
 
     props.refreshParent?.();
+    mutate(`/api/tests?page=1&search=''&limit=10&isbuddie=false`);
+    router.push('/tests');
   };
 
   const skill = props.testSkill?.split('_')[1];
