@@ -102,6 +102,7 @@ const ListeningPractice = ({
   }, [data, testData, params.part]);
 
   const answerChangehandler = (questionId: string, userAnswer: string) => {
+    console.log('logcheck2', userAnswer);
     let answerFound = false;
 
     const updatedAnswers = answers.map((answer) => {
@@ -121,9 +122,11 @@ const ListeningPractice = ({
     setAnswers(updatedAnswers);
   };
 
-  const findAnswerById = (id: string) => {
-    const answer = answers.find((answer) => answer._id === id);
-    return answer ? answer.answer_result.user_answer : '';
+  const findAnswerById = (question: QuestionInfo) => {
+    const answer = answers.find((answer) => answer._id === question._id);
+    return answer
+      ? question.options.indexOf(answer.answer_result.user_answer) + 1
+      : '';
   };
 
   const submitHandler = async () => {
@@ -205,10 +208,12 @@ const ListeningPractice = ({
       >
         {testData?.map((group: QuestionGroup, index: number) => (
           <div key={index}>
-            <h3 className={styles['question-prompt']}>
-              {group.question_groups_info.question_groups_prompt}
-            </h3>
-            {group.question_groups_info.question_groups_image_urls?.map(
+            {group?.question_groups_info?.question_groups_prompt && (
+              <h3 className={styles['question-prompt']}>
+                {group.question_groups_info.question_groups_prompt}
+              </h3>
+            )}
+            {group.question_groups_info?.question_groups_image_urls?.map(
               (imageUrl, imageIndex) => (
                 <img
                   className={styles.images}
@@ -241,9 +246,12 @@ const ListeningPractice = ({
                 ) : (
                   <Radio.Group
                     className={styles.answers}
-                    value={findAnswerById(question._id)}
+                    value={findAnswerById(question)}
                     onChange={(e) =>
-                      answerChangehandler(question._id, e.target.value)
+                      answerChangehandler(
+                        question._id,
+                        question.options[Number(e.target.value) - 1]
+                      )
                     }
                   >
                     {question.options.map((option, optionIndex) => (

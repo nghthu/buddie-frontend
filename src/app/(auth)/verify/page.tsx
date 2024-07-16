@@ -13,6 +13,7 @@ import styles from '@/styles/pages/Verify.module.scss';
 import { auth } from '@/lib/firebase';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
+import { getIdToken } from 'firebase/auth';
 
 const Verify = () => {
   const [user] = useAuthState(auth);
@@ -48,6 +49,7 @@ const Verify = () => {
         description: 'Email chưa được xác minh',
       });
     } else if (user?.emailVerified) {
+      await getIdToken(user, true);
       setVerified(true);
     }
   };
