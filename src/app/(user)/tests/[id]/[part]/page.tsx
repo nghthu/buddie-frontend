@@ -125,9 +125,11 @@ const UserTestPractice = ({
     setAnswers(updatedAnswers);
   };
 
-  const findAnswerById = (id: string) => {
-    const answer = answers.find((answer) => answer._id === id);
-    return answer ? answer.answer_result.user_answer : '';
+  const findAnswerById = (question: QuestionInfo) => {
+    const answer = answers.find((answer) => answer._id === question._id);
+    return answer
+      ? question.options.indexOf(answer.answer_result.user_answer) + 1
+      : '';
   };
 
   const submitHandler = async () => {
@@ -263,9 +265,12 @@ const UserTestPractice = ({
                 ) : (
                   <Radio.Group
                     className={styles.answers}
-                    value={findAnswerById(question._id)}
+                    value={findAnswerById(question)}
                     onChange={(e) =>
-                      answerChangehandler(question._id, e.target.value)
+                      answerChangehandler(
+                        question._id,
+                        question.options[Number(e.target.value) - 1]
+                      )
                     }
                   >
                     {question.options.map((option, optionIndex) => (

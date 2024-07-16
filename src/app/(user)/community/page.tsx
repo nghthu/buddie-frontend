@@ -54,7 +54,7 @@ const fetcher = async ({ url, user }: FetchArgs) => {
 
   return response.data;
 };
-const LIMIT = 6;
+const LIMIT = 20;
 const { Search } = Input;
 const Community = () => {
   const [openCreatePost, setOpenCreatePost] = useState(false);
