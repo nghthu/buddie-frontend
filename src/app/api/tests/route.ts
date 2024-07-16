@@ -15,11 +15,11 @@ export async function GET(request: NextRequest) {
     queryString += `&test_type=${test_type}`;
   }
   if (search) {
-    const encodedSearch = encodeURIComponent(search);
-    queryString += `&keyword=${encodedSearch}`;
+    // const encodedSearch = encodeURIComponent(search);
+    queryString += `&keyword=${search}`;
   }
   //const queryString = `${process.env.API_BASE_URL}/api/v1/tests/661b5d4b0d4e11e6b2817f1b`;
-  //console.log(queryString);
+  console.log(queryString);
 
   try {
     const response = await fetch(queryString, {
@@ -184,7 +184,11 @@ export const POST = async function createTest(req: Request) {
 
               const questionGroup =
                 test.parts[partIndex].question_groups[questionGroupIndex];
-              if (!Array.isArray(questionGroup.question_groups_info.question_groups_image_urls)) {
+              if (
+                !Array.isArray(
+                  questionGroup.question_groups_info.question_groups_image_urls
+                )
+              ) {
                 questionGroup.question_groups_info.question_groups_image_urls =
                   [];
               }
