@@ -35,13 +35,12 @@ const SignupForm = () => {
   const [signInWithEmailAndPassword, , signInLoading, signInError] =
     useSignInWithEmailAndPassword(auth);
   const [sendEmailVerification] = useSendEmailVerification(auth);
-  const [updateClaimsError, setUpdateClaimsError] = useState<Error | null>(
-    null
-  );
+  const [updatePostSignupError, setUpdatePostSignupError] =
+    useState<Error | null>(null);
   const [logout, logoutLoading] = useSignOut(auth);
   const router = useRouter();
 
-  const errors = [createError, updateError, signInError, updateClaimsError];
+  const errors = [createError, updateError, signInError, updatePostSignupError];
   const existingError = errors.some((error) => {
     if (
       !error ||
@@ -67,7 +66,7 @@ const SignupForm = () => {
 
       const token = await createdUser?.user.getIdToken();
 
-      const updateClaimsResult = (await fetch('/api/users/claims', {
+      const updatePostSignupResult = (await fetch('/api/users/post-signup', {
         method: 'POST',
         headers: {
           authorization: `Bearer ${token}`,
@@ -77,22 +76,22 @@ const SignupForm = () => {
           return await res.json();
         })
         .catch((err) => {
-          setUpdateClaimsError(err);
+          setUpdatePostSignupError(err);
         })) as ResponseData<UserCustomClaims> | undefined;
 
-      if (!updateClaimsResult) {
+      if (!updatePostSignupResult) {
         return false;
       }
 
-      if (updateClaimsResult.status === ResponseStatus.ERROR) {
-        setUpdateClaimsError(new Error('Ối, đã có lỗi xảy ra!'));
+      if (updatePostSignupResult.status === ResponseStatus.ERROR) {
+        setUpdatePostSignupError(new Error('Ối, đã có lỗi xảy ra!'));
         return false;
       }
 
-      setUpdateClaimsError(null);
+      setUpdatePostSignupError(null);
       return true;
     },
-    [updateProfile, setUpdateClaimsError, createdUser?.user]
+    [updateProfile, setUpdatePostSignupError, createdUser?.user]
   );
 
   useEffect(() => {
@@ -101,7 +100,7 @@ const SignupForm = () => {
         form.getFieldsValue() as Required<SignupProps>;
 
       updateUserProfile(fullName).then(async (updateResult: boolean) => {
-        if (!updateError && !updateClaimsError && updateResult) {
+        if (!updateError && !updatePostSignupError && updateResult) {
           await sendEmailVerification();
         } else {
           await logout();
@@ -115,7 +114,7 @@ const SignupForm = () => {
     form,
     signInWithEmailAndPassword,
     router,
-    updateClaimsError,
+    updatePostSignupError,
     updateError,
     logout,
   ]);
