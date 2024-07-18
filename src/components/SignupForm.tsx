@@ -67,7 +67,7 @@ const SignupForm = () => {
 
       const token = await createdUser?.user.getIdToken();
 
-      const updateClaimsResult = (await fetch('/api/user/claims', {
+      const updateClaimsResult = (await fetch('/api/users/claims', {
         method: 'POST',
         headers: {
           authorization: `Bearer ${token}`,
