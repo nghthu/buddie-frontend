@@ -609,6 +609,14 @@ const PracticeSpeaking = ({
               !chatVisible ? styles['full-width'] : ''
             )}
           >
+            {currentQuestion > 0 && (
+              <Checkbox
+                onChange={setSubmitHandler}
+                className={styles['set-submit']}
+              >
+                Nộp câu này
+              </Checkbox>
+            )}
             <div
               className={styles.question}
               onClick={hideMenu}
@@ -623,14 +631,6 @@ const PracticeSpeaking = ({
               >
                 {testData?.questions[currentQuestion]?.question_prompt}
               </div>
-              {currentQuestion > 0 && (
-                <Checkbox
-                  onChange={setSubmitHandler}
-                  className={styles['set-submit']}
-                >
-                  Nộp câu này
-                </Checkbox>
-              )}
             </div>
             <Button
               className={styles['audio-btn']}

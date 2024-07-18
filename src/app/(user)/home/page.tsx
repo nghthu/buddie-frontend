@@ -1,3 +1,5 @@
+'use client';
+
 import styles from '@/styles/pages/home/Home.module.scss';
 import {
   RightOutlined,
@@ -7,9 +9,30 @@ import {
   EditFilled,
 } from '@ant-design/icons';
 import { Button } from 'antd';
+import clsx from 'clsx';
 import Link from 'next/link';
+import { defaults } from 'chart.js/auto';
+import { Bar, Doughnut, Line } from 'react-chartjs-2';
+import type { DatePickerProps } from 'antd';
+import { DatePicker } from 'antd';
+
+defaults.maintainAspectRatio = false;
+defaults.responsive = true;
+
+defaults.plugins.title.display = true;
+defaults.plugins.title.align = 'start';
+// defaults.plugins.title.font.size = 20;
+defaults.plugins.title.color = 'black';
+
+import revenueData from './revenueData.json';
+import sourceData from './sourceData.json';
+import Footer from '@/components/Footer';
 
 const Home = () => {
+  const dateChangeHandler: DatePickerProps['onChange'] = (date, dateString) => {
+    console.log(date, dateString);
+  };
+
   return (
     <div className={styles.container}>
       <div className={styles.ieltsContainer}>
@@ -130,6 +153,106 @@ const Home = () => {
           </div>
         </div>
       </div>
+
+      <div className={styles.statistic}>
+        <DatePicker
+          onChange={dateChangeHandler}
+          picker="month"
+          className={styles.datePicker}
+        />
+        <div className={clsx(styles.dataCard, styles.timeSpendCard)}>
+          <Line
+            data={{
+              labels: revenueData.map((data) => data.label),
+              datasets: [
+                {
+                  label: 'Thời gian làm bài',
+                  data: revenueData.map((data) => data.revenue),
+                  backgroundColor: '#064FF0',
+                  borderColor: '#064FF0',
+                },
+                {
+                  label: 'Số bài thi',
+                  data: revenueData.map((data) => data.cost),
+                  backgroundColor: '#FF3030',
+                  borderColor: '#FF3030',
+                },
+              ],
+            }}
+            options={{
+              elements: {
+                line: {
+                  tension: 0.3,
+                },
+              },
+              plugins: {
+                title: {
+                  text: 'Thời gian làm bài và số bài thi',
+                },
+              },
+            }}
+          />
+        </div>
+
+        <div className={clsx(styles.dataCard, styles.skillTimeCard)}>
+          <Doughnut
+            data={{
+              labels: sourceData.map((data) => data.label),
+              datasets: [
+                {
+                  label: 'Phần trăm',
+                  data: sourceData.map((data) => data.value),
+                  backgroundColor: [
+                    'rgba(43, 63, 229, 0.8)',
+                    'rgba(250, 192, 19, 0.8)',
+                    'rgba(253, 135, 135, 0.8)',
+                  ],
+                  borderColor: [
+                    'rgba(43, 63, 229, 0.8)',
+                    'rgba(250, 192, 19, 0.8)',
+                    'rgba(253, 135, 135, 0.8)',
+                  ],
+                },
+              ],
+            }}
+            options={{
+              plugins: {
+                title: {
+                  text: 'Tỉ lệ làm bài theo kỹ năng',
+                },
+              },
+            }}
+          />
+        </div>
+
+        <div className={clsx(styles.dataCard, styles.buddieSupportCard)}>
+          <Bar
+            data={{
+              labels: sourceData.map((data) => data.label),
+              datasets: [
+                {
+                  label: 'Số lượng',
+                  data: sourceData.map((data) => data.value),
+                  backgroundColor: [
+                    'rgba(43, 63, 229, 0.8)',
+                    'rgba(250, 192, 19, 0.8)',
+                    'rgba(253, 135, 135, 0.8)',
+                  ],
+                  borderRadius: 5,
+                },
+              ],
+            }}
+            options={{
+              plugins: {
+                title: {
+                  text: 'Buddie Support đã sử dụng',
+                },
+              },
+            }}
+          />
+        </div>
+      </div>
+      <Footer />
     </div>
   );
 };

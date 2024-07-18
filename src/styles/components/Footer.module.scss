@@ -1,0 +1,52 @@
+.container {
+  width: 110vw;
+  height: 250px;
+  background-color: #09544f;
+  margin-bottom: -100px;
+  padding: 20px 50px;
+  color: white;
+  font-weight: 300;
+}
+
+.info {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10%;
+}
+
+.logo {
+  display: flex;
+  width: 30%;
+  flex-direction: column;
+  gap: 15px;
+  border-right: 1px solid white;
+  & img {
+    width: 60px;
+    height: 60px;
+  }
+  & h3 {
+    color: #14c7bb;
+    font-size: 25px;
+  }
+  & p {
+    font-size: 14px;
+    &:first-of-type {
+      margin-top: -7px;
+    }
+  }
+}
+
+.contact {
+  & a {
+    color: white;
+  }
+}
+
+.copyright {
+  display: block;
+  width: fit-content;
+  font-size: 13px;
+  margin: auto;
+  margin-top: 50px;
+}

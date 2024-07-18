@@ -168,3 +168,44 @@
     color: #675980;
   }
 }
+
+.statistic {
+  height: 950px;
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  align-content: center;
+  border-radius: 15px;
+  gap: 2vw;
+  flex-wrap: wrap;
+  background-color: #f5f6fa;
+}
+
+.datePicker {
+  box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px;
+  margin-top: 20px;
+}
+
+.dataCard {
+  background-color: #faf7f7;
+  border-radius: 0.5em;
+  box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px;
+  padding: 1em;
+}
+
+.timeSpendCard {
+  width: 92%;
+  height: 45rem;
+}
+
+.buddieSupportCard {
+  width: 50%;
+  height: 35rem;
+}
+
+.skillTimeCard {
+  width: 40%;
+  height: 35rem;
+}

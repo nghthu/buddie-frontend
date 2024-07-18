@@ -97,14 +97,14 @@ const Header = (props: Props) => {
           </div>
         </Link>
         <div className={clsx(styles.navigator)}>
-          {/* <Link
+          <Link
             href="/home"
             onClick={() => tabClickHandler('home')}
           >
             <p className={clsx(activatedTab === 'home' && styles.activate)}>
-              Trang chủ
+              Buddie đồng hành
             </p>
-          </Link> */}
+          </Link>
           <Link
             href="/tests"
             onClick={() => tabClickHandler('exams')}
