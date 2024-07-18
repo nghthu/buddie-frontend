@@ -10,7 +10,7 @@ export interface UserCustomClaims {
 export const POST = async function setCustomClaims(req: Request) {
   try {
     const response = await fetch(
-      `${process.env.API_BASE_URL}/api/v1/user/claims`,
+      `${process.env.API_BASE_URL}/api/v1/users/claims`,
       {
         method: 'POST',
         headers: req.headers,
