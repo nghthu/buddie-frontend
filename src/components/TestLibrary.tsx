@@ -33,6 +33,7 @@ interface test {
   tags: string[];
   test_recording?: string;
   parts?: { _id: string }[];
+  submission_count: number;
 }
 const fetcher = async ({ url, user }: FetchArgs) => {
   const token = await user?.getIdToken();
@@ -105,10 +106,10 @@ export default function TestLibrary(props: {
       scrollRef.current?.style.setProperty('overflow-y', 'scroll');
     }
   }, [isLoading]);
-  
-  const refreshTests = () => {  
+
+  const refreshTests = () => {
     router.refresh();
-  }
+  };
 
   // const handleLoad = () => {
   //   setTotalPage((prev) => prev + 1);
@@ -153,6 +154,7 @@ export default function TestLibrary(props: {
       : [];
     return (
       <TestCard
+        submissionCount={test.submission_count}
         setPageLoading={props.setPageLoading}
         key={test._id}
         testName={test.test_name}

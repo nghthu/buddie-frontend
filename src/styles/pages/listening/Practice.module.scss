@@ -34,3 +34,10 @@
 .images {
   width: 70%;
 }
+
+.test-info {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  padding: 0 40px;
+}

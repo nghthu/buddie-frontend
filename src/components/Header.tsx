@@ -62,7 +62,7 @@ const Header = (props: Props) => {
   }
 
   useEffect(() => {
-    if (pathname.includes('/home')) {
+    if (pathname.includes('/statistic')) {
       setActiveTab('home');
     } else if (pathname.includes('/tests')) {
       setActiveTab('exams');
@@ -98,7 +98,7 @@ const Header = (props: Props) => {
         </Link>
         <div className={clsx(styles.navigator)}>
           <Link
-            href="/home"
+            href="/statistic"
             onClick={() => tabClickHandler('home')}
           >
             <p className={clsx(activatedTab === 'home' && styles.activate)}>

@@ -18,7 +18,7 @@ const Footer = () => {
             <p>Học tiếng anh cùng AI</p>
           </div>
           <div>
-            <p>Trường đại học Khoa học Tự nhiên</p>
+            <p>Trường Đại học Khoa học Tự nhiên</p>
             <p>Khoa Công nghệ Thông tin</p>
             <p>227 Nguyễn Văn Cừ, Quận 5, Hồ Chí Minh</p>
           </div>

@@ -10,6 +10,9 @@ import useSWR from 'swr';
 import { auth } from '@/lib';
 import { User } from 'firebase/auth';
 import { DoubleLeftOutlined, DoubleRightOutlined } from '@ant-design/icons';
+import { Statistic } from 'antd';
+
+const { Countdown } = Statistic;
 
 interface Part {
   part_duration: number;
@@ -79,6 +82,7 @@ const ListeningPractice = ({
   const [answers, setAnswers] = useState<Answer[]>([]);
   const [currentPart, setCurrentPart] = useState(0);
   const [loading, setLoading] = useState(false);
+  const [remainingTime, setRemainingTime] = useState<number>(Date.now());
   const router = useRouter();
   const user = auth.currentUser;
 
@@ -90,8 +94,11 @@ const ListeningPractice = ({
   );
   finalPart = data?.parts.length - 1;
 
+  console.log(data);
+
   useEffect(() => {
     if (data && testData === null) {
+      setRemainingTime(Date.now() + data.duration * 1000);
       if (params.part !== 'all') {
         setTestData(data.parts[Number(params.part) - 1].question_groups);
       } else {
@@ -128,11 +135,16 @@ const ListeningPractice = ({
       ? question.options.indexOf(answer.answer_result.user_answer) + 1
       : '';
   };
+  console.log('remaining outside', remainingTime);
 
   const submitHandler = async () => {
     setLoading(true);
+    console.log('remaining', remainingTime);
     const structuredAnswers = {
       test_id: data._id,
+      time_spent: Math.round(
+        data.duration - (remainingTime - Date.now()) / 1000
+      ),
       parts: data.parts.map((part: Part, index: number) => ({
         part_number: index + 1,
         _id: part._id,
@@ -200,8 +212,13 @@ const ListeningPractice = ({
 
   return (
     <>
-      <AudioPlayer audioUrl={data?.test_recording} />
-
+      <div className={styles['test-info']}>
+        <AudioPlayer audioUrl={data?.test_recording} />
+        <Countdown
+          title="Thời gian còn lại"
+          value={remainingTime}
+        />
+      </div>
       <TextCard
         width="100%"
         height="auto"
