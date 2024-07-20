@@ -3,62 +3,57 @@
 import styles from '@/styles/components/CountdownClock.module.scss';
 import { useEffect, useState } from 'react';
 
-interface Props {
-  countdownTime?: string;
-  onStop?: boolean;
-  setUsedTime: (usedTime: number) => void;
-}
-
-const CountdownClock = ({ countdownTime, onStop, setUsedTime }: Props) => {
+const CountdownClock = (props: { countdownTime?: string }) => {
   const [time, setTime] = useState<string | null>(null);
 
   useEffect(() => {
-    if (!countdownTime) {
+    if (!props.countdownTime) {
       setTime('unlimited');
-    } else {
-      setTime(countdownTime);
-    }
-  }, [countdownTime]);
+    } else setTime(props.countdownTime);
 
-  useEffect(() => {
     if (time === 'unlimited') {
       return;
     }
+  }, []);
 
+  useEffect(() => {
     const interval = setInterval(() => {
       setTime((prevTime: string | null) => {
-        if (onStop && prevTime !== null) {
-          const [minutes, seconds] = prevTime.split(':').map(Number);
-          const remainingSeconds = minutes * 60 + seconds;
-          console.log('logcheck', remainingSeconds);
-          setUsedTime(remainingSeconds);
+        if (prevTime === null) {
+          return null;
         }
 
-        if (prevTime === null || prevTime === '00:00') {
+        const [minutes, seconds] = prevTime
+          .split(':')
+          .map((times) => parseInt(times));
+        if (minutes === 0 && seconds === 0) {
           clearInterval(interval);
-          if (onStop && prevTime !== null) {
-            const [minutes, seconds] = prevTime.split(':').map(Number);
-            const remainingSeconds = minutes * 60 + seconds;
-            console.log('logcheck', remainingSeconds);
-            setUsedTime(remainingSeconds);
-          }
           return '00:00';
-        }
-
-        const [minutes, seconds] = prevTime.split(':').map(Number);
-        if (seconds === 0 && minutes > 0) {
-          return `${minutes - 1}:59`;
-        } else if (seconds > 0) {
-          return `${minutes}:${seconds - 1}`;
         } else {
-          return '00:00';
+          if (seconds - 1 < 0) {
+            if (minutes - 1 < 10) {
+              return `0${minutes - 1}:59`;
+            } else {
+              return `${minutes - 1}:59`;
+            }
+          } else {
+            if (minutes < 10 && seconds - 1 >= 10) {
+              return `0${minutes}:${seconds - 1}`;
+            } else if (minutes < 10 && seconds - 1 < 10) {
+              return `0${minutes}:0${seconds - 1}`;
+            } else if (minutes >= 10 && seconds - 1 >= 10) {
+              return `${minutes}:${seconds - 1}`;
+            } else if (minutes >= 10 && seconds - 1 < 10) {
+              return `${minutes}:0${seconds - 1}`;
+            } else {
+              return '00:00';
+            }
+          }
         }
       });
     }, 1000);
-
     return () => clearInterval(interval);
-  }, [time, onStop]);
-
+  }, [time, props.countdownTime]);
   return (
     <>
       {time !== 'unlimited' && (
