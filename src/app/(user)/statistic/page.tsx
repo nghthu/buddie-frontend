@@ -140,7 +140,7 @@ const transformObjectToArray = (data: GeneralReport, type: number = 1) => {
 
   timeSpentKeys.forEach((key) => {
     if (typeof time_spent[key] === 'number') {
-      sum += time_spent[key];
+      sum += time_spent[key] as number;
     }
   });
 
