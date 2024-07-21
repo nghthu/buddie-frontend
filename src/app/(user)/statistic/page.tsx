@@ -42,14 +42,15 @@ interface SkillEntry {
 }
 
 interface GeneralReport {
-  _id: string;
   user_id: string;
+  month: number;
+  year: number;
   time_spent: {
     speaking: number;
     reading: number;
     listening: number;
     writing: number;
-    _id: string;
+    custom: number;
   };
   standard_request_count: {
     translate: number;
@@ -59,12 +60,15 @@ interface GeneralReport {
     synonyms: number;
     paraphrase_reading: number;
     generate_heading: number;
-    _id: string;
   };
   pro_request_count: {
     assess_speaking: number;
-    _id: string;
   };
+  time_spent_per_day: {
+    label: string;
+    time_spent: number;
+    submission_count: number;
+  }[];
   created_at: string;
   updated_at: string;
 }
@@ -199,14 +203,10 @@ const Home = () => {
     if (data) {
       console.log('data changed', data);
       setTimeSpentData(
-        createDailyData(
-          data.per_day_report.time_spent_per_day,
-          data.per_day_report.month,
-          data.per_day_report.year
-        )
+        createDailyData(data.time_spent_per_day, data.month, data.year)
       );
-      setSkillData(transformObjectToArray(data.general_report, 2));
-      setSupportData(transformObjectToArray(data.general_report, 1));
+      setSkillData(transformObjectToArray(data, 2));
+      setSupportData(transformObjectToArray(data, 1));
     }
   }, [data, setTimeSpentData]);
 
@@ -216,6 +216,22 @@ const Home = () => {
       `/api/users/${user?.uid}/reports?month=${date.month() + 1}&year=${date.year()}`
     );
   };
+
+  const formatTime = (totalSeconds: number): string => {
+    const minutes = Math.floor(totalSeconds / 60);
+    const seconds = totalSeconds % 60;
+
+    const formattedMinutes =
+      minutes < 10 ? String(minutes) : String(minutes).padStart(2, '0');
+    const formattedSeconds = String(seconds).padStart(2, '0');
+
+    return `${formattedMinutes}p${formattedSeconds}s`;
+  };
+
+  const totalSpentTime =
+    timeSpentData?.reduce((total, data) => total + data.time_spent, 0) ?? 0;
+
+  if (isLoading) return <Spin size="large" />;
 
   return (
     <div className={styles.container}>
@@ -235,7 +251,7 @@ const Home = () => {
         </div>
 
         <div className={styles.skillContainer}>
-          <Link href={'/ielts/listening'}>
+          <Link href={'/ielts'}>
             <div className={styles.skill}>
               <div className={styles.icon}>
                 <SoundFilled />
@@ -244,7 +260,7 @@ const Home = () => {
               <RightOutlined className={styles.arrow} />
             </div>
           </Link>
-          <Link href={'/ielts/reading'}>
+          <Link href={'/ielts'}>
             <div className={styles.skill}>
               <div className={styles.icon}>
                 <ReadFilled />
@@ -253,7 +269,7 @@ const Home = () => {
               <RightOutlined className={styles.arrow} />
             </div>
           </Link>
-          <Link href={'/ielts/speaking'}>
+          <Link href={'/ielts'}>
             <div className={styles.skill}>
               <div className={styles.icon}>
                 <AudioFilled />
@@ -262,7 +278,7 @@ const Home = () => {
               <RightOutlined className={styles.arrow} />
             </div>
           </Link>
-          <Link href={'/ielts/writing'}>
+          <Link href={'/ielts'}>
             <div className={styles.skill}>
               <div className={styles.icon}>
                 <EditFilled />
@@ -276,7 +292,7 @@ const Home = () => {
 
       <div className={styles.historyContainer}>
         <div className={styles.headerContainer}>
-          <h1> Kết quả luyện thi gần đây</h1>
+          <h1> Kết quả luyện thi trong tháng</h1>
           <Link href={'/tests/history'}>
             <p>Xem tất cả</p>
           </Link>
@@ -284,18 +300,18 @@ const Home = () => {
 
         <div className={styles.resultContainer}>
           <div className={styles.result}>
-            <h1>7h21p</h1>
+            <h1>{formatTime(totalSpentTime)}</h1>
             <p>Tổng thời gian</p>
           </div>
 
           <div className={styles.result}>
-            <h1>12</h1>
+            <h1>
+              {timeSpentData?.reduce(
+                (total, data) => total + data.submission_count,
+                0
+              ) ?? 0}
+            </h1>
             <p>Bài tập</p>
-          </div>
-
-          <div className={styles.result}>
-            <h1>85%</h1>
-            <p>Điểm trung bình</p>
           </div>
         </div>
 
