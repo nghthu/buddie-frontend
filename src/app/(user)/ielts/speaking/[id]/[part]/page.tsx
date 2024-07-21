@@ -21,6 +21,8 @@ import { CloseChatContext } from '@/components/CloseChatContext';
 import BuddieSupport from '@/components/BuddieSupport';
 import SpeakingFunctionMenu from '@/components/SpeakingFunctionMenu';
 import clsx from 'clsx';
+import { Statistic } from 'antd';
+const { Countdown } = Statistic;
 
 const mimeType: string = 'audio/webm';
 
@@ -120,6 +122,7 @@ const PracticeSpeaking = ({
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const [menuVisible, setMenuVisible] = useState(false);
   const [menuPosition, setMenuPosition] = useState({ x: 0, y: 0 });
+  const [remainingTime, setRemainingTime] = useState<number>(0);
 
   const router = useRouter();
   const user = auth.currentUser;
@@ -241,6 +244,7 @@ const PracticeSpeaking = ({
   };
 
   const startHandler = () => {
+    setRemainingTime(Date.now() + data.duration * 1000);
     setInstruction(true);
   };
 
@@ -410,6 +414,9 @@ const PracticeSpeaking = ({
 
       const structuredAnswers = {
         test_id: data._id,
+        time_spent: Math.round(
+          data.duration - (remainingTime - Date.now()) / 1000
+        ),
         parts: data.parts
           .map((part: Part, index: number) => ({
             part_number: index + 1,
@@ -617,20 +624,29 @@ const PracticeSpeaking = ({
                 Nộp câu này
               </Checkbox>
             )}
-            <div
-              className={styles.question}
-              onClick={hideMenu}
-            >
-              <img
-                className={styles.logo}
-                src="/images/logo/main.svg"
-              />
+            <div className={styles.time}>
               <div
-                className={styles['question-prompt']}
-                onContextMenu={showMenu}
+                className={styles.question}
+                onClick={hideMenu}
               >
-                {testData?.questions[currentQuestion]?.question_prompt}
+                <img
+                  className={styles.logo}
+                  src="/images/logo/main.svg"
+                />
+                <div
+                  className={styles['question-prompt']}
+                  onContextMenu={showMenu}
+                >
+                  {testData?.questions[currentQuestion]?.question_prompt}
+                </div>
               </div>
+
+              {remainingTime !== 0 && (
+                <Countdown
+                  title="Thời gian còn lại"
+                  value={remainingTime}
+                />
+              )}
             </div>
             <Button
               className={styles['audio-btn']}

@@ -24,7 +24,7 @@ defaults.plugins.title.align = 'start';
 defaults.plugins.title.color = 'black';
 
 import Footer from '@/components/Footer';
-import useSWR from 'swr';
+import useSWR, { mutate } from 'swr';
 import { auth } from '@/lib';
 import { User } from 'firebase/auth';
 import { useEffect, useState } from 'react';
@@ -183,9 +183,13 @@ const Home = () => {
   );
   const [skillData, setSkillData] = useState<null | SkillEntry[]>(null);
   const [supportData, setSupportData] = useState<null | SkillEntry[]>(null);
+  const [monthYear, setMonthYear] = useState<number[]>([7, 2024]);
 
   const { data, isLoading } = useSWR(
-    { url: `/api/users/${user?.uid}/reports?month=7&year=2024`, user },
+    {
+      url: `/api/users/${user?.uid}/reports?month=${monthYear[0]}&year=${monthYear[1]}`,
+      user,
+    },
     fetcher
   );
 
@@ -193,8 +197,7 @@ const Home = () => {
 
   useEffect(() => {
     if (data) {
-      console.log(data);
-
+      console.log('data changed', data);
       setTimeSpentData(
         createDailyData(
           data.per_day_report.time_spent_per_day,
@@ -207,8 +210,11 @@ const Home = () => {
     }
   }, [data, setTimeSpentData]);
 
-  const dateChangeHandler: DatePickerProps['onChange'] = (date, dateString) => {
-    console.log(date, dateString);
+  const dateChangeHandler: DatePickerProps['onChange'] = (date) => {
+    setMonthYear([date.month(), date.year()]);
+    mutate(
+      `/api/users/${user?.uid}/reports?month=${date.month() + 1}&year=${date.year()}`
+    );
   };
 
   if (isLoading) return <Spin size="large" />;
@@ -372,7 +378,7 @@ const Home = () => {
               },
               plugins: {
                 title: {
-                  text: `Thời gian làm bài và số bài thi trong tháng ${data?.per_day_report.month}/${data?.per_day_report.year}`,
+                  text: `Thời gian làm bài và số bài thi trong tháng ${monthYear[0]}/${monthYear[1]}`,
                   font: {
                     family: 'Lexend',
                     size: 20,
@@ -473,7 +479,7 @@ const Home = () => {
             options={{
               plugins: {
                 title: {
-                  text: 'Tỉ lệ làm bài theo kỹ năng',
+                  text: 'Tỉ lệ thời gian làm bài theo kỹ năng',
                   font: {
                     family: 'Lexend',
                     size: 20,
@@ -494,16 +500,7 @@ const Home = () => {
                 {
                   label: 'Số lượng',
                   data: supportData?.map((data) => data.value),
-                  backgroundColor: [
-                    '#4cc4c4',
-                    '#ffcd56',
-                    '#ff6384',
-                    '#36a2eb',
-                    '#ff9f40',
-                    '#9966cc',
-                    '#2cae1d',
-                    '#574242',
-                  ],
+                  backgroundColor: ['#4cc4c4'],
                   borderRadius: 5,
                 },
               ],

@@ -10,6 +10,8 @@ import { CloseChatContext } from '@/components/CloseChatContext';
 import { auth } from '@/lib';
 import { Button, Spin } from 'antd';
 import { useRouter } from 'next/navigation';
+import { Statistic } from 'antd';
+const { Countdown } = Statistic;
 
 interface QuestionInfo {
   question_number: number;
@@ -70,6 +72,8 @@ export default function PracticePage({
   const [loading, setLoading] = useState(false);
   const user = auth.currentUser;
   const router = useRouter();
+  const [remainingTime, setRemainingTime] = useState<number>(Date.now());
+  const [testTime, setTestTime] = useState<number>(0);
 
   const getPartData = async () => {
     const token = await user?.getIdToken();
@@ -96,6 +100,8 @@ export default function PracticePage({
       const data = await getPartData();
       let partData;
       if (data && data.parts) {
+        setRemainingTime(Date.now() + data.duration * 1000);
+        setTestTime(data.duration);
         if (part === '1' || part === 'all') {
           partData = data.parts.find(
             (p: { part_number: number }) => p.part_number === 1
@@ -137,6 +143,7 @@ export default function PracticePage({
       const part1Answer = partData?.question_groups.map((group) => ({
         _id: group._id,
         part_number: 1,
+        time_spent: Math.round(testTime - (remainingTime - Date.now()) / 1000),
         question_groups: [
           {
             _id: group._id,
@@ -157,6 +164,9 @@ export default function PracticePage({
       if (part == '1') {
         submittedAnswers = {
           test_id: params.id,
+          time_spent: Math.round(
+            testTime - (remainingTime - Date.now()) / 1000
+          ),
           parts: partData?.question_groups.map((group) => ({
             _id: group._id,
             part_number: Number(part),
@@ -181,6 +191,9 @@ export default function PracticePage({
         if (part1Answer.length == 0) {
           submittedAnswers = {
             test_id: params.id,
+            time_spent: Math.round(
+              testTime - (remainingTime - Date.now()) / 1000
+            ),
             parts: partData?.question_groups.map((group) => ({
               _id: group._id,
               part_number: Number(part),
@@ -421,7 +434,10 @@ export default function PracticePage({
                     {question?.question_prompt.split('.')[0]}
                   </p>
                 </div>
-                {/* <CountdownClock /> */}
+                <Countdown
+                  title="Thời gian còn lại"
+                  value={remainingTime}
+                />
               </div>
               <div className={styles.answerContainer}>
                 <p className={styles.textPracticing}>Trả lời:</p>

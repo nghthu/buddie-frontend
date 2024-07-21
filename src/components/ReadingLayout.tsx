@@ -108,6 +108,8 @@ interface Props {
   partNumber: number;
   data: data;
   answers: test_answer;
+  testTime: number;
+  remainingTime: number;
   chatVisible: boolean;
   isChatProcessing: boolean;
   testId: string;
@@ -126,6 +128,8 @@ export default function ReadingLayout({
   partNumber,
   data,
   answers,
+  remainingTime,
+  testTime,
   chatVisible,
   isChatProcessing,
   chatRequests,
@@ -276,7 +280,10 @@ export default function ReadingLayout({
         authorization: `Bearer ${token}`,
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify(answers),
+      body: JSON.stringify({
+        ...answers,
+        time_spent: Math.round(testTime - (remainingTime - Date.now()) / 1000),
+      }),
     });
     const res = await response.json();
     setFetchedData(res);

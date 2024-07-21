@@ -25,11 +25,11 @@ const Footer = () => {
         </div>
         <div className={styles.team}>
           <h3>Thành viên</h3>
+          <p>Văn Lý Hải</p>
+          <p>Dư Thanh Huy</p>
+          <p>La Thành Triết</p>
           <p>Nguyễn Hạnh Thư</p>
-          <p>Nguyễn Hạnh Thư</p>
-          <p>Nguyễn Hạnh Thư</p>
-          <p>Nguyễn Hạnh Thư</p>
-          <p>Nguyễn Hạnh Thư</p>
+          <p>Nguyễn Ngọc Thùy</p>
         </div>
         <div className={styles.contact}>
           <h3>Liên hệ với chúng tôi</h3>

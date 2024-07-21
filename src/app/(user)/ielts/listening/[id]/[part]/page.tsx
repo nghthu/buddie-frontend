@@ -135,11 +135,9 @@ const ListeningPractice = ({
       ? question.options.indexOf(answer.answer_result.user_answer) + 1
       : '';
   };
-  console.log('remaining outside', remainingTime);
 
   const submitHandler = async () => {
     setLoading(true);
-    console.log('remaining', remainingTime);
     const structuredAnswers = {
       test_id: data._id,
       time_spent: Math.round(

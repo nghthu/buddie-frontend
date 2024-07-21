@@ -1,10 +1,12 @@
 import styles from '@/styles/components/SkillHeader.module.scss';
-import CountdownClock from '@/components/CountdownClock';
 import clsx from 'clsx';
+import { Statistic } from 'antd';
+
+const { Countdown } = Statistic;
 
 const SkillHeader = (props: {
   title: string;
-  countdownTime?: string;
+  countdownTime?: number;
   children?: React.ReactNode;
 }) => {
   return (
@@ -12,16 +14,20 @@ const SkillHeader = (props: {
       className={clsx(
         styles.wrapper,
         !props.countdownTime && styles['wrappercenter'],
-        props.countdownTime !== 'unlimited' &&
+        props.countdownTime !== 0 &&
           props.countdownTime &&
           styles['wrapperspace-between'],
-        props.countdownTime === 'unlimited' && styles['wrapperflex-start']
+        props.countdownTime === 0 && styles['wrapperflex-start']
       )}
     >
       <h2 className={styles.header}>{props.title}</h2>
       {props.children}
-      {props.countdownTime && props.countdownTime !== 'unlimited' && (
-        <CountdownClock countdownTime={props.countdownTime} />
+
+      {props.countdownTime !== undefined && (
+        <Countdown
+          title="Thời gian còn lại"
+          value={props.countdownTime}
+        />
       )}
     </div>
   );

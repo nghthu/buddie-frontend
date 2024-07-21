@@ -122,7 +122,6 @@ export default function IeltsPart({
 
   const [fetchedData, setFetchedData] = useState<TestData>();
   // TODO: use timer and setTestTime
-  const [testTime] = useState('20:00');
 
   const [currentPart, setCurrentPart] = useState(1);
 
@@ -137,6 +136,8 @@ export default function IeltsPart({
   const [chatRequests, setChatRequests] = useState<
     Array<{ avatar: string; request: string; response: string }>
   >([]);
+
+  const [remainingTime, setRemainingTime] = useState<number>(Date.now());
 
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
@@ -167,6 +168,7 @@ export default function IeltsPart({
   }, [params.part]);
   useEffect(() => {
     if (tests) {
+      setRemainingTime(Date.now() + tests.duration * 1000);
       if (params.part !== 'all') {
         const temp_test_answer: {
           test_id: string;
@@ -473,6 +475,8 @@ export default function IeltsPart({
             setFetchedData={setFetchedData}
             testId={params.id}
             part={params.part}
+            testTime={tests.duration}
+            remainingTime={remainingTime}
           />
         )}
         <ReadingFunctionMenu
@@ -491,7 +495,7 @@ export default function IeltsPart({
         <>
           <SkillHeader
             title={metaData['test_name']}
-            countdownTime={testTime}
+            countdownTime={remainingTime}
           >
             {passageButtons}
           </SkillHeader>
