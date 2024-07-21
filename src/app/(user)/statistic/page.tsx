@@ -211,13 +211,11 @@ const Home = () => {
   }, [data, setTimeSpentData]);
 
   const dateChangeHandler: DatePickerProps['onChange'] = (date) => {
-    setMonthYear([date.month(), date.year()]);
+    setMonthYear([date.month() + 1, date.year()]);
     mutate(
       `/api/users/${user?.uid}/reports?month=${date.month() + 1}&year=${date.year()}`
     );
   };
-
-  if (isLoading) return <Spin size="large" />;
 
   return (
     <div className={styles.container}>
@@ -339,188 +337,190 @@ const Home = () => {
           </div>
         </div>
       </div>
-
-      <div className={styles.statistic}>
-        <DatePicker
-          onChange={dateChangeHandler}
-          picker="month"
-          className={styles.datePicker}
-        />
-        <div className={clsx(styles.dataCard, styles.timeSpendCard)}>
-          <ChartComponent
-            data={{
-              labels: timeSpentData?.map((data) => data.label),
-              datasets: [
-                {
-                  label: 'Số bài thi (bài)',
-                  data: timeSpentData?.map((data) => data.submission_count),
-                  backgroundColor: '#3c9de4',
-                  borderColor: '#3c9de4',
-                  type: 'line',
-                  order: 0,
-                  yAxisID: 'y1',
-                },
-                {
-                  label: 'Thời gian làm bài (giây)',
-                  data: timeSpentData?.map((data) => data.time_spent),
-                  backgroundColor: '#ffb2c17f ',
-                  borderColor: '#ffb2c17f',
-                  order: 1,
-                },
-              ],
-            }}
-            type="bar"
-            options={{
-              elements: {
-                line: {
-                  tension: 0.3,
-                },
-              },
-              plugins: {
-                title: {
-                  text: `Thời gian làm bài và số bài thi trong tháng ${monthYear[0]}/${monthYear[1]}`,
-                  font: {
-                    family: 'Lexend',
-                    size: 20,
-                    style: 'normal',
-                    lineHeight: 1.2,
+      {isLoading && <Spin size="large" />}
+      {!isLoading && (
+        <div className={styles.statistic}>
+          <DatePicker
+            onChange={dateChangeHandler}
+            picker="month"
+            className={styles.datePicker}
+          />
+          <div className={clsx(styles.dataCard, styles.timeSpendCard)}>
+            <ChartComponent
+              data={{
+                labels: timeSpentData?.map((data) => data.label),
+                datasets: [
+                  {
+                    label: 'Số bài thi (bài)',
+                    data: timeSpentData?.map((data) => data.submission_count),
+                    backgroundColor: '#3c9de4',
+                    borderColor: '#3c9de4',
+                    type: 'line',
+                    order: 0,
+                    yAxisID: 'y1',
+                  },
+                  {
+                    label: 'Thời gian làm bài (giây)',
+                    data: timeSpentData?.map((data) => data.time_spent),
+                    backgroundColor: '#ffb2c17f ',
+                    borderColor: '#ffb2c17f',
+                    order: 1,
+                  },
+                ],
+              }}
+              type="bar"
+              options={{
+                elements: {
+                  line: {
+                    tension: 0.3,
                   },
                 },
-                legend: {
-                  position: 'top',
-                },
-              },
-              scales: {
-                x: {
+                plugins: {
                   title: {
-                    display: true,
-                    text: 'Ngày',
-                    color: '#000',
+                    text: `Thời gian làm bài và số bài thi trong tháng ${monthYear[0]}/${monthYear[1]}`,
                     font: {
                       family: 'Lexend',
-                      size: 15,
+                      size: 20,
+                      style: 'normal',
+                      lineHeight: 1.2,
+                    },
+                  },
+                  legend: {
+                    position: 'top',
+                  },
+                },
+                scales: {
+                  x: {
+                    title: {
+                      display: true,
+                      text: 'Ngày',
+                      color: '#000',
+                      font: {
+                        family: 'Lexend',
+                        size: 15,
+                        style: 'normal',
+                        lineHeight: 1.2,
+                      },
+                    },
+                  },
+                  y: {
+                    type: 'linear',
+                    display: true,
+                    position: 'left',
+                    title: {
+                      display: true,
+                      text: 'Thời gian làm bài',
+                      color: '#000',
+                      font: {
+                        family: 'Lexend',
+                        size: 15,
+                        style: 'normal',
+                        lineHeight: 1.2,
+                      },
+                    },
+                  },
+                  y1: {
+                    type: 'linear',
+                    display: true,
+                    position: 'right',
+                    title: {
+                      display: true,
+                      text: 'Số bài thi',
+                      color: '#000',
+                      font: {
+                        family: 'Lexend',
+                        size: 15,
+                        style: 'normal',
+                        lineHeight: 1.2,
+                      },
+                    },
+                    // grid line settings
+                    grid: {
+                      drawOnChartArea: false, // only want the grid lines for one axis to show up
+                    },
+                  },
+                },
+              }}
+            />
+          </div>
+
+          <div className={clsx(styles.dataCard, styles.skillTimeCard)}>
+            <Doughnut
+              data={{
+                labels: skillData?.map((data) => data.label),
+                datasets: [
+                  {
+                    label: 'Phần trăm',
+                    data: skillData?.map((data) => data.value),
+                    backgroundColor: [
+                      '#4cc4c4',
+                      '#ffcd56',
+                      '#ff6384',
+                      '#36a2eb',
+                      '#ff9f40',
+                      '#9966cc',
+                      '#2cae1d',
+                      '#574242',
+                    ],
+                    borderColor: [
+                      '#4cc4c4',
+                      '#ffcd56',
+                      '#ff6384',
+                      '#36a2eb',
+                      '#ff9f40',
+                      '#9966cc',
+                      '#2cae1d',
+                      '#574242',
+                    ],
+                  },
+                ],
+              }}
+              options={{
+                plugins: {
+                  title: {
+                    text: 'Tỉ lệ thời gian làm bài theo kỹ năng',
+                    font: {
+                      family: 'Lexend',
+                      size: 20,
                       style: 'normal',
                       lineHeight: 1.2,
                     },
                   },
                 },
-                y: {
-                  type: 'linear',
-                  display: true,
-                  position: 'left',
+              }}
+            />
+          </div>
+
+          <div className={clsx(styles.dataCard, styles.buddieSupportCard)}>
+            <Bar
+              data={{
+                labels: supportData?.map((data) => data.label),
+                datasets: [
+                  {
+                    label: 'Số lượng',
+                    data: supportData?.map((data) => data.value),
+                    backgroundColor: ['#4cc4c4'],
+                    borderRadius: 5,
+                  },
+                ],
+              }}
+              options={{
+                plugins: {
                   title: {
-                    display: true,
-                    text: 'Thời gian làm bài',
-                    color: '#000',
+                    text: 'Buddie Support đã sử dụng',
                     font: {
                       family: 'Lexend',
-                      size: 15,
+                      size: 20,
                       style: 'normal',
                       lineHeight: 1.2,
                     },
                   },
                 },
-                y1: {
-                  type: 'linear',
-                  display: true,
-                  position: 'right',
-                  title: {
-                    display: true,
-                    text: 'Số bài thi',
-                    color: '#000',
-                    font: {
-                      family: 'Lexend',
-                      size: 15,
-                      style: 'normal',
-                      lineHeight: 1.2,
-                    },
-                  },
-                  // grid line settings
-                  grid: {
-                    drawOnChartArea: false, // only want the grid lines for one axis to show up
-                  },
-                },
-              },
-            }}
-          />
+              }}
+            />
+          </div>
         </div>
-
-        <div className={clsx(styles.dataCard, styles.skillTimeCard)}>
-          <Doughnut
-            data={{
-              labels: skillData?.map((data) => data.label),
-              datasets: [
-                {
-                  label: 'Phần trăm',
-                  data: skillData?.map((data) => data.value),
-                  backgroundColor: [
-                    '#4cc4c4',
-                    '#ffcd56',
-                    '#ff6384',
-                    '#36a2eb',
-                    '#ff9f40',
-                    '#9966cc',
-                    '#2cae1d',
-                    '#574242',
-                  ],
-                  borderColor: [
-                    '#4cc4c4',
-                    '#ffcd56',
-                    '#ff6384',
-                    '#36a2eb',
-                    '#ff9f40',
-                    '#9966cc',
-                    '#2cae1d',
-                    '#574242',
-                  ],
-                },
-              ],
-            }}
-            options={{
-              plugins: {
-                title: {
-                  text: 'Tỉ lệ thời gian làm bài theo kỹ năng',
-                  font: {
-                    family: 'Lexend',
-                    size: 20,
-                    style: 'normal',
-                    lineHeight: 1.2,
-                  },
-                },
-              },
-            }}
-          />
-        </div>
-
-        <div className={clsx(styles.dataCard, styles.buddieSupportCard)}>
-          <Bar
-            data={{
-              labels: supportData?.map((data) => data.label),
-              datasets: [
-                {
-                  label: 'Số lượng',
-                  data: supportData?.map((data) => data.value),
-                  backgroundColor: ['#4cc4c4'],
-                  borderRadius: 5,
-                },
-              ],
-            }}
-            options={{
-              plugins: {
-                title: {
-                  text: 'Buddie Support đã sử dụng',
-                  font: {
-                    family: 'Lexend',
-                    size: 20,
-                    style: 'normal',
-                    lineHeight: 1.2,
-                  },
-                },
-              },
-            }}
-          />
-        </div>
-      </div>
+      )}
       <Footer />
     </div>
   );
