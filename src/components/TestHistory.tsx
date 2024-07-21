@@ -1,25 +1,35 @@
 'use client';
 
-import { Empty, Select, Spin, notification } from 'antd';
+import { Button, Empty, Select, Spin, notification } from 'antd';
 
 import { User } from 'firebase/auth';
 import { auth } from '@/lib';
 import useSWR from 'swr';
 import { SetStateAction, useEffect, useRef, useState } from 'react';
-import TestCardHistory from '@/components/TestCardHistory';
 import { LoadingOutlined } from '@ant-design/icons';
 import styles from '@/styles/components/TestSelector.module.scss';
 import { Input } from 'antd';
 import type { SearchProps } from 'antd/es/input/Search';
+import Link from 'next/link';
 interface FetchArgs {
   url: string;
   user: User | null;
 }
-interface user {
-  user_id: string;
-  display_name: string;
-  photo_url: string;
+
+interface TestSubmission {
+  _id: string;
+  test: Test;
+  correct_answer_count: number;
+  question_count: number;
+  time_spent: number;
 }
+
+interface Test {
+  test_name: string;
+  duration: number;
+  _id: string;
+}
+
 const fetcher = async ({ url, user }: FetchArgs) => {
   const token = await user?.getIdToken();
   const response = await fetch(url, {
@@ -42,13 +52,12 @@ export default function TestLibrary(props: {
   text?: string;
 }) {
   const [totalPage] = useState(1);
-  // const tests = useRef([]);
   const [filteredTests, setFilteredTests] = useState([]);
-  const [searchValue, setSearchValue] = useState('');
-  const [selectedSkill, setSelectedSkill] = useState('');
+  // const [searchValue, setSearchValue] = useState('');
+  // const [selectedSkill, setSelectedSkill] = useState('');
   const scrollRef = useRef<HTMLDivElement>(null);
 
-  const apiUrl = `/api/tests?page=${totalPage}&test_type=${selectedSkill}&search=${searchValue}&isbuddie=false`;
+  const apiUrl = `/api/test-submissions?offset=${0}&limit=20`;
   const user = auth.currentUser;
   const {
     data: rawTests,
@@ -65,15 +74,14 @@ export default function TestLibrary(props: {
       });
     }
   }, [error, notificationApi]);
+
   useEffect(() => {
     if (rawTests) {
-      //tests.current = [...new Set([...tests.current, ...rawTests.tests])];
       console.log(rawTests);
-      setFilteredTests(rawTests.tests);
-      // handleFilterTests();
-      // setTests((prev) => [...prev, ...rawTests.tests]);
+      setFilteredTests(rawTests.test_submissions);
     }
   }, [rawTests]);
+
   useEffect(() => {
     if (isLoading) {
       scrollRef.current?.style.setProperty('overflow-y', 'hidden');
@@ -82,79 +90,64 @@ export default function TestLibrary(props: {
     }
   }, [isLoading]);
 
-  // const handleLoad = () => {
-  //   setTotalPage((prev) => prev + 1);
-  // };
-  // useEffect(() => {
-  //     handleFilterTests();
-  // }, [selectedSkill, searchValue]);
-
-  // TODO: use react inf scroll
-  // useEffect(() => {
-  //     const scrollElement = scrollRef.current;
-  //     if (scrollElement) {
-  //         scrollElement.addEventListener('scroll', () => {
-  //             if (scrollElement.scrollHeight - scrollElement.scrollTop <= scrollElement.clientHeight) {
-  //                 if (totalPage >= (rawTests.pagination.total_count / 10)) {
-  //                     return;
-  //                 }
-  //                 handleLoad();
-  //             }
-  //         })
-  //     }
-  //     return () => {
-  //         scrollElement?.removeEventListener('scroll', () => { });
-  //     }
-  // }, [])
   const onSearch: SearchProps['onSearch'] = (value) => {
-    // split the search value into an array of words, delimiter is space
     const searchWords = encodeURIComponent(value.trim());
     console.log(searchWords);
-    setSearchValue(searchWords);
+    // setSearchValue(searchWords);
   };
+
   const handleChange = (value: string) => {
-    setSelectedSkill(value);
+    // setSelectedSkill(value);
+    console.log(value);
   };
-  // const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-  //     console.log([e.target.value]);
-  //     setSearchValue([e.target.value]);
-  // }
+
+  const formatTime = (totalSeconds: number): string => {
+    const minutes = Math.floor(totalSeconds / 60);
+    const seconds = totalSeconds % 60;
+
+    const formattedMinutes =
+      minutes < 10 ? String(minutes) : String(minutes).padStart(2, '0');
+
+    const formattedSeconds =
+      seconds < 10 ? String(seconds) : String(seconds).padStart(2, '0');
+
+    if (Number(formattedMinutes) === 0) return `${formattedSeconds}s`;
+    if (Number(formattedSeconds) === 0) return `${formattedMinutes} phút`;
+    return `${formattedMinutes}p${formattedSeconds}s`;
+  };
+
   if ((isLoading && filteredTests.length === 0) || props.pageLoading) {
     return <Spin size="default" />;
   }
   console.log(rawTests);
-  const testComponent = filteredTests.map(
-    (test: {
-      _id: string;
-      test_name: string;
-      test_type: string;
-      user: user;
-      review: { star: number; count: number };
-      duration: number;
-      tags: string[];
-      test_recording?: string;
-      parts?: { _id: string }[];
-    }) => {
-      const partIds = test.parts
-        ? test.parts.map((part: { _id: string }) => part._id)
-        : [];
-      return (
-        <TestCardHistory
-          setPageLoading={props.setPageLoading}
-          key={test._id}
-          testName={test.test_name}
-          testDuration={test.duration.toString()}
-          testTags={test.tags}
-          testSkill={test.test_type}
-          testId={test._id}
-          partIds={partIds}
-          isUserTest={true}
-          user={test.user}
-          review={test.review}
-        />
-      );
-    }
-  );
+  const testComponent = filteredTests.map((submission: TestSubmission) => {
+    return (
+      <div
+        key={submission._id}
+        className={styles.test}
+      >
+        <div>
+          <h1>{submission.test.test_name}</h1>
+          <div>
+            <p className={styles.score}>
+              {submission.correct_answer_count}/{submission.question_count} Câu
+              đúng
+            </p>
+            <p>
+              {formatTime(submission.time_spent)}/
+              {formatTime(submission.test.duration)}
+            </p>
+          </div>
+        </div>
+
+        <Link
+          href={`/result?testId=${submission.test._id}&testSubmissionId=${submission._id}&part=all`}
+        >
+          <Button className={styles.detailButton}>Chi tiết</Button>
+        </Link>
+      </div>
+    );
+  });
   return (
     <div className={styles.container}>
       {contextHolder}

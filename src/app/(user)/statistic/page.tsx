@@ -73,6 +73,20 @@ interface GeneralReport {
   updated_at: string;
 }
 
+interface TestSubmission {
+  _id: string;
+  test: Test;
+  correct_answer_count: number;
+  question_count: number;
+  time_spent: number;
+}
+
+interface Test {
+  test_name: string;
+  duration: number;
+  _id: string;
+}
+
 const fetcher = async ({ url, user }: { url: string; user: User | null }) => {
   const token = await user?.getIdToken();
   const response = await fetch(url, {
@@ -232,8 +246,12 @@ const Home = () => {
 
     const formattedMinutes =
       minutes < 10 ? String(minutes) : String(minutes).padStart(2, '0');
-    const formattedSeconds = String(seconds).padStart(2, '0');
 
+    const formattedSeconds =
+      seconds < 10 ? String(seconds) : String(seconds).padStart(2, '0');
+
+    if (Number(formattedMinutes) === 0) return `${formattedSeconds}s`;
+    if (Number(formattedSeconds) === 0) return `${formattedMinutes} phút`;
     return `${formattedMinutes}p${formattedSeconds}s`;
   };
 
@@ -302,7 +320,7 @@ const Home = () => {
       <div className={styles.historyContainer}>
         <div className={styles.headerContainer}>
           <h1> Kết quả luyện thi trong tháng</h1>
-          <Link href={'/tests/history'}>
+          <Link href={'/statistic/history'}>
             <p>Xem tất cả</p>
           </Link>
         </div>
@@ -325,44 +343,34 @@ const Home = () => {
         </div>
 
         <div className={styles.testContainer}>
-          {/* {tests.map((test)=>{
-            return 
-          })} */}
-          <div className={styles.test}>
-            <div>
-              <h1>IELTS Simulation Listening Test 1</h1>
-              <div>
-                <p className={styles.score}>85%</p>
-                <p>48/60 phút</p>
+          {tests?.test_submissions.map((submission: TestSubmission) => {
+            return (
+              <div
+                key={submission._id}
+                className={styles.test}
+              >
+                <div>
+                  <h1>{submission.test.test_name}</h1>
+                  <div>
+                    <p className={styles.score}>
+                      {submission.correct_answer_count}/
+                      {submission.question_count} Câu đúng
+                    </p>
+                    <p>
+                      {formatTime(submission.time_spent)}/
+                      {formatTime(submission.test.duration)}
+                    </p>
+                  </div>
+                </div>
+
+                <Link
+                  href={`/result?testId=${submission.test._id}&testSubmissionId=${submission._id}&part=all`}
+                >
+                  <Button className={styles.detailButton}>Chi tiết</Button>
+                </Link>
               </div>
-            </div>
-
-            <Button className={styles.detailButton}>Chi tiết</Button>
-          </div>
-
-          <div className={styles.test}>
-            <div>
-              <h1>IELTS Simulation Listening Test 1</h1>
-              <div>
-                <p className={styles.score}>85%</p>
-                <p>48/60 phút</p>
-              </div>
-            </div>
-
-            <Button className={styles.detailButton}>Chi tiết</Button>
-          </div>
-
-          <div className={styles.test}>
-            <div>
-              <h1>IELTS Simulation Listening Test 1</h1>
-              <div>
-                <p className={styles.score}>85%</p>
-                <p>48/60 phút</p>
-              </div>
-            </div>
-
-            <Button className={styles.detailButton}>Chi tiết</Button>
-          </div>
+            );
+          })}
         </div>
       </div>
       {isLoading && <Spin size="large" />}

@@ -72,3 +72,24 @@
     cursor: pointer;
   }
 }
+
+.test {
+  padding: 20px;
+  border: 1px solid black;
+  border-radius: 15px;
+  background-color: white;
+
+  & h1 {
+    font-size: 20px;
+    font-weight: 500;
+  }
+
+  .score {
+    color: #675980;
+  }
+}
+
+.detailButton {
+  width: 100%;
+  margin-top: 20px;
+}
