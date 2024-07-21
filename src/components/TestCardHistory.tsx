@@ -1,7 +1,7 @@
 'use client';
 import { ClockCircleOutlined } from '@ant-design/icons';
 import styles from '@/styles/components/TestCardHistory.module.scss';
-import { Button, Modal, Select } from 'antd';
+import { Button, Modal } from 'antd';
 import { SetStateAction, useState } from 'react';
 
 import Link from 'next/link';
@@ -38,9 +38,6 @@ export default function TestCardHistory(props: {
   };
   const handleClick = () => {
     showModal();
-  };
-  const handleSelectChange = (value: string) => {
-    console.log(value);
   };
 
   const skill = props.testSkill?.split('_')[1];
@@ -128,18 +125,6 @@ export default function TestCardHistory(props: {
                 </span>
               );
             })}
-          </div>
-          <div className={styles.modalSelect}>
-            Chọn thời gian
-            <Select
-              defaultValue="không giới hạn"
-              options={[
-                { value: 'unlimied', label: 'không giới hạn' },
-                { value: 'dependent', label: 'theo thời gian của đề' },
-              ]}
-              style={{ width: '200px' }}
-              onChange={handleSelectChange}
-            />
           </div>
           {partSelectButtons}
           <Link href={`ielts/${skill}/${props.testId}/all`}>

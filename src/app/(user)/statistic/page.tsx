@@ -45,7 +45,7 @@ interface GeneralReport {
   user_id: string;
   month: number;
   year: number;
-  time_spent: {
+  submission_count: {
     speaking: number;
     reading: number;
     listening: number;
@@ -134,17 +134,17 @@ const convertToTitleCase = (str: string) => {
 };
 
 const transformObjectToArray = (data: GeneralReport, type: number = 1) => {
-  const { standard_request_count, pro_request_count, time_spent } = data;
+  const { standard_request_count, pro_request_count, submission_count } = data;
 
   let transformedArray = [];
   let sum = 0;
-  const timeSpentKeys = Object.keys(time_spent) as Array<
-    keyof typeof time_spent
+  const timeSpentKeys = Object.keys(submission_count) as Array<
+    keyof typeof submission_count
   >;
 
   timeSpentKeys.forEach((key) => {
-    if (typeof time_spent[key] === 'number') {
-      sum += time_spent[key] as number;
+    if (typeof submission_count[key] === 'number') {
+      sum += submission_count[key] as number;
     }
   });
 
@@ -173,7 +173,7 @@ const transformObjectToArray = (data: GeneralReport, type: number = 1) => {
     ];
   } else {
     console.log('sum', sum);
-    transformedArray = [...convertToObjectArray(time_spent)];
+    transformedArray = [...convertToObjectArray(submission_count)];
   }
 
   console.log('api data', transformedArray);
@@ -197,6 +197,15 @@ const Home = () => {
     fetcher
   );
 
+  const { data: tests, isLoading: testLoading } = useSWR(
+    {
+      url: `/api/test-submissions?offset=${0}&limit=3`,
+      user,
+    },
+    fetcher
+  );
+
+  console.log('test', tests);
   console.log('data', data);
 
   useEffect(() => {
@@ -231,7 +240,7 @@ const Home = () => {
   const totalSpentTime =
     timeSpentData?.reduce((total, data) => total + data.time_spent, 0) ?? 0;
 
-  if (isLoading) return <Spin size="large" />;
+  if (isLoading || testLoading) return <Spin size="large" />;
 
   return (
     <div className={styles.container}>
@@ -316,6 +325,9 @@ const Home = () => {
         </div>
 
         <div className={styles.testContainer}>
+          {/* {tests.map((test)=>{
+            return 
+          })} */}
           <div className={styles.test}>
             <div>
               <h1>IELTS Simulation Listening Test 1</h1>
@@ -360,6 +372,7 @@ const Home = () => {
             onChange={dateChangeHandler}
             picker="month"
             className={styles.datePicker}
+            placeholder="Chọn tháng"
           />
           <div className={clsx(styles.dataCard, styles.timeSpendCard)}>
             <ChartComponent
@@ -393,7 +406,7 @@ const Home = () => {
                 },
                 plugins: {
                   title: {
-                    text: `Thời gian làm bài và số bài thi trong tháng ${monthYear[0]}/${monthYear[1]}`,
+                    text: `Thời gian làm bài và số bài thi ${monthYear[0]}/${monthYear[1]}`,
                     font: {
                       family: 'Lexend',
                       size: 20,
@@ -494,7 +507,7 @@ const Home = () => {
               options={{
                 plugins: {
                   title: {
-                    text: 'Tỉ lệ thời gian làm bài theo kỹ năng',
+                    text: 'Tỉ lệ số bài làm theo kỹ năng',
                     font: {
                       family: 'Lexend',
                       size: 20,

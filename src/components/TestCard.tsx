@@ -1,7 +1,7 @@
 'use client';
 import { ClockCircleOutlined } from '@ant-design/icons';
 import styles from '@/styles/components/TestCard.module.scss';
-import { Button, Modal, Rate, Select, Space } from 'antd';
+import { Button, Modal, Rate, Space } from 'antd';
 import { SetStateAction, useState, useEffect } from 'react';
 
 import Link from 'next/link';
@@ -55,10 +55,6 @@ export default function TestCard(props: {
   };
   const handleClick = () => {
     showModal();
-  };
-  // TODO: handle timer
-  const handleSelectChange = (value: string) => {
-    console.log(value);
   };
 
   const handleDelete = async () => {
@@ -208,18 +204,7 @@ export default function TestCard(props: {
               );
             })}
           </div>
-          <div className={styles.modalSelect}>
-            Chọn thời gian
-            <Select
-              defaultValue="không giới hạn"
-              options={[
-                { value: 'unlimied', label: 'không giới hạn' },
-                { value: 'dependent', label: 'theo thời gian của đề' },
-              ]}
-              style={{ width: '200px' }}
-              onChange={handleSelectChange}
-            />
-          </div>
+
           {partSelectButtons}
           <Link href={`ielts/${skill}/${props.testId}/all`}>
             <Button
