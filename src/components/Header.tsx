@@ -23,7 +23,18 @@ const Header = (props: Props) => {
   const [activatedTab, setActiveTab] = useState(props.activatedTab);
   const [logout, logoutLoading, logoutError] = useSignOut(auth);
   const [notificationApi, contextHolder] = notification.useNotification();
+  const [isAdmin, setIsAdmin] = useState(false);
   const pathname = usePathname();
+
+  useEffect(() => {
+    async function fetchAdminStatus() {
+      const tokenResult = await auth.currentUser?.getIdTokenResult();
+      const isAdmin = tokenResult?.claims.admin;
+      setIsAdmin(!!isAdmin);
+    }
+
+    fetchAdminStatus();
+  }, []);
 
   const accountItems: MenuProps['items'] = [
     {
@@ -79,7 +90,7 @@ const Header = (props: Props) => {
     <>
       {contextHolder}
       <div className={styles.header}>
-        <Link href="/statistic">
+        <Link href="/ielts">
           <div
             className={styles.logo}
             onClick={() => tabClickHandler('ielts')}
@@ -97,38 +108,44 @@ const Header = (props: Props) => {
           </div>
         </Link>
         <div className={clsx(styles.navigator)}>
-          <Link
-            href="/statistic"
-            onClick={() => tabClickHandler('home')}
-          >
-            <p className={clsx(activatedTab === 'home' && styles.activate)}>
-              Buddie đồng hành
-            </p>
-          </Link>
+          {!isAdmin && (
+            <Link
+              href="/statistic"
+              onClick={() => tabClickHandler('home')}
+            >
+              <p className={clsx(activatedTab === 'home' && styles.activate)}>
+                Buddie đồng hành
+              </p>
+            </Link>
+          )}
           <Link
             href="/tests"
             onClick={() => tabClickHandler('exams')}
           >
             <p className={clsx(activatedTab === 'exams' && styles.activate)}>
-              Đề thi
+              {!isAdmin ? 'Đề thi' : 'Đề thi User'}
             </p>
           </Link>
-          <Link
-            href="/community"
-            onClick={() => tabClickHandler('community')}
-          >
-            <p
-              className={clsx(activatedTab === 'community' && styles.activate)}
+          {!isAdmin && (
+            <Link
+              href="/community"
+              onClick={() => tabClickHandler('community')}
             >
-              Cộng đồng
-            </p>
-          </Link>
+              <p
+                className={clsx(
+                  activatedTab === 'community' && styles.activate
+                )}
+              >
+                Cộng đồng
+              </p>
+            </Link>
+          )}
           <Link
             href="/ielts"
             onClick={() => tabClickHandler('ielts')}
           >
             <p className={clsx(activatedTab === 'ielts' && styles.activate)}>
-              IELTS cùng AI✨
+              {!isAdmin ? 'IELTS cùng AI✨' : 'Đề thi Buddie'}
             </p>
           </Link>
           <Dropdown

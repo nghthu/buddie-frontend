@@ -274,6 +274,25 @@ const SpeakingAssessment = (props: Props) => {
                       )
                     )}
                   </TextCard>
+                  <div className={styles.note}>
+                    <p>Ghi chú:</p>
+                    <p>
+                      <del className={styles.red}>hyphenated word</del> cho biết
+                      từ này dùng sai ngữ pháp.
+                    </p>
+                    <p>
+                      <span className={styles.red}>red word</span> cho biết bạn
+                      phát âm chưa tốt, điểm nhận được từ 0-50.
+                    </p>
+                    <p>
+                      <span className={styles.yellow}>yellow word</span> cho
+                      biết bạn phát âm trung bình, điểm nhận được từ 50-80.
+                    </p>
+                    <p>
+                      <span className={styles.green}>green word</span> cho biết
+                      bạn phát âm rất tốt, điểm nhận được từ 80-100.
+                    </p>
+                  </div>
                 </div>
               ))}
             </div>

@@ -123,6 +123,7 @@ const PracticeSpeaking = ({
   const [menuVisible, setMenuVisible] = useState(false);
   const [menuPosition, setMenuPosition] = useState({ x: 0, y: 0 });
   const [remainingTime, setRemainingTime] = useState<number>(0);
+  const [startRecordingTime, setStartRecordingTime] = useState<number>(0);
 
   const router = useRouter();
   const user = auth.currentUser;
@@ -157,6 +158,7 @@ const PracticeSpeaking = ({
   }
 
   const startRecording = async (streamData: MediaStream) => {
+    setStartRecordingTime(Date.now() + 60 * 1000);
     setRecordingStatus('recording');
     setDisable(true);
     if (streamData) {
@@ -655,6 +657,17 @@ const PracticeSpeaking = ({
               {recordingStatus === 'inactive' && <AudioOutlined />}
               {recordingStatus === 'recording' && <EllipsisOutlined />}
             </Button>
+            {recordingStatus === 'recording' && (
+              <Countdown
+                className={styles.audioTime}
+                value={startRecordingTime}
+                onChange={(value) => {
+                  if (Number(value) < 0) {
+                    stopRecording();
+                  }
+                }}
+              />
+            )}
             {audio ? (
               <div className={styles['audio-container']}>
                 <audio
