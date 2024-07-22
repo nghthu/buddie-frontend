@@ -375,7 +375,10 @@ const Home = () => {
       </div>
       {isLoading && <Spin size="large" />}
       {!isLoading && (
-        <div className={styles.statistic}>
+        <div
+          className={styles.statistic}
+          style={{ visibility: 'hidden' }}
+        >
           <DatePicker
             onChange={dateChangeHandler}
             picker="month"

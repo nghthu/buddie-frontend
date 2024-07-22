@@ -15,7 +15,6 @@ const TextCard = (props: {
       style={{
         width: props.width,
         height: props.height,
-        overflowY: props.scroll ? 'scroll' : 'unset',
       }}
       onClick={props.onClick}
     >
