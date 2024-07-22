@@ -375,16 +375,15 @@ const Home = () => {
       </div>
       {isLoading && <Spin size="large" />}
       {!isLoading && (
-        <div
-          className={styles.statistic}
-          style={{ visibility: 'hidden' }}
-        >
-          <DatePicker
-            onChange={dateChangeHandler}
-            picker="month"
-            className={styles.datePicker}
-            placeholder="Chọn tháng"
-          />
+        <div className={styles.statistic}>
+          <div style={{ visibility: 'hidden' }}>
+            <DatePicker
+              onChange={dateChangeHandler}
+              picker="month"
+              className={styles.datePicker}
+              placeholder="Chọn tháng"
+            />
+          </div>
           <div className={clsx(styles.dataCard, styles.timeSpendCard)}>
             <ChartComponent
               data={{
