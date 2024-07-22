@@ -6,6 +6,7 @@ const TextCard = (props: {
   width: string;
   height: string;
   className?: string;
+  scroll?: boolean;
   onClick?: (event: React.MouseEvent<HTMLDivElement>) => void;
 }) => {
   return (
@@ -14,6 +15,7 @@ const TextCard = (props: {
       style={{
         width: props.width,
         height: props.height,
+        overflowY: props.scroll ? 'scroll' : 'unset',
       }}
       onClick={props.onClick}
     >

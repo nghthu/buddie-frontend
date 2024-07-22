@@ -23,7 +23,7 @@ export default function AuthLayout({
     if (user) {
       user.reload().then(() => {
         if (user.emailVerified) {
-          return router.replace('/ielts');
+          return router.replace('/statistic');
         } else if (pathname !== '/verify') {
           return router.replace('/verify');
         }

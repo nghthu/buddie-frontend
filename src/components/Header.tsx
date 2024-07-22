@@ -79,7 +79,7 @@ const Header = (props: Props) => {
     <>
       {contextHolder}
       <div className={styles.header}>
-        <Link href="/ielts">
+        <Link href="/statistic">
           <div
             className={styles.logo}
             onClick={() => tabClickHandler('ielts')}

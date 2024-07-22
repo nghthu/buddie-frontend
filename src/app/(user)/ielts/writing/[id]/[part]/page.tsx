@@ -213,6 +213,9 @@ export default function PracticePage({
         } else {
           submittedAnswers = {
             test_id: params.id,
+            time_spent: Math.round(
+              testTime - (remainingTime - Date.now()) / 1000
+            ),
             parts: [
               ...part1Answer,
               {

@@ -172,6 +172,9 @@ const ListeningPractice = ({
     } else {
       submittedAnswers = {
         test_id: structuredAnswers.test_id,
+        time_spent: Math.round(
+          data.duration - (remainingTime - Date.now()) / 1000
+        ),
         parts: [structuredAnswers.parts[Number(params.part) - 1]],
       };
     }

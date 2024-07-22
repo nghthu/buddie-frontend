@@ -664,6 +664,7 @@ const PracticeSpeaking = ({
               </div>
             ) : null}
             <TextCard
+              scroll
               width="50%"
               height="170px"
               className={styles.transcription}

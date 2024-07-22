@@ -414,7 +414,7 @@ const Home = () => {
                 },
                 plugins: {
                   title: {
-                    text: `Thời gian làm bài và số bài thi ${monthYear[0]}/${monthYear[1]}`,
+                    text: `Thời gian làm bài và số bài thi`,
                     font: {
                       family: 'Lexend',
                       size: 20,
