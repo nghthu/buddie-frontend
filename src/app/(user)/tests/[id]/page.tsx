@@ -214,9 +214,9 @@ export default function TestLanding({ params }: { params: { id: string } }) {
           user_name={test?.user?.display_name || 'lorem ipsum'}
           rating={rating || 0}
           rating_count={totalRating || 0}
-          create_date={test.created_at || '2024-04-23T06:57:19.523Z'}
-          submission_count={test.submission_count || 0}
-          test_id={test._id}
+          create_date={test?.created_at || '2024-04-23T06:57:19.523Z'}
+          submission_count={test?.submission_count || 0}
+          test_id={test?._id}
           handleRefresh={handleRefresh}
         />
         <PartSelector

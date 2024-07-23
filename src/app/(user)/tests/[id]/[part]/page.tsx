@@ -12,6 +12,9 @@ import { User } from 'firebase/auth';
 import { DoubleLeftOutlined, DoubleRightOutlined } from '@ant-design/icons';
 
 const { TextArea } = Input;
+import { Statistic } from 'antd';
+import AudioPlayer from '@/components/AudioPlayer';
+const { Countdown } = Statistic;
 
 interface Part {
   part_duration: number;
@@ -83,6 +86,7 @@ const UserTestPractice = ({
   const [loading, setIsloading] = useState(false);
   const router = useRouter();
   const user = auth.currentUser;
+  const [remainingTime, setRemainingTime] = useState<number>(Date.now());
 
   let finalPart = 0;
 
@@ -94,6 +98,7 @@ const UserTestPractice = ({
 
   useEffect(() => {
     if (data && testData === null) {
+      setRemainingTime(Date.now() + data.duration * 1000);
       if (params.part !== 'all') {
         setTestData(data.parts[Number(params.part) - 1].question_groups);
       } else {
@@ -136,6 +141,9 @@ const UserTestPractice = ({
     setIsloading(true);
     const structuredAnswers = {
       test_id: data._id,
+      time_spent: Math.round(
+        data.duration - (remainingTime - Date.now()) / 1000
+      ),
       parts: data.parts.map((part: Part, index: number) => ({
         _id: part._id,
         part_number: index + 1,
@@ -165,6 +173,9 @@ const UserTestPractice = ({
     } else {
       submittedAnswers = {
         test_id: structuredAnswers.test_id,
+        time_spent: Math.round(
+          data.duration - (remainingTime - Date.now()) / 1000
+        ),
         parts: [structuredAnswers.parts[Number(params.part) - 1]],
       };
     }
@@ -203,11 +214,20 @@ const UserTestPractice = ({
 
   return (
     <div className={styles.container}>
-      {/* <AudioPlayer
-        audioUrl={data?.test_recording}
-        disableStopButton
-      /> */}
-      <h2 className={styles.part}>Phần {currentPart + 1}:</h2>
+      {data.test_recording && (
+        <AudioPlayer
+          audioUrl={data.test_recording}
+          disableStopButton
+        />
+      )}
+      <div className={styles.header}>
+        <h2 className={styles.part}>Phần {currentPart + 1}:</h2>
+        <Countdown
+          title="Thời gian còn lại"
+          value={remainingTime}
+        />
+      </div>
+
       <TextCard
         width="100%"
         height="auto"

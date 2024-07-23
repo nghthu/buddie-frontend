@@ -4,6 +4,12 @@
   border-radius: 2px;
 }
 
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
 .part {
   color: #10a9a0;
 }
