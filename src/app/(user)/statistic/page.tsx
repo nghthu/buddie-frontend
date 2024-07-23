@@ -203,6 +203,8 @@ const Home = () => {
   const [supportData, setSupportData] = useState<null | SkillEntry[]>(null);
   const [monthYear, setMonthYear] = useState<number[]>([7, 2024]);
 
+  console.log(monthYear);
+
   const { data, isLoading } = useSWR(
     {
       url: `/api/users/${user?.uid}/reports?month=${monthYear[0]}&year=${monthYear[1]}`,
@@ -319,29 +321,11 @@ const Home = () => {
 
       <div className={styles.historyContainer}>
         <div className={styles.headerContainer}>
-          <h1> Kết quả luyện thi trong tháng</h1>
+          <h1>Bài thi gần nhất</h1>
           <Link href={'/statistic/history'}>
             <p>Xem tất cả</p>
           </Link>
         </div>
-
-        <div className={styles.resultContainer}>
-          <div className={styles.result}>
-            <h1>{formatTime(totalSpentTime)}</h1>
-            <p>Tổng thời gian</p>
-          </div>
-
-          <div className={styles.result}>
-            <h1>
-              {timeSpentData?.reduce(
-                (total, data) => total + data.submission_count,
-                0
-              ) ?? 0}
-            </h1>
-            <p>Bài tập</p>
-          </div>
-        </div>
-
         <div className={styles.testContainer}>
           {tests?.test_submissions.map((submission: TestSubmission) => {
             return (
@@ -376,13 +360,34 @@ const Home = () => {
       {isLoading && <Spin size="large" />}
       {!isLoading && (
         <div className={styles.statistic}>
-          <div style={{ visibility: 'hidden' }}>
-            <DatePicker
-              onChange={dateChangeHandler}
-              picker="month"
-              className={styles.datePicker}
-              placeholder="Chọn tháng"
-            />
+          <DatePicker
+            onChange={dateChangeHandler}
+            picker="month"
+            className={styles.datePicker}
+            placeholder={`${monthYear[0]}/${monthYear[1]}`}
+          />
+
+          <div className={styles.headerContainer}>
+            <h1 className={styles.result}>
+              {`Kết quả luyện thi trong tháng ${monthYear[0]}/${monthYear[1]}`}
+            </h1>
+          </div>
+
+          <div className={styles.resultContainer}>
+            <div className={styles.result}>
+              <h1>{formatTime(totalSpentTime)}</h1>
+              <p>Tổng thời gian</p>
+            </div>
+
+            <div className={styles.result}>
+              <h1>
+                {timeSpentData?.reduce(
+                  (total, data) => total + data.submission_count,
+                  0
+                ) ?? 0}
+              </h1>
+              <p>Bài tập</p>
+            </div>
           </div>
           <div className={clsx(styles.dataCard, styles.timeSpendCard)}>
             <ChartComponent

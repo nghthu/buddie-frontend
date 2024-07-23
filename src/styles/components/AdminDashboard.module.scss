@@ -1,0 +1,14 @@
+.admin-dashboard {
+  padding: 20px;
+}
+
+.green {
+  color: #10a9a0;
+}
+
+.delete {
+  color: #f13b3ba9;
+  &:hover {
+    color: red;
+  }
+}

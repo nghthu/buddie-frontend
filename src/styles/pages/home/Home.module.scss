@@ -5,6 +5,7 @@
   align-items: center;
   background-color: white;
   gap: 30px;
+  padding: 20px;
 }
 
 .ieltsContainer {
@@ -119,6 +120,7 @@
   border: 1px solid black;
   border-radius: 15px;
   background-color: white;
+  width: 300px;
 
   & h1 {
     font-size: 20px;
@@ -161,7 +163,7 @@
 }
 
 .statistic {
-  height: 950px;
+  height: 1100px;
   width: 100%;
   display: flex;
   flex-direction: row;
@@ -199,4 +201,11 @@
 .skillTimeCard {
   width: 40%;
   height: 35rem;
+}
+
+.result {
+  padding: 25px;
+  font-size: 25px;
+  font-weight: 500;
+  margin-top: -50px;
 }
