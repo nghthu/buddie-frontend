@@ -40,6 +40,7 @@
   padding: 10px;
   display: flex;
   flex-direction: column;
+  padding: 20px;
 }
 .checked {
   border: solid green 3px;
@@ -63,8 +64,29 @@
 }
 
 .excellentBtn {
-  width: 25px !important;
-  height: 25px !important;
+  width: 30px !important;
+  height: 30px !important;
+  &:hover {
+    background-color: #f1e6a3 !important;
+    color: #ff8000 !important;
+    font-weight: bold;
+  }
+}
+
+.yellow-card {
+  width: 100%;
+  height: 30px;
+  background-color: #fce407;
+  border-radius: 10px 10px 0 0;
+  font-size: 13px;
+  font-weight: bold;
+  color: white;
+  display: flex;
+  align-items: center;
+  padding-left: 20px;
+  margin-bottom: -25px;
+  z-index: 999;
+  border-bottom: solid 1px rgba(0, 0, 0, 0.3725490196);
 }
 
 .post-answer-metadata {

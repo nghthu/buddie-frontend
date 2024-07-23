@@ -29,6 +29,7 @@ interface Post {
   user: User;
   audio_url: string;
   image_url: string;
+  user_id: string;
 }
 
 interface Props {

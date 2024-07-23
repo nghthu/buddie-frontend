@@ -34,6 +34,7 @@ interface Post {
   user: User;
   audio_url: string;
   image_url: string;
+  user_id: string;
 }
 
 interface Props {
@@ -51,14 +52,25 @@ const PostDetail = ({ postData }: Props) => {
   const [audioPlaying, setAudioPlaying] = useState(false);
 
   useEffect(() => {
+    const canSetExcellent = postData.answers.every(
+      (answer) => !answer.is_excellent
+    );
     const postAnswersTemp = postData.answers.map((answer) => (
       <PostAnswer
         key={answer._id}
+        questionId={postData._id}
         answer={answer}
+        canSetExcellent={canSetExcellent && postData.user_id === user?.uid}
       />
     ));
     setPostAnswers(postAnswersTemp);
-  }, [setPostAnswers, postData.answers]);
+  }, [
+    setPostAnswers,
+    postData.answers,
+    user?.uid,
+    postData._id,
+    postData.user_id,
+  ]);
 
   const handleAudio = (e: React.MouseEvent<HTMLElement>) => {
     e.stopPropagation();
@@ -97,11 +109,16 @@ const PostDetail = ({ postData }: Props) => {
           new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
         );
       })[0];
+    const canSetExcellent = postData.answers.every(
+      (answer) => !answer.is_excellent
+    );
     setPostAnswers((prev) => [
       ...prev,
       <PostAnswer
         key={newAnswer._id}
         answer={newAnswer}
+        questionId={postData._id}
+        canSetExcellent={canSetExcellent && postData.user_id === user?.uid}
       />,
     ]);
     setValue('');
