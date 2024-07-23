@@ -39,6 +39,7 @@ interface question {
   user: questionUser;
   audio_url: string;
   image_url: string;
+  user_id: string;
 }
 const fetcher = async ({ url, user }: FetchArgs) => {
   const token = await user?.getIdToken();
