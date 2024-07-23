@@ -3,7 +3,8 @@
 import clsx from 'clsx';
 import { useState } from 'react';
 import styles from '@/styles/components/Post.module.scss';
-import { CheckCircleFilled } from '@ant-design/icons';
+import { CheckCircleFilled, StarOutlined } from '@ant-design/icons';
+import { Button, Tooltip } from 'antd';
 
 interface User {
   user_id: string;
@@ -53,6 +54,14 @@ export default function PostAnswer({ answer }: Props) {
         onClick={() => setClamp(!clamp)}
       >
         <p>{answer.content}</p>
+        <Tooltip title="Bình chọn câu trả lời nổi bật">
+          <Button
+            type="text"
+            shape="circle"
+            icon={<StarOutlined />}
+            className={styles.excellentBtn}
+          />
+        </Tooltip>
       </div>
       {answer.is_excellent && (
         <CheckCircleFilled style={{ color: 'green', fontSize: '25px' }} />

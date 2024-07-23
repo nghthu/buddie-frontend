@@ -58,7 +58,7 @@ const PostDetail = ({ postData }: Props) => {
       />
     ));
     setPostAnswers(postAnswersTemp);
-  }, []);
+  }, [setPostAnswers, postData.answers]);
 
   const handleAudio = (e: React.MouseEvent<HTMLElement>) => {
     e.stopPropagation();
