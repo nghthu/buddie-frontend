@@ -48,19 +48,24 @@ const PostDetail = ({ postData }: Props) => {
   const [isPosting, setIsPosting] = useState(false);
   const [postAnswers, setPostAnswers] = useState<React.JSX.Element[]>([]);
   const audioref = useRef<HTMLAudioElement>(null);
+  const [canSetExcellent, setCanSetExcellent] = useState(true);
 
   const [audioPlaying, setAudioPlaying] = useState(false);
 
   useEffect(() => {
-    const canSetExcellent = postData.answers.every(
+    const settedExcellent = postData.answers.every(
       (answer) => !answer.is_excellent
     );
+    if (canSetExcellent) {
+      setCanSetExcellent(settedExcellent && postData.user_id === user?.uid);
+    }
     const postAnswersTemp = postData.answers.map((answer) => (
       <PostAnswer
         key={answer._id}
         questionId={postData._id}
         answer={answer}
-        canSetExcellent={canSetExcellent && postData.user_id === user?.uid}
+        canSetExcellent={canSetExcellent}
+        setCanSetExcellent={setCanSetExcellent}
       />
     ));
     setPostAnswers(postAnswersTemp);
@@ -70,6 +75,8 @@ const PostDetail = ({ postData }: Props) => {
     user?.uid,
     postData._id,
     postData.user_id,
+    setCanSetExcellent,
+    canSetExcellent,
   ]);
 
   const handleAudio = (e: React.MouseEvent<HTMLElement>) => {
@@ -119,6 +126,7 @@ const PostDetail = ({ postData }: Props) => {
         answer={newAnswer}
         questionId={postData._id}
         canSetExcellent={canSetExcellent && postData.user_id === user?.uid}
+        setCanSetExcellent={setCanSetExcellent}
       />,
     ]);
     setValue('');
@@ -126,17 +134,11 @@ const PostDetail = ({ postData }: Props) => {
   };
   const formatDate = (date: Date) => {
     const day = String(date.getDate()).padStart(2, '0');
-    const month = String(date.getMonth() + 1).padStart(2, '0'); // Months are 0-based, so add 1
+    const month = String(date.getMonth() + 1).padStart(2, '0');
     const year = date.getFullYear();
     return `${day}/${month}/${year}`;
   };
   const newDate = new Date(postData.created_at);
-  // const formattedDate =
-  //   (newDate.getDate() < 10 ? newDate.getDate() : '0' + newDate.getDate()) +
-  //   '/' +
-  //   (newDate.getMonth() + 1) +
-  //   '/' +
-  //   newDate.getFullYear();
   const formattedDate = formatDate(newDate);
   return (
     <>

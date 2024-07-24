@@ -40,6 +40,9 @@ const Profile = () => {
     },
     fetcher
   );
+
+  console.log(profile);
+
   const [notificationApi, contextHolder] = notification.useNotification();
   useEffect(() => {
     if (error) {

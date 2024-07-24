@@ -11,13 +11,16 @@ export const PUT = async function updateQuestion(
     const response = await fetch(
       `${process.env.API_BASE_URL}/api/v1/questions/${params.id}`,
       {
-        method: 'POST',
-        headers: req.headers,
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          authorization: req.headers.get('authorization') ?? '',
+        },
         body: JSON.stringify(reqData),
       }
     );
     const data = await response.json();
-    console.log(chalk.bgCyan('Update Question Response:'), data.data);
+    console.log(chalk.bgCyan('Update Question Response:'), data);
     return NextResponse.json(data.data);
   } catch (error) {
     console.error(error);

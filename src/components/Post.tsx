@@ -62,12 +62,13 @@ const Post = ({ postData, comments, onClose }: Props) => {
     setAudioPlaying((prev) => !prev);
   };
   const newDate = new Date(postData.created_at);
-  const formattedDay =
-    newDate.getDate() < 10 ? '0' + newDate.getDate() : newDate.getDate();
-  const formattedMonth =
-    newDate.getMonth() + 1 < 10 ? '0' + newDate.getMonth() : newDate.getMonth();
-  const formattedDate =
-    formattedDay + '/' + formattedMonth + '/' + newDate.getFullYear();
+  const formatDate = (date: Date) => {
+    const day = String(date.getDate()).padStart(2, '0');
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const year = date.getFullYear();
+    return `${day}/${month}/${year}`;
+  };
+  const formattedDate = formatDate(newDate);
   return (
     <>
       <div className={styles.post}>

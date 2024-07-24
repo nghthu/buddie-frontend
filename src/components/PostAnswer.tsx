@@ -1,9 +1,9 @@
 'use client';
 
 import clsx from 'clsx';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import styles from '@/styles/components/Post.module.scss';
-import { CheckCircleFilled, StarOutlined } from '@ant-design/icons';
+import { StarOutlined } from '@ant-design/icons';
 import { Button, Tooltip } from 'antd';
 import { auth } from '@/lib';
 
@@ -23,10 +23,20 @@ interface Props {
   answer: PostAnswer;
   canSetExcellent: boolean;
   questionId: string;
+  setCanSetExcellent: (isSetted: boolean) => void;
 }
+
+const formatDate = (date: Date) => {
+  const day = String(date.getDate()).padStart(2, '0');
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const year = date.getFullYear();
+  return `${day}/${month}/${year}`;
+};
+
 export default function PostAnswer({
   answer,
   canSetExcellent,
+  setCanSetExcellent,
   questionId,
 }: Props) {
   const [clamp, setClamp] = useState(true);
@@ -34,33 +44,34 @@ export default function PostAnswer({
   const [isExcellentAnswer, setIsExcellentAnswer] = useState(
     answer.is_excellent
   );
-  const [canAwardExcellent, setCanAwardExcellent] = useState(canSetExcellent);
+  const [canAwardExcellent, setCanAwardExcellent] = useState(true);
+
+  useEffect(() => {
+    setCanAwardExcellent(canSetExcellent);
+  }, [canSetExcellent]);
 
   const newDate = new Date(answer.created_at);
-  const formattedDate =
-    (newDate.getDate() < 10 ? '0' + newDate.getDate() : newDate.getDate()) +
-    '/' +
-    (newDate.getMonth() + 1 < 10
-      ? '0' + newDate.getMonth()
-      : newDate.getMonth()) +
-    '/' +
-    newDate.getFullYear();
+  const formattedDate = formatDate(newDate);
 
   const setExcellentAnswerHandler = async () => {
-    const token = user?.getIdToken();
+    const token = await user?.getIdToken();
 
     await fetch(`/api/questions/${questionId}`, {
       method: 'PUT',
       headers: {
+        'Content-Type': 'application/json',
         authorization: `Bearer ${token}`,
       },
       body: JSON.stringify({
-        is_excellent: true,
-        _id: answer._id,
+        answer: {
+          is_excellent: true,
+          _id: answer._id,
+        },
       }),
     });
 
     setIsExcellentAnswer(true);
+    setCanSetExcellent(false);
     setCanAwardExcellent(false);
   };
 
@@ -105,9 +116,6 @@ export default function PostAnswer({
             </Tooltip>
           )}
         </div>
-        {answer.is_excellent && (
-          <CheckCircleFilled style={{ color: 'green', fontSize: '25px' }} />
-        )}
       </div>
     </>
   );
