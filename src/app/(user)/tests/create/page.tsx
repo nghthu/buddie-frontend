@@ -18,6 +18,10 @@ import { mutate } from 'swr';
 import type { InputRef } from 'antd';
 import { Flex, Input, Tag, theme, Tooltip, Select, Form } from 'antd';
 
+interface InputValues {
+  [key: number]: string;
+}
+
 const tagInputStyle: React.CSSProperties = {
   width: 64,
   height: 22,
@@ -79,6 +83,15 @@ const CreateTest = () => {
   const user = auth.currentUser;
 
   const [isAdmin, setIsAdmin] = useState(false);
+
+  const [inputValues, setInputValues] = useState<InputValues>({});
+
+  const handleAnswerInputChange = (index: number, value: string) => {
+    setInputValues((prevValues) => ({
+      ...prevValues,
+      [index]: value,
+    }));
+  };
 
   useEffect(() => {
     async function fetchAdminStatus() {
@@ -200,11 +213,9 @@ const CreateTest = () => {
 
     const result = await response.json();
     console.log(result);
-    mutate(`/api/tests?page=1&search=''&limit=10&isbuddie=false`);
-    setTimeout(() => {
-      setLoading(false);
-      router.push('/tests');
-    }, 5000);
+    await mutate(`/api/tests?page=1&search=''&limit=10&isbuddie=false`);
+    setLoading(false);
+    router.push('/tests');
   };
 
   const handleOk = async () => {
@@ -461,7 +472,7 @@ const CreateTest = () => {
             label="Thời gian (phút)"
             rules={[{ required: true, message: 'Vui lòng nhập thời gian!' }]}
           >
-            <InputNumber min={1} />
+            <InputNumber min={1}/>
           </Form.Item>
 
           <Form.Item
@@ -478,7 +489,7 @@ const CreateTest = () => {
           >
             <Flex
               gap="4px 0"
-              wrap
+              wrap="wrap"
             >
               {tags.map<React.ReactNode>((tag, index) => {
                 if (editInputIndex === index) {
@@ -689,7 +700,43 @@ const CreateTest = () => {
                       label="Thời gian làm bài (phút)"
                       name={[field.name, 'part_duration']}
                     >
-                      <InputNumber min={1} />
+                      <InputNumber min={1}
+                      onChange={(value) => {
+                        const testDuration = form.getFieldValue('duration');
+                        if (testDuration)
+                        {
+                          let totalDuration = 0;
+                          fields.forEach((field, i) => {
+                            const partDuration = form.getFieldValue([
+                              'parts',
+                              field.name,
+                              'part_duration',
+                            ]) as number;
+                            totalDuration += partDuration;
+                          });
+
+                          if (totalDuration > testDuration)
+                          {
+                            form.setFields([
+                              {
+                                name: ['parts', field.name, 'part_duration'],
+                                errors: ['Thời gian làm bài của các phần không được vượt quá thời gian làm bài của bài thi.'],
+                              },
+                            ]);
+                          }
+                          else
+                          {
+                            form.setFields([
+                              {
+                                name: ['parts', field.name, 'part_duration'],
+                                errors: [],
+                              },
+                            ]);
+                          }
+                        }
+                      }
+                      }
+                      />
                     </Form.Item>
                     <Form.List name={[field.name, 'question_groups']}>
                       {(subFields, subOpt) => (
@@ -822,7 +869,50 @@ const CreateTest = () => {
                                   'question_groups_duration',
                                 ]}
                               >
-                                <InputNumber min={1} />
+                                <InputNumber min={1} 
+                                onChange={(value) => {
+                                  const partDuration = form.getFieldValue([
+                                    'parts',
+                                    field.name,
+                                    'part_duration',
+                                  ]) as number;
+                                  if (partDuration)
+                                  {
+                                    let totalDuration = 0;
+                                    subFields.forEach((subField, i) => {
+                                      const questionGroupDuration = form.getFieldValue([
+                                        'parts',
+                                        field.name,
+                                        'question_groups',
+                                        subField.name,
+                                        'question_groups_info',
+                                        'question_groups_duration',
+                                      ]) as number;
+                                      totalDuration += questionGroupDuration;
+                                    });
+
+                                    if (totalDuration > partDuration)
+                                    {
+                                      form.setFields([
+                                        {
+                                          name: ['parts', field.name, 'question_groups', subField.name, 'question_groups_info', 'question_groups_duration'],
+                                          errors: ['Thời gian làm bài của các nhóm câu hỏi không được vượt quá thời gian làm bài của phần thi.'],
+                                        },
+                                      ]);
+                                    }
+                                    else
+                                    {
+                                      form.setFields([
+                                        {
+                                          name: ['parts', field.name, 'question_groups', subField.name, 'question_groups_info', 'question_groups_duration'],
+                                          errors: [],
+                                        },
+                                      ]);
+                                    }
+                                  }
+                                }
+                                }
+                                />
                               </Form.Item>
 
                               <Form.List name={[subField.name, 'questions']}>
@@ -1064,7 +1154,54 @@ const CreateTest = () => {
                                               'question_duration',
                                             ]}
                                           >
-                                            <InputNumber min={1} />
+                                            <InputNumber min={1}
+                                            onChange={(value) => {
+                                              const questionGroupDuration = form.getFieldValue([
+                                                'parts',
+                                                field.name,
+                                                'question_groups',
+                                                subField.name,
+                                                'question_groups_info',
+                                                'question_groups_duration',
+                                              ]) as number;
+                                              if (questionGroupDuration)
+                                              {
+                                                let totalDuration = 0;
+                                                questionFields.forEach((questionField, i) => {
+                                                  const questionDuration = form.getFieldValue([
+                                                    'parts',
+                                                    field.name,
+                                                    'question_groups',
+                                                    subField.name,
+                                                    'questions',
+                                                    questionField.name,
+                                                    'question_duration',
+                                                  ]) as number;
+                                                  totalDuration += questionDuration;
+                                                });
+
+                                                if (totalDuration > questionGroupDuration)
+                                                {
+                                                  form.setFields([
+                                                    {
+                                                      name: ['parts', field.name, 'question_groups', subField.name, 'questions', questionField.name, 'question_duration'],
+                                                      errors: ['Thời gian làm bài của các câu hỏi không được vượt quá thời gian làm bài của nhóm câu hỏi.'],
+                                                    },
+                                                  ]);
+                                                }
+                                                else
+                                                {
+                                                  form.setFields([
+                                                    {
+                                                      name: ['parts', field.name, 'question_groups', subField.name, 'questions', questionField.name, 'question_duration'],
+                                                      errors: [],
+                                                    },
+                                                  ]);
+                                                }
+                                              }
+                                            }
+                                            }
+                                            />
                                           </Form.Item>
                                         </div>
 
@@ -1118,9 +1255,7 @@ const CreateTest = () => {
                                                                 e.target.checked
                                                               ) {
                                                                 answer.push(
-                                                                  String(
-                                                                    index + 1
-                                                                  )
+                                                                  inputValues[optionField.name]
                                                                 );
                                                               } else {
                                                                 answer =
@@ -1129,10 +1264,7 @@ const CreateTest = () => {
                                                                       a: string
                                                                     ) =>
                                                                       a !==
-                                                                      String(
-                                                                        index +
-                                                                          1
-                                                                      )
+                                                                      inputValues[optionField.name]
                                                                   );
                                                               }
 
@@ -1178,7 +1310,17 @@ const CreateTest = () => {
                                                           ]}
                                                           noStyle
                                                         >
-                                                          <Input placeholder="Lựa chọn..." />
+                                                          <Input
+                                                           placeholder="Lựa chọn..."
+                                                            value = {inputValues[optionField.name] || ''}
+                                                            onChange = {(e) => {
+                                                              handleAnswerInputChange(
+                                                                optionField.name,
+                                                                e.target.value
+                                                              );
+                                                            }
+                                                            }
+                                                            />
                                                         </Form.Item>
 
                                                         <MinusCircleOutlined
@@ -1229,9 +1371,7 @@ const CreateTest = () => {
                                                 <div>
                                                   <Radio.Group
                                                     onChange={(e) => {
-                                                      const answer = String(
-                                                        e.target.value
-                                                      );
+                                                      const answer = inputValues[e.target.value];
                                                       form.setFieldsValue({
                                                         parts: {
                                                           [field.name]: {
@@ -1269,7 +1409,7 @@ const CreateTest = () => {
                                                             <Form.Item>
                                                               <Radio
                                                                 value={
-                                                                  index + 1
+                                                                  optionField.name
                                                                 }
                                                               ></Radio>
                                                             </Form.Item>
@@ -1292,7 +1432,17 @@ const CreateTest = () => {
                                                               ]}
                                                               noStyle
                                                             >
-                                                              <Input placeholder="Lựa chọn..." />
+                                                              <Input placeholder="Lựa chọn..."
+                                                              value = {inputValues[optionField.name]}
+                                                              onChange={
+                                                                (e) => {
+                                                                  handleAnswerInputChange(
+                                                                    optionField.name,
+                                                                    e.target.value
+                                                                  );
+                                                                }
+                                                              }
+                                                              />
                                                             </Form.Item>
 
                                                             <Form.Item>
@@ -1300,7 +1450,7 @@ const CreateTest = () => {
                                                                 onClick={() =>
                                                                   remove(
                                                                     optionField.name
-                                                                  )
+                                                                  )                                                               
                                                                 }
                                                               />
                                                             </Form.Item>
