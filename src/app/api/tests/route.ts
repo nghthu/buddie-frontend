@@ -4,14 +4,11 @@ import { v4 as uuid } from 'uuid';
 
 export async function GET(request: NextRequest) {
   const searchParams = request.nextUrl.searchParams;
-  const page = searchParams.get('page');
+  const offset = searchParams.get('offset');
   const test_type = searchParams.get('test_type');
   const search = searchParams.get('search');
   const isbuddie = searchParams.get('isbuddie');
-  const limit = searchParams.get('limit');
-  //const queryString = `${process.env.API_BASE_URL}/api/v1/ai/synonyms?word=speed`;
-  const offset = page ? Number(page) - 1 : 0;
-  let queryString = `${process.env.API_BASE_URL}/api/v1/tests?limit=${limit}&offset=${offset}&access=public&is_buddie_test=${isbuddie}`;
+  let queryString = `${process.env.API_BASE_URL}/api/v1/tests?limit=10&offset=${offset}&access=public&is_buddie_test=${isbuddie}`;
   if (test_type) {
     queryString += `&test_type=${test_type}`;
   }
@@ -19,9 +16,6 @@ export async function GET(request: NextRequest) {
     // const encodedSearch = encodeURIComponent(search);
     queryString += `&keyword=${search}`;
   }
-  //const queryString = `${process.env.API_BASE_URL}/api/v1/tests/661b5d4b0d4e11e6b2817f1b`;
-  console.log(queryString);
-
   try {
     const response = await fetch(queryString, {
       method: 'GET',

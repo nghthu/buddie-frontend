@@ -7,7 +7,6 @@ import { auth } from '@/lib';
 import useSWR from 'swr';
 import { SetStateAction, useEffect, useRef, useState } from 'react';
 import TestCard from './TestCard';
-import { LoadingOutlined } from '@ant-design/icons';
 import styles from '@/styles/components/TestSelector.module.scss';
 import { Input } from 'antd';
 import type { SearchProps } from 'antd/es/input/Search';
@@ -49,6 +48,7 @@ const fetcher = async ({ url, user }: FetchArgs) => {
 
   return response.data;
 };
+
 const { Search } = Input;
 const LIMIT = 10;
 export default function TestLibrary(props: {
@@ -56,14 +56,13 @@ export default function TestLibrary(props: {
   setPageLoading: React.Dispatch<SetStateAction<boolean>>;
   text?: string;
 }) {
-  // TODO: Implement infinite scroll and fetch more data and use setTotalPage
-  const [totalPage, setTotalPage] = useState(1);
+  const [offset, setOffset] = useState(0);
   const [filteredTests, setFilteredTests] = useState<test[]>([]);
   const [searchValue, setSearchValue] = useState('');
   const scrollRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
 
-  const apiUrl = `/api/tests?page=${totalPage}&search=${searchValue}&limit=${LIMIT}&isbuddie=false`;
+  const apiUrl = `/api/tests?offset=${offset}&search=${searchValue}&limit=${LIMIT}&isbuddie=false`;
   const user = auth.currentUser;
   const {
     data: rawTests,
@@ -111,43 +110,14 @@ export default function TestLibrary(props: {
     router.refresh();
   };
 
-  // const handleLoad = () => {
-  //   setTotalPage((prev) => prev + 1);
-  // };
-  // useEffect(() => {
-  //     handleFilterTests();
-  // }, [selectedSkill, searchValue]);
-
-  // TODO: use react inf scroll
-  // useEffect(() => {
-  //     const scrollElement = scrollRef.current;
-  //     if (scrollElement) {
-  //         scrollElement.addEventListener('scroll', () => {
-  //             if (scrollElement.scrollHeight - scrollElement.scrollTop <= scrollElement.clientHeight) {
-  //                 if (totalPage >= (rawTests.pagination.total_count / 10)) {
-  //                     return;
-  //                 }
-  //                 handleLoad();
-  //             }
-  //         })
-  //     }
-  //     return () => {
-  //         scrollElement?.removeEventListener('scroll', () => { });
-  //     }
-  // }, [])
   const onSearch: SearchProps['onSearch'] = (value) => {
     // split the search value into an array of words, delimiter is space
     const searchWords = encodeURIComponent(value.trim());
+    setOffset(0);
     setSearchValue(searchWords);
+    setFilteredTests([]);
   };
-  // const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-  //     console.log([e.target.value]);
-  //     setSearchValue([e.target.value]);
-  // }
 
-  if ((isLoading && filteredTests.length === 0) || props.pageLoading) {
-    return <Spin size="default" />;
-  }
   const testComponent = filteredTests.map((test) => {
     const partIds = test.parts
       ? test.parts.map((part: { _id: string }) => part._id)
@@ -171,8 +141,8 @@ export default function TestLibrary(props: {
     );
   });
   const handleInfScroll = () => {
-    if (totalPage < rawTests?.pagination.total_count / 10) {
-      setTotalPage((prev) => prev + LIMIT);
+    if (offset + LIMIT < rawTests?.pagination?.total_count ?? 0) {
+      setOffset((prev) => prev + LIMIT);
     }
   };
 
@@ -207,33 +177,32 @@ export default function TestLibrary(props: {
           scrollableTarget="scrollableDiv"
           dataLength={testComponent.length}
           next={handleInfScroll}
-          hasMore={totalPage < rawTests?.pagination.total_count / 10}
+          hasMore={offset + LIMIT < rawTests?.pagination?.total_count ?? 0}
           loader={<h4>Loading...</h4>}
           className={styles.wrapper}
         >
+          {(isLoading || props.pageLoading) && (
+            <Spin
+              size="large"
+              style={{
+                width: '100%',
+                height: '100%',
+                position: 'fixed',
+                top: 0,
+                left: 0,
+              }}
+            />
+          )}
           {testComponent}
         </InfiniteScroll>
-        {testComponent.length === 0 && (
+        {testComponent.length === 0 && !(isLoading || props.pageLoading) && (
           <Empty
             image={Empty.PRESENTED_IMAGE_SIMPLE}
             description="Không tìm thấy bài thi nào"
             style={{ width: '100%' }}
           />
         )}
-        {isLoading && (
-          <div className={styles.overlay}>
-            <Spin
-              size="default"
-              indicator={
-                <LoadingOutlined
-                  style={{ fontSize: 100 }}
-                  spin
-                />
-              }
-            />
-          </div>
-        )}
-        {rawTests && totalPage < rawTests.pagination.total_count / 10 && (
+        {offset + LIMIT < (rawTests?.pagination?.total_count ?? 0) && (
           <div className={styles.freeSpace}></div>
         )}
       </div>

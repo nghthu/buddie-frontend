@@ -7,7 +7,6 @@ import { auth } from '@/lib';
 import useSWR from 'swr';
 import { SetStateAction, useEffect, useRef, useState } from 'react';
 import TestCard from './TestCard';
-import { LoadingOutlined } from '@ant-design/icons';
 import styles from '@/styles/components/TestSelector.module.scss';
 import { Input } from 'antd';
 import type { SearchProps } from 'antd/es/input/Search';
@@ -46,6 +45,7 @@ const fetcher = async ({ url, user }: FetchArgs) => {
 
   return response.data;
 };
+
 const { Search } = Input;
 const LIMIT = 10;
 export default function TestSelector(props: {
@@ -55,14 +55,14 @@ export default function TestSelector(props: {
   text?: string;
 }) {
   // TODO: Implement infinite scroll and fetch more data and use setTotalPage
-  const [totalPage, setTotalPage] = useState(1);
+  const [offset, setOffset] = useState(0);
   // const tests = useRef([]);
   const [filteredTests, setFilteredTests] = useState<test[]>([]);
   const [searchValue, setSearchValue] = useState('');
   const [selectedSkill, setSelectedSkill] = useState('');
   const scrollRef = useRef<HTMLDivElement>(null);
 
-  const apiUrl = `/api/tests?page=${totalPage}&test_type=${selectedSkill}&search=${searchValue}&limit=${LIMIT}&isbuddie=true`;
+  const apiUrl = `/api/tests?offset=${offset}&test_type=${selectedSkill}&search=${searchValue}&limit=${LIMIT}&isbuddie=true`;
   const user = auth.currentUser;
   const {
     data: rawTests,
@@ -96,54 +96,25 @@ export default function TestSelector(props: {
       // setTests((prev) => [...prev, ...rawTests.tests]);
     }
   }, [rawTests]);
-  useEffect(() => {
-    if (isLoading) {
-      scrollRef.current?.style.setProperty('overflow-y', 'hidden');
-    } else {
-      scrollRef.current?.style.setProperty('overflow-y', 'scroll');
-    }
-  }, [isLoading]);
 
-  // const handleLoad = () => {
-  //   setTotalPage((prev) => prev + 1);
-  // };
-  // useEffect(() => {
-  //     handleFilterTests();
-  // }, [selectedSkill, searchValue]);
-
-  // TODO: use react inf scroll
-  // useEffect(() => {
-  //     const scrollElement = scrollRef.current;
-  //     if (scrollElement) {
-  //         scrollElement.addEventListener('scroll', () => {
-  //             if (scrollElement.scrollHeight - scrollElement.scrollTop <= scrollElement.clientHeight) {
-  //                 if (totalPage >= (rawTests.pagination.total_count / 10)) {
-  //                     return;
-  //                 }
-  //                 handleLoad();
-  //             }
-  //         })
-  //     }
-  //     return () => {
-  //         scrollElement?.removeEventListener('scroll', () => { });
-  //     }
-  // }, [])
   const onSearch: SearchProps['onSearch'] = (value) => {
     // split the search value into an array of words, delimiter is space
     const searchWords = encodeURIComponent(value.trim());
+    setFilteredTests([]);
+    setOffset(0);
     setSearchValue(searchWords);
+    console.log(value);
   };
   const handleChange = (value: string) => {
+    setFilteredTests([]);
+    setOffset(0);
     setSelectedSkill(value);
   };
   // const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
   //     console.log([e.target.value]);
   //     setSearchValue([e.target.value]);
   // }
-  if ((isLoading && filteredTests.length === 0) || props.pageLoading) {
-    return <Spin size="default" />;
-  }
-  const testComponent = filteredTests.map(
+  const testComponent = filteredTests?.map(
     (test: {
       _id: string;
       test_name: string;
@@ -170,9 +141,9 @@ export default function TestSelector(props: {
       );
     }
   );
-  const hasMore = rawTests && totalPage < rawTests.pagination.total_count / 10;
+  const hasMore = offset + LIMIT < (rawTests?.pagination?.total_count ?? 0);
   const handleInfScroll = () => {
-    setTotalPage((prev) => prev + LIMIT);
+    setOffset((prev) => prev + LIMIT);
   };
   return (
     <div className={styles.container}>
@@ -183,9 +154,10 @@ export default function TestSelector(props: {
           placeholder="Nhập từ khóa cần tìm"
           onSearch={onSearch}
           style={{ width: 300 }}
+          defaultValue={decodeURIComponent(searchValue)}
         />
         <Select
-          defaultValue=""
+          defaultValue={selectedSkill}
           options={[
             {
               value: '',
@@ -223,34 +195,34 @@ export default function TestSelector(props: {
           scrollThreshold={0.9}
           next={handleInfScroll}
           hasMore={hasMore}
-          loader={<Spin size="default" />}
+          loader={<></>}
           className={styles.wrapper}
         >
+          {(isLoading || props.pageLoading) && (
+            <Spin
+              size="large"
+              style={{
+                width: '100%',
+                height: '100%',
+                position: 'fixed',
+                top: 0,
+                left: 0,
+              }}
+            />
+          )}
           {testComponent}
         </InfiniteScroll>
-        {testComponent.length === 0 && (
+        {testComponent.length === 0 && !(isLoading || props.pageLoading) && (
           <Empty
             image={Empty.PRESENTED_IMAGE_SIMPLE}
             description="Không tìm thấy bài thi nào"
             style={{ width: '100%' }}
           />
         )}
-        {isLoading && (
-          <div className={styles.overlay}>
-            <Spin
-              size="default"
-              indicator={
-                <LoadingOutlined
-                  style={{ fontSize: 100 }}
-                  spin
-                />
-              }
-            />
-          </div>
-        )}
-        {rawTests && totalPage < rawTests.pagination.total_count / 10 && (
-          <div className={styles.freeSpace}></div>
-        )}
+        {rawTests &&
+          offset + LIMIT < (rawTests?.pagination?.total_count ?? 0) && (
+            <div className={styles.freeSpace}></div>
+          )}
       </div>
     </div>
   );
