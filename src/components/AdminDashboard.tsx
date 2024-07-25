@@ -1,10 +1,17 @@
 import styles from '@/styles/components/AdminDashboard.module.scss';
-import { Space, Spin, Table, Tag, Tooltip } from 'antd';
-import type { TableProps } from 'antd';
+import { Button, Space, Table, Tag, Tooltip } from 'antd';
+import { TableProps, notification } from 'antd';
 import { User } from 'firebase/auth';
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import useSWR from 'swr';
 import { auth } from '@/lib';
+import Link from 'next/link';
+import type { NotificationArgsProps } from 'antd';
+import type { SearchProps } from 'antd/es/input/Search';
+import { Input } from 'antd';
+import { useRouter } from 'next/navigation';
+
+const { Search } = Input;
 
 interface Review {
   star: number;
@@ -83,69 +90,6 @@ interface FetchArgs {
   user: User | null;
 }
 
-const columns: TableProps<DataTable>['columns'] = [
-  {
-    title: 'Mã đề thi',
-    dataIndex: 'key',
-    key: 'key',
-    render: (text) => (
-      <Tooltip title="Xem chi tiết">
-        <a className={styles.green}>{text}</a>
-      </Tooltip>
-    ),
-  },
-  {
-    title: 'Tên đề thi',
-    dataIndex: 'name',
-    key: 'name',
-  },
-  {
-    title: 'Người tạo',
-    dataIndex: 'owner',
-    key: 'owner',
-  },
-  {
-    title: 'Ngày tạo',
-    dataIndex: 'createdDate',
-    key: 'createdDate',
-  },
-  {
-    title: 'Tags',
-    key: 'tags',
-    dataIndex: 'tags',
-    render: (_, { tags }) => (
-      <>
-        {tags.map((tag) => {
-          let color = 'green';
-          if (tag.toLowerCase().includes('ielts')) {
-            color = 'geekblue';
-          }
-          return (
-            <Tag
-              color={color}
-              key={tag}
-            >
-              {tag}
-            </Tag>
-          );
-        })}
-      </>
-    ),
-  },
-  {
-    title: 'Hành động',
-    key: 'action',
-    render: () => (
-      // render: (_, record) => (
-      <Space size="middle">
-        {/* <a>Invite {record.name}</a> */}
-        <a>Chỉnh sửa</a>
-        <a className={styles.delete}>Delete</a>
-      </Space>
-    ),
-  },
-];
-
 const fetcher = async ({ url, user }: FetchArgs) => {
   const token = await user?.getIdToken();
   const response = await fetch(url, {
@@ -161,19 +105,35 @@ const fetcher = async ({ url, user }: FetchArgs) => {
   return response.data;
 };
 
-const LIMIT = 8;
+type NotificationPlacement = NotificationArgsProps['placement'];
+const Context = React.createContext({ status: 'Success' });
 
-const AdminDashboard = () => {
+const LIMIT = 50;
+const OFFSET = 0;
+
+const AdminDashboard = ({ buddie = false }: { buddie?: boolean }) => {
   const [totalPage] = useState(1);
-  const [searchValue] = useState('');
   const [tableData, setTableData] = useState<DataTable[] | undefined>(
     undefined
   );
-  const user = auth.currentUser;
+  const [api, contextHolder] = notification.useNotification();
+  const [columns, setColumns] =
+    useState<TableProps<DataTable>['columns']>(undefined);
+  const [contextValue, setContextValue] = useState({ status: '' });
+  const [loading, setLoading] = useState(false);
+  const [searchValue, setSearchValue] = useState('');
 
-  const { data, isLoading } = useSWR(
+  const user = auth.currentUser;
+  const router = useRouter();
+
+  const {
+    data,
+    isLoading,
+    mutate: mutateTests,
+    isValidating,
+  } = useSWR(
     {
-      url: `/api/tests?page=${totalPage}&search=${searchValue}&limit=${LIMIT}&isbuddie=false`,
+      url: `/api/tests?page=${totalPage}&search=${searchValue}&offset=${OFFSET}&limit=${LIMIT}&isbuddie=${buddie}&`,
       user,
     },
     fetcher
@@ -181,6 +141,80 @@ const AdminDashboard = () => {
 
   useEffect(() => {
     if (data) {
+      setColumns([
+        {
+          title: 'Mã đề thi',
+          dataIndex: 'key',
+          key: 'key',
+          width: '15%',
+          render: (text) => (
+            <Tooltip title="Xem chi tiết">
+              <a className={styles.green}>{text}</a>
+            </Tooltip>
+          ),
+        },
+        {
+          title: 'Tên đề thi',
+          dataIndex: 'name',
+          key: 'name',
+          width: '25%',
+        },
+        {
+          title: 'Người tạo',
+          dataIndex: 'owner',
+          key: 'owner',
+          width: '15%',
+        },
+        {
+          title: 'Ngày tạo',
+          dataIndex: 'createdDate',
+          key: 'createdDate',
+          width: '15%',
+        },
+        {
+          title: 'Tags',
+          key: 'tags',
+          dataIndex: 'tags',
+          width: '15%',
+          render: (_, { tags }) => (
+            <>
+              {tags.map((tag) => {
+                let color = 'green';
+                if (tag.toLowerCase().includes('ielts')) {
+                  color = 'geekblue';
+                }
+                return (
+                  <Tag
+                    color={color}
+                    key={tag}
+                  >
+                    {tag}
+                  </Tag>
+                );
+              })}
+            </>
+          ),
+        },
+        {
+          title: 'Hành động',
+          key: 'action',
+          width: '15%',
+          render: (_, record) => (
+            <Space size="middle">
+              <Link href={`/tests/update/${record.key}`}>Cập nhật</Link>
+              <Button
+                type="link"
+                danger
+                onClick={() => deleteTestHandler(record.key)}
+                className={styles.delete}
+              >
+                Xóa
+              </Button>
+            </Space>
+          ),
+        },
+      ]);
+
       const tableFormattedData: DataTable[] = data.tests.map((test: Test) => {
         const date = new Date(test.created_at);
         const day = date.getUTCDate().toString().padStart(2, '0');
@@ -202,14 +236,84 @@ const AdminDashboard = () => {
     }
   }, [data]);
 
-  if (isLoading) return <Spin size="large" />;
+  const openNotification = (placement: NotificationPlacement, type: string) => {
+    console.log(type);
+    if (type === 'success')
+      return api.success({
+        message: (
+          <Context.Consumer>{({ status }) => `${status}!`}</Context.Consumer>
+        ),
+        placement,
+      });
+    return api.error({
+      message: (
+        <Context.Consumer>{({ status }) => `${status}!`}</Context.Consumer>
+      ),
+      placement,
+    });
+  };
+
+  const deleteTestHandler = async (testId: string) => {
+    const user = auth.currentUser;
+    const token = await user?.getIdToken();
+
+    setLoading(true);
+    const response = await fetch(`/api/tests/${testId}`, {
+      method: 'DELETE',
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    const result = await response.json();
+    mutateTests();
+    console.log(result);
+    if (result.status === 'success') {
+      setContextValue({ status: `Xóa thành công` });
+    } else {
+      setContextValue({ status: `Đã có lỗi xảy ra, xin hãy thử lại sau` });
+    }
+    openNotification('topRight', result.status);
+    setLoading(false);
+  };
+
+  const onSearch: SearchProps['onSearch'] = (value) => {
+    const searchWords = encodeURIComponent(value.trim());
+    setSearchValue(searchWords);
+  };
+
+  const createTest = () => {
+    router.push('/ielts/create');
+  };
 
   return (
-    <Table
-      columns={columns}
-      dataSource={tableData}
-      className={styles['admin-dashboard']}
-    />
+    <Context.Provider value={contextValue}>
+      {contextHolder}
+      <>
+        <div className={styles.control}>
+          <Search
+            placeholder="Nhập từ khóa cần tìm"
+            onSearch={onSearch}
+            style={{ width: 300 }}
+          />
+          {buddie && (
+            <button
+              className={styles['create-question-btn']}
+              onClick={createTest}
+            >
+              Tạo đề thi
+            </button>
+          )}
+        </div>
+        <Table
+          columns={columns}
+          dataSource={tableData}
+          className={styles['admin-dashboard']}
+          loading={isLoading || loading || isValidating}
+          locale={{ emptyText: isLoading ? ' ' : 'Không có dữ liệu' }}
+        />
+      </>
+    </Context.Provider>
   );
 };
 

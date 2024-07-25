@@ -1,4 +1,5 @@
 import { uploadBuffer } from '@/lib';
+import chalk from 'chalk';
 import { NextRequest, NextResponse } from 'next/server';
 import { v4 as uuid } from 'uuid';
 
@@ -8,7 +9,8 @@ export async function GET(request: NextRequest) {
   const test_type = searchParams.get('test_type');
   const search = searchParams.get('search');
   const isbuddie = searchParams.get('isbuddie');
-  let queryString = `${process.env.API_BASE_URL}/api/v1/tests?limit=10&offset=${offset}&access=public&is_buddie_test=${isbuddie}`;
+  const limit = searchParams.get('limit');
+  let queryString = `${process.env.API_BASE_URL}/api/v1/tests?limit=${limit || 10}&offset=${offset}&access=public&is_buddie_test=${isbuddie}`;
   if (test_type) {
     queryString += `&test_type=${test_type}`;
   }
@@ -22,6 +24,7 @@ export async function GET(request: NextRequest) {
       headers: request.headers,
     });
     const data = await response.json();
+    console.log(chalk.bgBlueBright('Get Tests Response:'), data);
     return NextResponse.json(data);
   } catch (error) {
     return NextResponse.json({ error });
@@ -271,6 +274,7 @@ export const POST = async function createTest(req: Request) {
       body: JSON.stringify(test),
     });
     const data = await response.json();
+    console.log(chalk.bgMagentaBright('Create Test Response'), data);
     return NextResponse.json(data);
   } catch (error) {
     console.error(error);

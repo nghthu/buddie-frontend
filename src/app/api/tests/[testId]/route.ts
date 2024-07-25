@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { v4 as uuid } from 'uuid';
 import { uploadBuffer } from '@/lib';
+import chalk from 'chalk';
 
 export async function GET(
   request: Request,
@@ -47,7 +48,10 @@ type Question = {
   question_preparation_time: number | null;
 };
 
-export const PUT = async function updateTest(req: NextRequest, { params }: { params: { testId: string } }) {
+export const PUT = async function updateTest(
+  req: NextRequest,
+  { params }: { params: { testId: string } }
+) {
   try {
     const testId = params.testId;
     const reqData = await req.formData();
@@ -175,7 +179,11 @@ export const PUT = async function updateTest(req: NextRequest, { params }: { par
 
               const questionGroup =
                 test.parts[partIndex].question_groups[questionGroupIndex];
-              if (!Array.isArray(questionGroup.question_groups_info.question_groups_image_urls)) {
+              if (
+                !Array.isArray(
+                  questionGroup.question_groups_info.question_groups_image_urls
+                )
+              ) {
                 questionGroup.question_groups_info.question_groups_image_urls =
                   [];
               }
@@ -253,14 +261,17 @@ export const PUT = async function updateTest(req: NextRequest, { params }: { par
     console.log(test.parts[0].question_groups[0]);
 
     console.log(test.parts[0].question_groups[0].questions[0]);
-    const response = await fetch(`${process.env.API_BASE_URL}/api/v1/tests/${testId}`, {
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: req.headers.get('Authorization') || '',
-      },
-      body: JSON.stringify(test),
-    });
+    const response = await fetch(
+      `${process.env.API_BASE_URL}/api/v1/tests/${testId}`,
+      {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: req.headers.get('Authorization') || '',
+        },
+        body: JSON.stringify(test),
+      }
+    );
     const data = await response.json();
     return NextResponse.json(data);
   } catch (error) {
@@ -269,19 +280,26 @@ export const PUT = async function updateTest(req: NextRequest, { params }: { par
   }
 };
 
-export async function DELETE(req: NextRequest, { params }: { params: { testId: string } }) {
+export async function DELETE(
+  req: NextRequest,
+  { params }: { params: { testId: string } }
+) {
   try {
     const testId = params.testId;
-    const response = await fetch(`${process.env.API_BASE_URL}/api/v1/tests/${testId}`, {
-      method: 'DELETE',
-      headers: {
-        Authorization: req.headers.get('Authorization') || '',
-      },
-    });
+    const response = await fetch(
+      `${process.env.API_BASE_URL}/api/v1/tests/${testId}`,
+      {
+        method: 'DELETE',
+        headers: {
+          Authorization: req.headers.get('Authorization') || '',
+        },
+      }
+    );
     const data = await response.json();
+    console.log(chalk.bgGreenBright('Delete Test Response: '), data);
     return NextResponse.json(data);
   } catch (error) {
     console.error(error);
     return NextResponse.json({ error });
   }
-};
+}

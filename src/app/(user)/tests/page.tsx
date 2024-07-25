@@ -22,6 +22,7 @@ const UserTestLibrary = () => {
 
   return (
     <>
+      {isAdmin && <AdminDashboard />}
       {!isAdmin && (
         <>
           <SkillHeader title={'Đề thi IELTS'}></SkillHeader>
@@ -31,7 +32,6 @@ const UserTestLibrary = () => {
           />
         </>
       )}
-      {isAdmin && <AdminDashboard />}
     </>
   );
 };
