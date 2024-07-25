@@ -144,24 +144,35 @@ const Community = () => {
     }
     formData.append('text', newPostValue);
 
-    const res = await fetch(`/api/questions`, {
+    await fetch(`/api/questions`, {
       method: 'POST',
       headers: {
         authorization: `Bearer ${token}`,
       },
       body: formData,
     }).then((res) => res.json());
-    console.log(res);
-    setTotalQuestions((prev) => {
-      const seen = new Set();
-      const returnRes = [res ?? {}, ...prev].filter((question) => {
-        if (seen.has(question._id)) return false;
-        seen.add(question._id);
-        return true;
-      });
-      return returnRes;
-    });
-    setOffset((prev) => prev + 1);
+    // console.log(res);
+    // setTotalQuestions((prev) => {
+    //   const seen = new Set();
+    //   const returnRes = [res ?? {}, ...prev].filter((question) => {
+    //     if (seen.has(question._id)) return false;
+    //     seen.add(question._id);
+    //     return true;
+    //   });
+    //   return returnRes;
+    // });
+    const res = await fetch(
+      `/api/community?offset=${0}&limit=${LIMIT}&text=${search}`,
+      {
+        method: 'GET',
+        headers: {
+          authorization: `Bearer ${token}`,
+        },
+      }
+    ).then((response) => response.json());
+    setSearch('');
+    setTotalQuestions(res.data.questions);
+    setOffset(0);
     handleCancelCreate();
     setLoadingCreate(false);
   };
@@ -219,7 +230,7 @@ const Community = () => {
     setTotalQuestions([]);
   };
 
-  const postData = totalQuestions.map((question: question) => {
+  const postData = (totalQuestions ?? [])?.map((question: question) => {
     return (
       <Post
         key={question._id}
@@ -275,7 +286,8 @@ const Community = () => {
               loader={<Spin size="small" />}
               scrollThreshold={1}
             >
-              {postData}
+              {isLoading && <Spin>{postData}</Spin>}
+              {!isLoading && postData}
             </InfiniteScroll>
           )}
         </Card>
